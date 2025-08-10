@@ -28,7 +28,6 @@ RUN dotnet publish "KnxMonitor/KnxMonitor.csproj" \
     --runtime linux-musl-x64 \
     --self-contained true \
     --output /app/publish \
-    -p:PublishTrimmed=true \
     -p:PublishSingleFile=true
 
 # Runtime stage
