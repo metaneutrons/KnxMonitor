@@ -49,8 +49,7 @@ public partial class KnxGroupAddressDatabase
         if (!IsValidEtsFormat(header))
         {
             throw new InvalidOperationException(
-                "Invalid CSV format. Expected ETS export format '3/1' with semicolon separation. "
-                    + "Header should contain: Main;Middle;Sub;Address;Central;Unfiltered;Description;DatapointType;Security"
+                "Invalid CSV format. Expected ETS export format '3/1' with semicolon separation."
             );
         }
 

@@ -69,6 +69,7 @@ public partial class KnxMonitorService : IKnxMonitorService, IAsyncDisposable
             this.LogStartingMonitoring(this._config.ConnectionType.ToString());
 
             // Load group address database if CSV path is provided
+            // Note: Application will exit with code 1 if CSV loading fails
             if (!string.IsNullOrEmpty(this._config.GroupAddressCsvPath))
             {
                 try
@@ -80,7 +81,8 @@ public partial class KnxMonitorService : IKnxMonitorService, IAsyncDisposable
                 catch (Exception ex)
                 {
                     this.LogFailedToLoadGroupAddressCsv(ex, ex.Message);
-                    this.LogContinuingWithoutGroupAddressDatabase();
+                    // Exit with error code when CSV loading fails
+                    Environment.Exit(1);
                 }
             }
             else
