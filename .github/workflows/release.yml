@@ -189,10 +189,25 @@ jobs:
             org.opencontainers.image.documentation=${{ github.server_url }}/${{ github.repository }}/blob/main/README.md
             org.opencontainers.image.licenses=GPL-3.0
 
+      - name: Download Linux binary for Docker
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-linux
+          path: ./docker-context
+
+      - name: Extract Linux binary and prepare Docker context
+        run: |
+          cd docker-context
+          tar -xzf ${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-linux-x64.tar.gz
+          mkdir -p publish
+          mv KnxMonitor publish/
+          cp ../Dockerfile .
+          ls -la publish/
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./docker-context
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
