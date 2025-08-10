@@ -207,8 +207,8 @@ jobs:
           sbom: true
 
   release:
-    needs: [calculate-version, build]
-    if: always() && needs.calculate-version.result == 'success' && needs.build.result == 'success'
+    needs: [calculate-version, build, docker]
+    if: always() && needs.calculate-version.result == 'success' && needs.build.result == 'success' && (needs.docker.result == 'success' || needs.docker.result == 'skipped')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -307,8 +307,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   update-homebrew:
-    needs: [calculate-version, release]
-    if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success'
+    needs: [calculate-version, release, docker]
+    if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success' && (needs.docker.result == 'success' || needs.docker.result == 'skipped')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: true  # Don't fail the entire release if Homebrew update fails
@@ -432,6 +432,21 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      - name: Check critical failures
+        run: |
+          # Fail immediately if Docker was requested but failed
+          if [[ "${{ inputs.create_docker }}" == "true" && "${{ needs.docker.result }}" == "failure" ]]; then
+            echo "❌ Docker build failed - this is a critical error when Docker is requested"
+            echo "Docker build was explicitly requested but failed. Stopping workflow."
+            exit 1
+          fi
+          
+          # Fail if core components failed
+          if [[ "${{ needs.build.result }}" != "success" || "${{ needs.release.result }}" != "success" ]]; then
+            echo "❌ Core release components failed"
+            exit 1
+          fi
+
       - name: Release Summary
         run: |
           echo "## 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY

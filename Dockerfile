@@ -21,6 +21,9 @@ RUN dotnet restore "KnxMonitor.sln"
 # Copy source code
 COPY . .
 
+# Create a temporary Directory.Build.props to disable GitVersion
+RUN echo '<Project><PropertyGroup><UseGitVersionTask>false</UseGitVersionTask><EnableGitVersionTask>false</EnableGitVersionTask></PropertyGroup></Project>' > Directory.Build.Docker.props
+
 # Build and publish
 WORKDIR "/src"
 RUN dotnet publish "KnxMonitor/KnxMonitor.csproj" \
@@ -34,7 +37,9 @@ RUN dotnet publish "KnxMonitor/KnxMonitor.csproj" \
     -p:AssemblyVersion=${VERSION} \
     -p:FileVersion=${VERSION} \
     -p:InformationalVersion=${VERSION} \
-    -p:UseGitVersionTask=false
+    -p:UseGitVersionTask=false \
+    -p:EnableGitVersionTask=false \
+    --property:DirectoryBuildPropsPath=../Directory.Build.Docker.props
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-alpine AS runtime
