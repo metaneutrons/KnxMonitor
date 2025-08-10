@@ -79,21 +79,22 @@ knxmonitor --connection-type routing --health-check-port 8080
 
 ## 📋 Version Information
 
-Get comprehensive version and build information:
+Get concise version and GitVersion information:
 
 ```bash
 knxmonitor --version
 ```
 
-**Output includes:**
-- **Version Information**: Assembly version, file version, and GitVersion details
-- **GitVersion Details**: Semantic version and build metadata
-- **Assembly Information**: Product, company, description, and copyright
-- **Runtime Information**: .NET version, OS, and architecture details
-- **Build Information**: Build date and assembly location
-- **Repository Information**: GitHub links for issues, releases, and documentation
+**Example output:**
+```
+Version:    1.0.1
+GitVersion: 1.0.1+Branch.main.Sha.8c6f5fd4d70c35e1d68e8fd5d0a7cb1e50bfbe21
+```
 
-Perfect for troubleshooting, support requests, and deployment verification.
+- **Version**: Semantic version from GitVersion
+- **GitVersion**: Full GitVersion string with build metadata and commit SHA
+
+Perfect for scripts, automation, and build verification.
 
 ## 📖 Documentation
 

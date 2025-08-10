@@ -37,7 +37,7 @@ This directory contains VS Code configuration files for optimal development expe
 - **watch**: Hot reload development mode
 - **test**: Runs unit tests
 - **clean**: Cleans build artifacts
-- **version**: Shows comprehensive version information
+- **version**: Shows concise version information with GitVersion details
 
 ### `launch.json` - Debug Configurations
 - **KnxMonitor - Router Mode**: Debug in IP routing mode
