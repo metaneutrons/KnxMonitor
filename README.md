@@ -1,7 +1,8 @@
 # KNX Monitor
 
 [![Build Status](https://github.com/metaneutrons/KnxMonitor/workflows/Build%20and%20Test/badge.svg)](https://github.com/metaneutrons/KnxMonitor/actions)
-[![Docker](https://github.com/metaneutrons/KnxMonitor/workflows/Build%20and%20Publish%20Docker%20Image/badge.svg)](https://github.com/metaneutrons/KnxMonitor/pkgs/container/knxmonitor)
+[![Release](https://github.com/metaneutrons/KnxMonitor/workflows/Release/badge.svg)](https://github.com/metaneutrons/KnxMonitor/actions)
+[![Docker](https://img.shields.io/badge/Docker-ghcr.io-blue)](https://github.com/metaneutrons/KnxMonitor/pkgs/container/knxmonitor)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/GPL-3.0)
 [![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/9.0)
 
