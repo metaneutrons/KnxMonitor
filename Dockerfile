@@ -30,7 +30,11 @@ RUN dotnet publish "KnxMonitor/KnxMonitor.csproj" \
     --output /app/publish \
     -p:PublishSingleFile=true \
     -p:UseAppHost=true \
-    -p:Version=${VERSION:-1.0.0}
+    -p:Version=${VERSION} \
+    -p:AssemblyVersion=${VERSION} \
+    -p:FileVersion=${VERSION} \
+    -p:InformationalVersion=${VERSION} \
+    -p:UseGitVersionTask=false
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-alpine AS runtime
