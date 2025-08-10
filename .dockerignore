@@ -1,0 +1,43 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+**/*.md
+docs/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Logs
+**/*.log
+
+# Test results
+**/TestResults/
+**/coverage*/
+
+# Temporary files
+**/temp/
+**/.tmp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Package files
+*.nupkg
+*.snupkg
+
+# Local config
+config/
+*.csv

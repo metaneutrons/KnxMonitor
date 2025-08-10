@@ -7,21 +7,23 @@ ARG VCS_REF
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 WORKDIR /src
 
-# Copy project files
+# Copy solution and project files
+COPY ["KnxMonitor.sln", "./"]
 COPY ["KnxMonitor/KnxMonitor.csproj", "KnxMonitor/"]
 COPY ["Directory.Build.props", "./"]
+COPY ["Directory.Packages.props", "./"]
 COPY ["GitVersion.props", "./"]
 COPY ["GitVersion.yml", "./"]
 
 # Restore dependencies
-RUN dotnet restore "KnxMonitor/KnxMonitor.csproj"
+RUN dotnet restore "KnxMonitor.sln"
 
 # Copy source code
 COPY . .
 
 # Build and publish
-WORKDIR "/src/KnxMonitor"
-RUN dotnet publish "KnxMonitor.csproj" \
+WORKDIR "/src"
+RUN dotnet publish "KnxMonitor/KnxMonitor.csproj" \
     --configuration Release \
     --runtime linux-musl-x64 \
     --self-contained true \
@@ -61,8 +63,8 @@ LABEL org.opencontainers.image.title="KNX Monitor" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.vendor="KnxMonitor" \
-      org.opencontainers.image.licenses="GPL-3.0-or-later" \
-      org.opencontainers.image.source="https://github.com/metaneutrons/KnxMonitor"
+      org.opencontainers.image.licenses="LGPL-3.0-or-later" \
+      org.opencontainers.image.source="https://github.com/yourusername/KnxMonitor"
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

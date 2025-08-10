@@ -2,26 +2,24 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-  
   <ItemGroup>
     <!-- KNX and Core Dependencies -->
-    <PackageVersion Include="Knx.Falcon.Sdk" Version="5.7.261" />
-    
+    <PackageVersion Include="Knx.Falcon.Sdk" Version="6.3.7959" />
     <!-- Microsoft Extensions -->
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.8" />
-    
     <!-- UI and Command Line -->
-    <PackageVersion Include="Spectre.Console" Version="0.49.1" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-    <PackageVersion Include="Terminal.Gui" Version="1.17.1" />
-    
+    <PackageVersion Include="Spectre.Console" Version="0.50.0" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta6.25358.103" />
+    <PackageVersion Include="Terminal.Gui" Version="2.0.0-develop.4533" />
     <!-- Utilities -->
-    <PackageVersion Include="Polly" Version="8.4.2" />
-    
+    <PackageVersion Include="Polly" Version="8.6.2" />
     <!-- Build and Versioning -->
-    <PackageVersion Include="GitVersion.MsBuild" Version="6.0.5" />
+    <PackageVersion Include="GitVersion.MsBuild" Version="6.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageVersion>
   </ItemGroup>
 </Project>
