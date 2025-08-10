@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Git tag to release (e.g., v1.0.0) - GitVersion will calculate the version"
-        required: true
+        description: "Git tag to release (e.g., v1.0.0) - Leave empty to auto-calculate from GitVersion"
+        required: false
         type: string
       create_docker:
         description: "Also create Docker image"
@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       version: ${{ steps.gitversion.outputs.semVer }}
-      tag: ${{ steps.gitversion.outputs.fullSemVer }}
+      tag: ${{ steps.determine-tag.outputs.tag }}
       informational-version: ${{ steps.gitversion.outputs.informationalVersion }}
       assembly-version: ${{ steps.gitversion.outputs.assemblySemVer }}
       is-prerelease: ${{ steps.gitversion.outputs.preReleaseLabel != '' }}
@@ -51,6 +51,20 @@ jobs:
         with:
           useConfigFile: true
 
+      - name: Determine Tag
+        id: determine-tag
+        run: |
+          if [[ -n "${{ needs.calculate-version.outputs.tag }}" ]]; then
+            # Use provided tag
+            TAG="${{ needs.calculate-version.outputs.tag }}"
+            echo "Using provided tag: $TAG"
+          else
+            # Auto-calculate tag from GitVersion
+            TAG="v${{ steps.gitversion.outputs.semVer }}"
+            echo "Auto-calculated tag: $TAG"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
       - name: Display GitVersion outputs
         run: |
           echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
@@ -58,6 +72,7 @@ jobs:
           echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
           echo "AssemblySemVer: ${{ steps.gitversion.outputs.assemblySemVer }}"
           echo "PreReleaseLabel: ${{ steps.gitversion.outputs.preReleaseLabel }}"
+          echo "Final Tag: ${{ steps.determine-tag.outputs.tag }}"
 
   build:
     needs: calculate-version
@@ -219,8 +234,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a ${{ github.event.inputs.tag }} -m "Release ${{ github.event.inputs.tag }}"
-          git push origin ${{ github.event.inputs.tag }}
+          git tag -a ${{ needs.calculate-version.outputs.tag }} -m "Release ${{ needs.calculate-version.outputs.tag }}"
+          git push origin ${{ needs.calculate-version.outputs.tag }}
 
       - name: Generate release notes
         id: release_notes
@@ -252,7 +267,7 @@ jobs:
           - **.NET Version**: 9.0
           - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
           - **Commit**: ${{ github.sha }}
-          - **Tag**: ${{ github.event.inputs.tag }}
+          - **Tag**: ${{ needs.calculate-version.outputs.tag }}
 
           ### 📋 Supported Platforms
           - **Windows x64** (knxmonitor-${{ needs.calculate-version.outputs.version }}-win-x64.zip)
@@ -275,13 +290,13 @@ jobs:
 
           ---
 
-          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ github.event.inputs.tag }}...HEAD
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ needs.calculate-version.outputs.tag }}...HEAD
           EOF
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.tag }}
+          tag_name: ${{ needs.calculate-version.outputs.tag }}
           name: "KNX Monitor ${{ needs.calculate-version.outputs.version }}"
           body_path: release_notes.md
           files: ./release-assets/*
@@ -393,7 +408,7 @@ jobs:
           echo "## 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version**: ${{ needs.calculate-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Tag**: ${{ github.event.inputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: ${{ needs.calculate-version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "**GitVersion**: ${{ needs.calculate-version.outputs.informational-version }}" >> $GITHUB_STEP_SUMMARY
           echo "**Prerelease**: ${{ needs.calculate-version.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -407,7 +422,7 @@ jobs:
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
-          echo "- [Release Page](https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.tag }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [Release Page](https://github.com/${{ github.repository }}/releases/tag/${{ needs.calculate-version.outputs.tag }})" >> $GITHUB_STEP_SUMMARY
           echo "- [Docker Image](https://github.com/${{ github.repository }}/pkgs/container/knxmonitor)" >> $GITHUB_STEP_SUMMARY
           echo "- [Homebrew Tap](https://github.com/metaneutrons/homebrew-tap)" >> $GITHUB_STEP_SUMMARY
 
@@ -422,7 +437,7 @@ jobs:
           echo "## 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version**: ${{ needs.calculate-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Tag**: ${{ github.event.inputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: ${{ needs.calculate-version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "**GitVersion**: ${{ needs.calculate-version.outputs.informational-version }}" >> $GITHUB_STEP_SUMMARY
           echo "**Prerelease**: ${{ needs.calculate-version.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -450,7 +465,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.release.result }}" == "success" ]]; then
-            echo "- [Release Page](https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.tag }})" >> $GITHUB_STEP_SUMMARY
+            echo "- [Release Page](https://github.com/${{ github.repository }}/releases/tag/${{ needs.calculate-version.outputs.tag }})" >> $GITHUB_STEP_SUMMARY
           fi
           if [[ "${{ needs.docker.result }}" == "success" ]]; then
             echo "- [Docker Image](https://github.com/${{ github.repository }}/pkgs/container/knxmonitor)" >> $GITHUB_STEP_SUMMARY
