@@ -156,7 +156,15 @@ jobs:
           security list-keychains -d user -s "$KEYCHAIN_PATH"
           
           # Import certificate
-          echo "$APPLE_CERTIFICATE_P12" | base64 --decode > certificate.p12
+          if [ -z "$APPLE_CERTIFICATE_P12" ]; then
+            echo "Error: APPLE_CERTIFICATE_P12 secret is empty"
+            exit 1
+          fi
+          echo "$APPLE_CERTIFICATE_P12" | base64 -D > certificate.p12
+          if [ ! -f certificate.p12 ] || [ ! -s certificate.p12 ]; then
+            echo "Error: Failed to decode certificate"
+            exit 1
+          fi
           security import certificate.p12 -k "$KEYCHAIN_PATH" -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           
