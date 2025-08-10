@@ -148,7 +148,7 @@ jobs:
           compression-level: 9
 
   docker:
-    needs: calculate-version
+    needs: [calculate-version, build]
     if: inputs.create_docker
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -192,7 +192,7 @@ jobs:
       - name: Download Linux binary for Docker
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.PROJECT_NAME }}-linux
+          name: ${{ env.PROJECT_NAME }}-linux-x64
           path: ./docker-context
 
       - name: Extract Linux binary and prepare Docker context
