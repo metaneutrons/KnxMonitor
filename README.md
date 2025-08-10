@@ -167,6 +167,27 @@ services:
 ### Prerequisites
 - [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [Git](https://git-scm.com/)
+- [VS Code](https://code.visualstudio.com/) (recommended)
+
+### VS Code Setup (Recommended)
+
+This project includes comprehensive VS Code configuration for optimal development experience:
+
+#### Quick Start
+1. Open the project in VS Code
+2. Install recommended extensions (VS Code will prompt)
+3. **Press Shift+Cmd+B** to build and run the application
+4. Use **F5** to debug with breakpoints
+
+#### Key Shortcuts
+- **Shift+Cmd+B**: Build and run in router mode (primary development shortcut)
+- **Shift+Cmd+R**: Run in IP routing mode
+- **Shift+Cmd+T**: Run in IP tunneling mode
+- **Shift+Cmd+W**: Watch mode (hot reload)
+- **F5**: Debug with breakpoints
+- **Cmd+K Cmd+T**: Run tests
+
+See [.vscode/README.md](.vscode/README.md) for complete VS Code documentation.
 
 ### Building from Source
 ```bash
