@@ -111,8 +111,6 @@ jobs:
             --self-contained true \
             --output ./publish/${{ matrix.runtime }} \
             -p:PublishSingleFile=true \
-            -p:PublishTrimmed=true \
-            -p:TrimMode=partial \
             --verbosity minimal
 
       - name: Create archive
