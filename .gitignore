@@ -71,3 +71,8 @@ config/
 logs/
 temp/
 publish/
+# Docker build context (temporary)
+docker-context/
+
+# Test publish directory
+test-publish/
