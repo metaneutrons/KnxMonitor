@@ -78,13 +78,20 @@ public static partial class Program
                 DefaultValueFactory = _ => 3671,
             };
 
-            Option<bool> verboseOption = new("--verbose", "-v") { Description = "Enable verbose logging" };
+            Option<bool> verboseOption = new("--verbose", "-v")
+            {
+                Description = "Enable verbose logging",
+            };
 
-            Option<string?> filterOption = new("--filter", "-f") { Description = "Group address filter pattern" };
+            Option<string?> filterOption = new("--filter", "-f")
+            {
+                Description = "Group address filter pattern",
+            };
 
             Option<string?> csvOption = new("--groupaddress-csv", "--csv")
             {
-                Description = "Path to KNX group address CSV file (ETS export format 3/1, semicolon separated)",
+                Description =
+                    "Path to KNX group address CSV file (ETS export format 3/1, semicolon separated)",
             };
 
             Option<bool> loggingModeOption = new("--logging-mode", "-l")
@@ -105,7 +112,9 @@ public static partial class Program
             };
 
             // Create root command using modern pattern
-            RootCommand rootCommand = new("KNX Monitor - Visual debugging tool for KNX/EIB bus activity");
+            RootCommand rootCommand = new(
+                "KNX Monitor - Visual debugging tool for KNX/EIB bus activity"
+            );
             rootCommand.Options.Add(gatewayOption);
             rootCommand.Options.Add(connectionTypeOption);
             rootCommand.Options.Add(multicastAddressOption);
@@ -126,7 +135,7 @@ public static partial class Program
                 Console.WriteLine(rootCommand.Description);
                 Console.WriteLine();
                 Console.WriteLine("Options:");
-                
+
                 // Define help entries explicitly for better control
                 var helpEntries = new[]
                 {
@@ -134,18 +143,24 @@ public static partial class Program
                     ("--version", "Show version information including GitVersion details"),
                     ("-g, --gateway", "KNX gateway address (required for tunnel connections only)"),
                     ("-c, --connection-type", "Connection type: tunnel (default), router, usb"),
-                    ("-m, --multicast-address", "Use router mode with multicast address (default: 224.0.23.12)"),
+                    (
+                        "-m, --multicast-address",
+                        "Use router mode with multicast address (default: 224.0.23.12)"
+                    ),
                     ("-p, --port", "Port number (default: 3671)"),
                     ("-v, --verbose", "Enable verbose logging"),
                     ("-f, --filter", "Group address filter pattern"),
-                    ("--csv, --groupaddress-csv", "Path to KNX group address CSV file (ETS export format)"),
+                    (
+                        "--csv, --groupaddress-csv",
+                        "Path to KNX group address CSV file (ETS export format)"
+                    ),
                     ("-l, --logging-mode", "Force simple logging mode instead of TUI"),
-                    ("--enable-health-check", "Enable HTTP health check service on port 8080")
+                    ("--enable-health-check", "Enable HTTP health check service on port 8080"),
                 };
 
                 foreach (var (aliases, description) in helpEntries)
                 {
-                    Console.WriteLine($"  {aliases, -27} {description}");
+                    Console.WriteLine($"  {aliases,-27} {description}");
                 }
                 return 0;
             }
@@ -205,7 +220,9 @@ public static partial class Program
             // Validate required parameters based on connection type
             if (connectionType.ToLowerInvariant() == "tunnel" && string.IsNullOrEmpty(gateway))
             {
-                Console.Error.WriteLine("Error: Gateway address is required for tunnel connections");
+                Console.Error.WriteLine(
+                    "Error: Gateway address is required for tunnel connections"
+                );
                 return 1;
             }
 
@@ -337,7 +354,10 @@ public static partial class Program
                         {
                             options.FormatterName = "knx";
                         });
-                        logging.AddConsoleFormatter<KnxConsoleFormatter, KnxConsoleFormatterOptions>();
+                        logging.AddConsoleFormatter<
+                            KnxConsoleFormatter,
+                            KnxConsoleFormatterOptions
+                        >();
                         logging.SetMinimumLevel(verbose ? LogLevel.Debug : LogLevel.Information);
                     }
                 })
@@ -357,7 +377,8 @@ public static partial class Program
                     // - Disabled by default in standalone mode (unless --enable-health-check is used)
                     bool shouldEnableHealthCheck =
                         enableHealthCheck
-                        || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+                        || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")
+                            == "true";
 
                     if (shouldEnableHealthCheck)
                     {
@@ -387,7 +408,8 @@ public static partial class Program
 
             // Conditionally get health check service (same logic as registration)
             bool shouldEnableHealthCheck =
-                enableHealthCheck || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+                enableHealthCheck
+                || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
 
             if (shouldEnableHealthCheck)
             {
@@ -397,14 +419,22 @@ public static partial class Program
             // Start health check service if enabled
             if (healthCheckService != null)
             {
-                await healthCheckService.StartAsync(8080, _applicationCancellationTokenSource.Token);
-                Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Health check service started on port 8080");
+                await healthCheckService.StartAsync(
+                    8080,
+                    _applicationCancellationTokenSource.Token
+                );
+                Console.WriteLine(
+                    $"[{DateTime.Now:HH:mm:ss.fff}] Health check service started on port 8080"
+                );
             }
 
             // Start monitoring service first
             try
             {
-                await StartMonitoringWithRetry(monitorService, _applicationCancellationTokenSource.Token);
+                await StartMonitoringWithRetry(
+                    monitorService,
+                    _applicationCancellationTokenSource.Token
+                );
             }
             catch (InvalidOperationException ex)
             {
@@ -413,18 +443,25 @@ public static partial class Program
             }
 
             // Start display service with proper lifecycle coordination
-            var displayTask = displayService.StartAsync(monitorService, _applicationCancellationTokenSource.Token);
+            var displayTask = displayService.StartAsync(
+                monitorService,
+                _applicationCancellationTokenSource.Token
+            );
 
             // Wait for either shutdown signal or display service completion
             var completedTask = await Task.WhenAny(displayTask, _shutdownCompletionSource.Task);
 
             if (completedTask == _shutdownCompletionSource.Task)
             {
-                Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Shutdown signal received, stopping services...");
+                Console.WriteLine(
+                    $"[{DateTime.Now:HH:mm:ss.fff}] Shutdown signal received, stopping services..."
+                );
             }
             else
             {
-                Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Display service completed, shutting down...");
+                Console.WriteLine(
+                    $"[{DateTime.Now:HH:mm:ss.fff}] Display service completed, shutting down..."
+                );
             }
 
             return 0; // Success
@@ -432,7 +469,9 @@ public static partial class Program
         catch (OperationCanceledException)
         {
             // Expected when Ctrl+C is pressed or cancellation is requested
-            Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Operation cancelled, shutting down gracefully...");
+            Console.WriteLine(
+                $"[{DateTime.Now:HH:mm:ss.fff}] Operation cancelled, shutting down gracefully..."
+            );
             return 0; // Normal shutdown
         }
         catch (Exception ex)
@@ -471,7 +510,9 @@ public static partial class Program
                 try
                 {
                     await healthCheckService.StopAsync();
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Health check service stopped");
+                    Console.WriteLine(
+                        $"[{DateTime.Now:HH:mm:ss.fff}] Health check service stopped"
+                    );
                 }
                 catch (Exception ex)
                 {
@@ -488,11 +529,15 @@ public static partial class Program
                 {
                     await displayService.StopAsync(_applicationCancellationTokenSource.Token);
                     await displayService.DisposeAsync();
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Display service stopped and disposed");
+                    Console.WriteLine(
+                        $"[{DateTime.Now:HH:mm:ss.fff}] Display service stopped and disposed"
+                    );
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Error stopping display service: {ex.Message}");
+                    Console.WriteLine(
+                        $"[{DateTime.Now:HH:mm:ss.fff}] Error stopping display service: {ex.Message}"
+                    );
                 }
             }
 
@@ -501,13 +546,19 @@ public static partial class Program
             {
                 try
                 {
-                    await monitorService.StopMonitoringAsync(_applicationCancellationTokenSource.Token);
+                    await monitorService.StopMonitoringAsync(
+                        _applicationCancellationTokenSource.Token
+                    );
                     await monitorService.DisposeAsync();
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Monitor service stopped and disposed");
+                    Console.WriteLine(
+                        $"[{DateTime.Now:HH:mm:ss.fff}] Monitor service stopped and disposed"
+                    );
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Error stopping monitor service: {ex.Message}");
+                    Console.WriteLine(
+                        $"[{DateTime.Now:HH:mm:ss.fff}] Error stopping monitor service: {ex.Message}"
+                    );
                 }
             }
 
@@ -522,7 +573,9 @@ public static partial class Program
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Error stopping host: {ex.Message}");
+                    Console.WriteLine(
+                        $"[{DateTime.Now:HH:mm:ss.fff}] Error stopping host: {ex.Message}"
+                    );
                 }
             }
 
@@ -535,13 +588,27 @@ public static partial class Program
     }
 
     /// <summary>
-    /// Displays the startup banner.
+    /// Displays the startup banner with version information.
     /// </summary>
     private static void DisplayStartupBanner()
     {
         AnsiConsole.Write(new FigletText("KNX Monitor").LeftJustified().Color(Color.Cyan1));
 
         AnsiConsole.MarkupLine("[dim]Visual debugging tool for KNX/EIB bus activity[/]");
+
+        // Display version information using GitVersion
+        try
+        {
+            AnsiConsole.MarkupLine($"[dim]Version: {GitVersionInformation.FullSemVer}[/]");
+        }
+        catch
+        {
+            // Fallback to assembly version if GitVersion is not available
+            var assembly = Assembly.GetExecutingAssembly();
+            var version = assembly.GetName().Version?.ToString(3) ?? "Unknown";
+            AnsiConsole.MarkupLine($"[dim]Version: {version}[/]");
+        }
+
         AnsiConsole.MarkupLine("[dim]Press Ctrl+C to stop monitoring[/]");
         AnsiConsole.WriteLine();
     }
@@ -577,16 +644,26 @@ public static partial class Program
     private static bool ValidateConfiguration(KnxMonitorConfig config)
     {
         // Gateway is only required for tunnel connections
-        if (config.ConnectionType == KnxConnectionType.Tunnel && string.IsNullOrEmpty(config.Gateway))
+        if (
+            config.ConnectionType == KnxConnectionType.Tunnel
+            && string.IsNullOrEmpty(config.Gateway)
+        )
         {
-            AnsiConsole.MarkupLine("[red]Error: Gateway address is required for tunnel connections[/]");
+            AnsiConsole.MarkupLine(
+                "[red]Error: Gateway address is required for tunnel connections[/]"
+            );
             return false;
         }
 
         // Validate multicast address for router connections
-        if (config.ConnectionType == KnxConnectionType.Router && string.IsNullOrEmpty(config.MulticastAddress))
+        if (
+            config.ConnectionType == KnxConnectionType.Router
+            && string.IsNullOrEmpty(config.MulticastAddress)
+        )
         {
-            AnsiConsole.MarkupLine("[red]Error: Multicast address is required for router connections[/]");
+            AnsiConsole.MarkupLine(
+                "[red]Error: Multicast address is required for router connections[/]"
+            );
             return false;
         }
 
@@ -648,7 +725,8 @@ public static partial class Program
             )
             .WaitAndRetryAsync(
                 retryCount: 3,
-                sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), // Exponential backoff: 2s, 4s, 8s
+                sleepDurationProvider: retryAttempt =>
+                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), // Exponential backoff: 2s, 4s, 8s
                 onRetry: (exception, timespan, retryCount, context) =>
                 {
                     Console.WriteLine(
@@ -674,12 +752,16 @@ public static partial class Program
 
         try
         {
-            Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Starting KNX connection with retry policy...");
+            Console.WriteLine(
+                $"[{DateTime.Now:HH:mm:ss.fff}] Starting KNX connection with retry policy..."
+            );
 
             await retryPolicy.ExecuteAsync(
                 async (ct) =>
                 {
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Attempting KNX connection...");
+                    Console.WriteLine(
+                        $"[{DateTime.Now:HH:mm:ss.fff}] Attempting KNX connection..."
+                    );
 
                     // Create a timeout for each individual attempt
                     using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
@@ -687,7 +769,9 @@ public static partial class Program
 
                     await monitorService.StartMonitoringAsync(timeoutCts.Token);
 
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] KNX Monitor connection successful");
+                    Console.WriteLine(
+                        $"[{DateTime.Now:HH:mm:ss.fff}] KNX Monitor connection successful"
+                    );
                 },
                 cancellationToken
             );
@@ -701,16 +785,21 @@ public static partial class Program
         {
             var errorMessage = ex switch
             {
-                SocketException socketEx when socketEx.SocketErrorCode == SocketError.AddressAlreadyInUse =>
+                SocketException socketEx
+                    when socketEx.SocketErrorCode == SocketError.AddressAlreadyInUse =>
                     "Address already in use. Another KNX application may be running.",
-                SocketException socketEx when socketEx.SocketErrorCode == SocketError.NetworkUnreachable =>
+                SocketException socketEx
+                    when socketEx.SocketErrorCode == SocketError.NetworkUnreachable =>
                     "Network unreachable. Check your network connection and KNX gateway.",
                 SocketException socketEx when socketEx.SocketErrorCode == SocketError.TimedOut =>
                     "Connection timed out. Check if the KNX gateway is reachable.",
                 _ => ex.Message,
             };
 
-            throw new InvalidOperationException($"Failed to connect after 4 attempts. Last error: {errorMessage}", ex);
+            throw new InvalidOperationException(
+                $"Failed to connect after 4 attempts. Last error: {errorMessage}",
+                ex
+            );
         }
     }
 
@@ -720,15 +809,22 @@ public static partial class Program
     private static void DisplayVersionInformation()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        
+
         // Get version information
-        var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Unknown";
+        var informationalVersion =
+            assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "Unknown";
 
         // Extract semantic version from informational version
         var semanticVersion = informationalVersion;
         if (informationalVersion.Contains("+") || informationalVersion.Contains("-"))
         {
-            var parts = informationalVersion.Split(new[] { '+', '-' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            var parts = informationalVersion.Split(
+                new[] { '+', '-' },
+                2,
+                StringSplitOptions.RemoveEmptyEntries
+            );
             if (parts.Length > 0)
             {
                 semanticVersion = parts[0];
