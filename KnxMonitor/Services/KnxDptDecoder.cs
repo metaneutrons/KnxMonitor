@@ -37,29 +37,44 @@ public partial class KnxDptDecoder
 
         try
         {
+            // Debug logging
+            this._logger.LogDebug("Attempting to decode value with DPT: {DptString}", dptString);
+            
             // Get or create DPT converter
             var datapointSubtype = GetDatapointSubtype(dptString);
             if (datapointSubtype == null)
             {
+                this._logger.LogDebug("Could not find DatapointSubtype for DPT: {DptString}", dptString);
                 return null;
             }
+
+            this._logger.LogDebug("Found DatapointSubtype: {SubtypeName} for DPT: {DptString}", datapointSubtype.Name, dptString);
 
             // Create DPT converter using Falcon SDK
             var dptConverter = DptFactory.Default.Create(datapointSubtype);
             if (dptConverter == null)
             {
+                this._logger.LogDebug("DptFactory.Default.Create returned null for DPT: {DptString}", dptString);
                 return null;
             }
+
+            this._logger.LogDebug("Created DPT converter: {ConverterType} for DPT: {DptString}", dptConverter.GetType().Name, dptString);
 
             // Check if conversion is possible
             if (!dptConverter.CanConvertToValue(groupValue))
             {
+                this._logger.LogDebug("DPT converter cannot convert GroupValue for DPT: {DptString}", dptString);
                 return null;
             }
 
             // Decode using Falcon SDK
             var decodedValue = dptConverter.ToValue(groupValue);
-            return FormatDecodedValue(decodedValue, dptString);
+            var formattedValue = FormatDecodedValue(decodedValue, dptString);
+            
+            this._logger.LogDebug("Successfully decoded value: {DecodedValue} -> {FormattedValue} for DPT: {DptString}", 
+                decodedValue, formattedValue, dptString);
+            
+            return formattedValue;
         }
         catch (Exception ex)
         {
