@@ -224,9 +224,25 @@ See [.vscode/README.md](.vscode/README.md) for complete VS Code documentation.
 ```bash
 git clone https://github.com/metaneutrons/KnxMonitor.git
 cd KnxMonitor
+dotnet tool restore
 dotnet restore
 dotnet build --configuration Release
 ```
+
+### Git Hooks Setup (Recommended)
+
+For consistent code quality and conventional commits:
+
+```bash
+./setup-hooks.sh
+```
+
+This installs Git hooks that:
+- ✅ Validate conventional commit messages
+- ✅ Format code automatically with CSharpier
+- ✅ Build project before commits
+- ✅ Run tests before pushes
+- ✅ Provide commit message templates
 
 ### Running Tests
 
