@@ -130,7 +130,9 @@ jobs:
 
       - name: Build and publish
         run: |
+          echo "DEBUG: Building for runtime: ${{ matrix.runtime }}"
           if [[ "${{ matrix.runtime }}" == "linux-x64" || "${{ matrix.runtime }}" == "linux-arm64" ]]; then
+            echo "DEBUG: Using framework-dependent deployment for Linux"
             # Framework-dependent deployment for Docker (Linux)
             dotnet publish ${{ env.PROJECT_NAME }} \
               --configuration Release \
@@ -139,6 +141,7 @@ jobs:
               --output ./publish/${{ matrix.runtime }} \
               --verbosity minimal
           else
+            echo "DEBUG: Using self-contained deployment for non-Linux platforms"
             # Self-contained deployment without single-file for other platforms
             dotnet publish ${{ env.PROJECT_NAME }} \
               --configuration Release \
@@ -147,6 +150,8 @@ jobs:
               --output ./publish/${{ matrix.runtime }} \
               --verbosity minimal
           fi
+          echo "DEBUG: Build completed. Checking output:"
+          ls -la ./publish/${{ matrix.runtime }}/ | head -10
 
       - name: Code sign macOS binaries
         if: startsWith(matrix.runtime, 'osx-')
