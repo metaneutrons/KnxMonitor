@@ -136,6 +136,8 @@ jobs:
             --self-contained true \
             --output ./publish/${{ matrix.runtime }} \
             -p:PublishSingleFile=true \
+            -p:PublishTrimmed=false \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
             --verbosity minimal
 
       - name: Code sign macOS binaries
