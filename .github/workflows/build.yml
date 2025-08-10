@@ -2,6 +2,8 @@ name: Build and Test
 
 permissions:
   contents: read
+  checks: write # For test results
+  pull-requests: write # For PR comments
 
 on:
   workflow_dispatch:
@@ -22,25 +24,96 @@ on:
       - "docs/**"
       - "homebrew/**"
 
+env:
+  DOTNET_VERSION: '9.0.x'
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
 jobs:
-  build:
+  # Fast feedback job for basic validation
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.gitversion.outputs.semVer }}
+      should-build: ${{ steps.changes.outputs.src }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for source changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'KnxMonitor/**'
+              - '**/*.csproj'
+              - '**/*.sln'
+              - 'Directory.*.props'
+              - 'GitVersion.*'
+
+      - name: Setup .NET
+        if: steps.changes.outputs.src == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install GitVersion
+        if: steps.changes.outputs.src == 'true'
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: "6.x"
+
+      - name: Determine version
+        if: steps.changes.outputs.src == 'true'
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.10.2
+
+      - name: Restore dependencies
+        if: steps.changes.outputs.src == 'true'
+        run: dotnet restore --verbosity minimal
+
+      - name: Build (validation only)
+        if: steps.changes.outputs.src == 'true'
+        run: dotnet build --configuration Debug --no-restore --verbosity minimal
+
+  # Comprehensive build and test matrix
+  build-and-test:
+    needs: validate
+    if: needs.validate.outputs.should-build == 'true'
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            runtime: linux-x64
+            artifact-name: linux
+          - os: windows-latest
+            runtime: win-x64
+            artifact-name: windows
+          - os: macos-latest
+            runtime: osx-x64
+            artifact-name: macos-x64
+          - os: macos-latest
+            runtime: osx-arm64
+            artifact-name: macos-arm64
     
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Full history for GitVersion
-          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0.x"
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.10.2
@@ -51,58 +124,99 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
 
-      - name: Display version
-        run: |
-          echo "Version: ${{ steps.gitversion.outputs.semVer }}"
-          echo "AssemblyVersion: ${{ steps.gitversion.outputs.assemblySemVer }}"
-          echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore --verbosity minimal
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore --verbosity minimal
 
       - name: Test
-        run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+        run: |
+          dotnet test --configuration Release --no-build --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            --logger "trx;LogFileName=test-results.trx"
 
-      - name: Upload coverage reports
-        if: matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v3
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always() && matrix.os == 'ubuntu-latest'
         with:
-          files: '**/coverage.cobertura.xml'
-          fail_ci_if_error: false
+          name: Test Results (${{ matrix.os }})
+          path: './TestResults/*.trx'
+          reporter: dotnet-trx
+          fail-on-error: false
 
-      - name: Publish artifacts (Linux)
+      - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v4
+        with:
+          files: './TestResults/*/coverage.cobertura.xml'
+          fail_ci_if_error: false
+          verbose: true
+
+      - name: Publish artifacts
         run: |
           dotnet publish KnxMonitor/KnxMonitor.csproj \
             --configuration Release \
-            --runtime linux-x64 \
+            --runtime ${{ matrix.runtime }} \
             --self-contained true \
-            --output ./publish/linux-x64
-
-      - name: Publish artifacts (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          dotnet publish KnxMonitor/KnxMonitor.csproj `
-            --configuration Release `
-            --runtime win-x64 `
-            --self-contained true `
-            --output ./publish/win-x64
-
-      - name: Publish artifacts (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          dotnet publish KnxMonitor/KnxMonitor.csproj \
-            --configuration Release \
-            --runtime osx-x64 \
-            --self-contained true \
-            --output ./publish/osx-x64
+            --output ./publish/${{ matrix.runtime }} \
+            -p:PublishSingleFile=true \
+            -p:PublishTrimmed=true \
+            -p:TrimMode=partial
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: knxmonitor-${{ matrix.os }}-${{ steps.gitversion.outputs.semVer }}
-          path: ./publish/
-          retention-days: 30
+          name: knxmonitor-${{ matrix.artifact-name }}-${{ needs.validate.outputs.version }}
+          path: ./publish/${{ matrix.runtime }}/
+          retention-days: 7
+          compression-level: 9
+
+  # Security scanning
+  security-scan:
+    needs: validate
+    if: needs.validate.outputs.should-build == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore --verbosity minimal
+
+      - name: Run security scan
+        run: |
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable-packages.txt
+          if grep -q "has the following vulnerable packages" vulnerable-packages.txt; then
+            echo "::warning::Vulnerable packages detected"
+            cat vulnerable-packages.txt
+          fi
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+          queries: security-and-quality
+
+      - name: Build for CodeQL
+        run: dotnet build --configuration Release --verbosity minimal
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

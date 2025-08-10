@@ -1,0 +1,324 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to release (e.g., v1.0.0) - GitVersion will calculate the version'
+        required: true
+        type: string
+      create_docker:
+        description: 'Also create Docker image'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  PROJECT_NAME: 'KnxMonitor'
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  calculate-version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.gitversion.outputs.semVer }}
+      tag: ${{ steps.gitversion.outputs.fullSemVer }}
+      informational-version: ${{ steps.gitversion.outputs.informationalVersion }}
+      assembly-version: ${{ steps.gitversion.outputs.assemblySemVer }}
+      is-prerelease: ${{ steps.gitversion.outputs.preReleaseLabel != '' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: '6.x'
+
+      - name: Create and checkout tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ github.event.inputs.tag }}
+          git checkout ${{ github.event.inputs.tag }}
+
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.10.2
+        with:
+          useConfigFile: true
+
+      - name: Display GitVersion outputs
+        run: |
+          echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+          echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
+          echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
+          echo "AssemblySemVer: ${{ steps.gitversion.outputs.assemblySemVer }}"
+          echo "PreReleaseLabel: ${{ steps.gitversion.outputs.preReleaseLabel }}"
+
+  build:
+    needs: calculate-version
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [win-x64, linux-x64, osx-x64, osx-arm64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout tag
+        run: git checkout ${{ github.event.inputs.tag }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: '6.x'
+
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.10.2
+        with:
+          useConfigFile: true
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore --verbosity minimal
+
+      - name: Run tests
+        run: dotnet test --configuration Release --verbosity normal --no-restore
+
+      - name: Build and publish
+        run: |
+          dotnet publish ${{ env.PROJECT_NAME }} \
+            --configuration Release \
+            --runtime ${{ matrix.runtime }} \
+            --self-contained true \
+            --output ./publish/${{ matrix.runtime }} \
+            -p:PublishSingleFile=true \
+            -p:PublishTrimmed=true \
+            -p:TrimMode=partial \
+            --verbosity minimal
+
+      - name: Create archive
+        run: |
+          cd ./publish/${{ matrix.runtime }}
+          if [[ "${{ matrix.runtime }}" == win-* ]]; then
+            zip -r ../../${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-${{ matrix.runtime }}.zip .
+          else
+            tar -czf ../../${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-${{ matrix.runtime }}.tar.gz .
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-${{ matrix.runtime }}
+          path: |
+            *.zip
+            *.tar.gz
+          retention-days: 1
+          compression-level: 9
+
+  docker:
+    needs: calculate-version
+    if: inputs.create_docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout tag
+        run: git checkout ${{ github.event.inputs.tag }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}
+          tags: |
+            type=raw,value=${{ needs.calculate-version.outputs.version }}
+            type=raw,value=latest,enable=${{ needs.calculate-version.outputs.is-prerelease == 'false' }}
+          labels: |
+            org.opencontainers.image.title=KNX Monitor
+            org.opencontainers.image.description=Professional KNX/EIB bus monitoring and debugging tool
+            org.opencontainers.image.vendor=metaneutrons
+            org.opencontainers.image.version=${{ needs.calculate-version.outputs.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.documentation=${{ github.server_url }}/${{ github.repository }}/blob/main/README.md
+            org.opencontainers.image.licenses=GPL-3.0
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ needs.calculate-version.outputs.version }}
+            BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+            VCS_REF=${{ github.sha }}
+          provenance: true
+          sbom: true
+
+  release:
+    needs: [calculate-version, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p ./release-assets
+          find ./artifacts -name "*.zip" -o -name "*.tar.gz" | xargs -I {} cp {} ./release-assets/
+          ls -la ./release-assets/
+
+      - name: Push Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin ${{ github.event.inputs.tag }}
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat << EOF > release_notes.md
+          ## 🚀 KNX Monitor ${{ needs.calculate-version.outputs.version }}
+          
+          ### 📋 Version Information
+          - **Version**: ${{ needs.calculate-version.outputs.version }}
+          - **GitVersion**: ${{ needs.calculate-version.outputs.informational-version }}
+          - **Assembly Version**: ${{ needs.calculate-version.outputs.assembly-version }}
+          
+          ### 📦 Installation
+          
+          #### Homebrew (macOS/Linux)
+          \`\`\`bash
+          brew install metaneutrons/tap/knxmonitor
+          \`\`\`
+          
+          #### Docker
+          \`\`\`bash
+          docker run --rm -it ghcr.io/metaneutrons/knxmonitor:${{ needs.calculate-version.outputs.version }} --help
+          \`\`\`
+          
+          #### Manual Installation
+          Download the appropriate binary for your platform from the assets below.
+          
+          ### 🏗️ Build Information
+          - **.NET Version**: 9.0
+          - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - **Commit**: ${{ github.sha }}
+          - **Tag**: ${{ github.event.inputs.tag }}
+          
+          ### 📋 Supported Platforms
+          - **Windows x64** (knxmonitor-${{ needs.calculate-version.outputs.version }}-win-x64.zip)
+          - **Linux x64** (knxmonitor-${{ needs.calculate-version.outputs.version }}-linux-x64.tar.gz)
+          - **macOS x64** (knxmonitor-${{ needs.calculate-version.outputs.version }}-osx-x64.tar.gz)
+          - **macOS ARM64** (knxmonitor-${{ needs.calculate-version.outputs.version }}-osx-arm64.tar.gz)
+          - **Docker** (ghcr.io/metaneutrons/knxmonitor:${{ needs.calculate-version.outputs.version }})
+          
+          ### 🔧 Quick Start
+          \`\`\`bash
+          # Show version
+          knxmonitor --version
+          
+          # Monitor KNX bus via IP routing
+          knxmonitor --connection-type routing
+          
+          # Monitor with IP tunneling
+          knxmonitor --connection-type tunneling --host 192.168.1.100
+          \`\`\`
+          
+          ---
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ github.event.inputs.tag }}...HEAD
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: "KNX Monitor ${{ needs.calculate-version.outputs.version }}"
+          body_path: release_notes.md
+          files: ./release-assets/*
+          draft: false
+          prerelease: ${{ needs.calculate-version.outputs.is-prerelease == 'true' }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Summary
+        run: |
+          echo "## 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ needs.calculate-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: ${{ github.event.inputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "**GitVersion**: ${{ needs.calculate-version.outputs.informational-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Prerelease**: ${{ needs.calculate-version.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Assets" >> $GITHUB_STEP_SUMMARY
+          echo "- $(ls -1 ./release-assets/ | wc -l) platform binaries" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ inputs.create_docker }}" == "true" ]]; then
+            echo "- Docker image: \`ghcr.io/metaneutrons/knxmonitor:${{ needs.calculate-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
+          echo "- [Release Page](https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.tag }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [Docker Image](https://github.com/${{ github.repository }}/pkgs/container/knxmonitor)" >> $GITHUB_STEP_SUMMARY
