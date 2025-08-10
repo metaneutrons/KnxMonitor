@@ -1,0 +1,41 @@
+mode: ContinuousDeployment
+assembly-versioning-scheme: MajorMinorPatch
+assembly-file-versioning-scheme: MajorMinorPatch
+assembly-informational-format: '{InformationalVersion}'
+tag-prefix: '[vV]'
+major-version-bump-message: '\+semver:\s?(breaking|major)'
+minor-version-bump-message: '\+semver:\s?(feature|minor)'
+patch-version-bump-message: '\+semver:\s?(fix|patch)'
+
+branches:
+  main:
+    regex: ^main$
+    label: ''
+    increment: Patch
+    is-release-branch: true
+
+  develop:
+    regex: ^develop$
+    label: beta
+    increment: Minor
+
+  feature:
+    regex: ^features?[/-]
+    label: alpha
+    increment: Minor
+
+  hotfix:
+    regex: ^hotfix(es)?[/-]
+    label: beta
+    increment: Patch
+
+  release:
+    regex: ^releases?[/-]
+    label: rc
+    increment: None
+    is-release-branch: true
+
+  pull-request:
+    regex: ^(pull|pull\-requests|pr)[/-]
+    label: pr
+    increment: Inherit

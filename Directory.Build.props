@@ -1,0 +1,30 @@
+<Project>
+  <Import Project="GitVersion.props" />
+  
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    
+    <!-- Assembly Information -->
+    <Product>KNX Monitor</Product>
+    <Company>KnxMonitor</Company>
+    <Authors>KnxMonitor Contributors</Authors>
+    <Copyright>Copyright © $(Company) $([System.DateTime]::Now.Year)</Copyright>
+    <Description>Enterprise-grade KNX/EIB bus monitoring and debugging tool</Description>
+    
+    <!-- Repository Information -->
+    <RepositoryUrl>https://github.com/metaneutrons/KnxMonitor</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    
+    <!-- Build Configuration -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>

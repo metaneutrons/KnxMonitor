@@ -1,0 +1,38 @@
+services:
+  # KNX Monitor - Development with hot reload
+  knx-monitor-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - .:/app:cached # Mount source code for hot reload
+      - ../Directory.Packages.props:/Directory.Packages.props:ro # Central package management
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+      - DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
+    networks:
+      - snapdog-dev
+    stdin_open: true
+    tty: true
+    profiles: ["dev"]
+
+  # KNX Monitor - Production
+  knx-monitor:
+    build:
+      context: ..
+      dockerfile: KnxMonitor/Dockerfile
+      target: production
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+    networks:
+      - snapdog-dev
+    stdin_open: true
+    tty: true
+    profiles: ["prod"]
+
+networks:
+  snapdog-dev:
+    external: true
+    name: snapdog_snapdog-dev

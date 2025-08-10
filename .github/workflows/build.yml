@@ -1,0 +1,110 @@
+name: Build and Test
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths-ignore:
+      - ".gitignore"
+      - ".github/**"
+      - "**/*.md"
+      - "docs/**"
+      - "homebrew/**"
+  pull_request:
+    branches: [main, develop]
+    paths-ignore:
+      - ".gitignore"
+      - ".github/**"
+      - "**/*.md"
+      - "docs/**"
+      - "homebrew/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for GitVersion
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: "6.x"
+
+      - name: Determine version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.10.2
+
+      - name: Display version
+        run: |
+          echo "Version: ${{ steps.gitversion.outputs.semVer }}"
+          echo "AssemblyVersion: ${{ steps.gitversion.outputs.assemblySemVer }}"
+          echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+      - name: Upload coverage reports
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v3
+        with:
+          files: '**/coverage.cobertura.xml'
+          fail_ci_if_error: false
+
+      - name: Publish artifacts (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          dotnet publish KnxMonitor/KnxMonitor.csproj \
+            --configuration Release \
+            --runtime linux-x64 \
+            --self-contained true \
+            --output ./publish/linux-x64
+
+      - name: Publish artifacts (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          dotnet publish KnxMonitor/KnxMonitor.csproj `
+            --configuration Release `
+            --runtime win-x64 `
+            --self-contained true `
+            --output ./publish/win-x64
+
+      - name: Publish artifacts (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          dotnet publish KnxMonitor/KnxMonitor.csproj \
+            --configuration Release \
+            --runtime osx-x64 \
+            --self-contained true \
+            --output ./publish/osx-x64
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: knxmonitor-${{ matrix.os }}-${{ steps.gitversion.outputs.semVer }}
+          path: ./publish/
+          retention-days: 30
