@@ -191,6 +191,7 @@ jobs:
                    --verbose \
                    --force \
                    --options runtime \
+                   --entitlements entitlements.plist \
                    --timestamp \
                    "$BINARY_PATH"
           
