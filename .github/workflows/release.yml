@@ -282,9 +282,9 @@ jobs:
           # Copy entire framework-dependent deployment
           cp -r * ../../docker-context/publish-arm64/
           
-          # Copy Dockerfile
+          # Copy CI/CD Dockerfile
           cd ../..
-          cp Dockerfile docker-context/
+          cp Dockerfile.ci docker-context/Dockerfile
           
           # Verify binaries
           echo "AMD64 deployment:"

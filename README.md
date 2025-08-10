@@ -36,6 +36,16 @@ brew install metaneutrons/tap/knxmonitor
 docker run --rm -it ghcr.io/metaneutrons/knxmonitor:latest --help
 ```
 
+#### Local Docker Build
+
+```bash
+# Git-based build (default Dockerfile)
+docker build -t knxmonitor:local .
+
+# CI/CD build (requires pre-built binaries)
+docker build -f Dockerfile.ci -t knxmonitor:ci .
+```
+
 #### Manual Installation
 
 Download the latest release from [GitHub Releases](https://github.com/metaneutrons/KnxMonitor/releases).
