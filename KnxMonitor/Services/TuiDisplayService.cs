@@ -10,7 +10,7 @@ namespace KnxMonitor.Services;
 
 /// <summary>
 /// Award-worthy Terminal.Gui V2 implementation for KNX Monitor.
-/// Provides enterprise-grade windowed interface with proper V2 API compatibility and coordinated shutdown.
+/// Provides windowed interface with proper V2 API compatibility and coordinated shutdown.
 /// </summary>
 public partial class TuiDisplayService : IDisplayService
 {

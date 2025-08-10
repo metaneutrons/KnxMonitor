@@ -5,7 +5,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/GPL-3.0)
 [![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/9.0)
 
-> **Enterprise-grade KNX/EIB bus monitoring and debugging tool built with modern .NET 9**
+> **KNX/EIB bus monitoring and debugging tool built with modern .NET 9**
 
 KNX Monitor is a professional-grade command-line application for monitoring, debugging, and analyzing KNX/EIB building automation networks. Built with enterprise-level architecture patterns, it provides real-time visualization of KNX bus traffic with comprehensive logging and analysis capabilities.
 
@@ -27,7 +27,7 @@ KNX Monitor is a professional-grade command-line application for monitoring, deb
 
 ### 🔧 **Professional Features**
 - **Health check endpoints** for monitoring integration
-- **Configuration validation** with enterprise-grade constants
+- **Configuration validation** with constants
 - **Custom console formatting** for clean output
 - **Docker containerization** with multi-architecture support
 - **Cross-platform compatibility** (Windows, macOS, Linux)
@@ -192,7 +192,7 @@ dotnet build --configuration Debug
 
 ## 🏗️ Architecture
 
-KNX Monitor follows enterprise-grade architectural patterns:
+KNX Monitor follows architectural patterns:
 
 ### **Clean Architecture**
 - **Domain Layer**: Core KNX protocol handling
@@ -271,4 +271,4 @@ This project is licensed under the GNU Lesser General Public License v3.0 or lat
 
 ---
 
-**Built with ❤️ using .NET 9 and enterprise-grade architecture patterns**
+**Built with ❤️ using .NET 9 and architecture patterns**

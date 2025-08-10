@@ -15,7 +15,7 @@
     <Company>KnxMonitor</Company>
     <Authors>KnxMonitor Contributors</Authors>
     <Copyright>Copyright © $(Company) $([System.DateTime]::Now.Year)</Copyright>
-    <Description>Enterprise-grade KNX/EIB bus monitoring and debugging tool</Description>
+    <Description>KNX/EIB bus monitoring and debugging tool</Description>
     
     <!-- Repository Information -->
     <RepositoryUrl>https://github.com/metaneutrons/KnxMonitor</RepositoryUrl>

@@ -1,5 +1,5 @@
 class Knxmonitor < Formula
-  desc "Enterprise-grade KNX/EIB bus monitoring and debugging tool"
+  desc "KNX/EIB bus monitoring and debugging tool"
   homepage "https://github.com/metaneutrons/KnxMonitor"
   url "https://github.com/metaneutrons/KnxMonitor/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "0000000000000000000000000000000000000000000000000000000000000000" # Will be updated with actual SHA

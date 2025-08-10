@@ -58,13 +58,13 @@ USER knxmonitor
 
 # Add labels
 LABEL org.opencontainers.image.title="KNX Monitor" \
-      org.opencontainers.image.description="Enterprise-grade KNX/EIB bus monitoring and debugging tool" \
+      org.opencontainers.image.description="KNX/EIB bus monitoring and debugging tool" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.vendor="KnxMonitor" \
       org.opencontainers.image.licenses="LGPL-3.0-or-later" \
-      org.opencontainers.image.source="https://github.com/yourusername/KnxMonitor"
+      org.opencontainers.image.source="https://github.com/metaneutrons/KnxMonitor"
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

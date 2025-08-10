@@ -78,7 +78,7 @@ Data: 860C -> Value: -5 -> Formatted: -5,0°C
 
 ### Interactive Mode (Terminal.Gui V2)
 
-When running in an interactive terminal, KNX Monitor automatically launches the **enterprise-grade Terminal.Gui V2 interface**:
+When running in an interactive terminal, KNX Monitor automatically launches the **Terminal.Gui V2 interface**:
 
 ### Logging Mode (Console Output)
 
@@ -327,7 +327,7 @@ KnxMonitor/
 ### Dependencies
 
 - **Knx.Falcon.Sdk**: KNX/EIB communication
-- **Terminal.Gui V2**: Enterprise-grade Terminal User Interface
+- **Terminal.Gui V2**: Terminal User Interface
 - **System.CommandLine**: Command-line argument parsing
 - **Spectre.Console**: Beautiful console output for logging mode
 - **Microsoft.Extensions.Hosting**: Dependency injection and hosting

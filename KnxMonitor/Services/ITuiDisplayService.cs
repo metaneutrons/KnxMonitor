@@ -1,7 +1,7 @@
 namespace KnxMonitor.Services;
 
 /// <summary>
-/// Enterprise-grade Terminal User Interface service for KNX Monitor.
+/// Terminal User Interface service for KNX Monitor.
 /// Provides rich, interactive display capabilities using Terminal.Gui V2.
 /// </summary>
 public interface ITuiDisplayService : IAsyncDisposable

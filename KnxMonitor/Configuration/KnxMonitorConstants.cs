@@ -2,7 +2,7 @@ namespace KnxMonitor.Configuration;
 
 /// <summary>
 /// Constants for KNX Monitor configuration and validation.
-/// Provides enterprise-grade configuration boundaries and limits.
+/// Provides configuration boundaries and limits.
 /// </summary>
 public static class KnxMonitorConstants
 {

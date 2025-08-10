@@ -334,7 +334,7 @@ public partial class KnxMonitorService : IKnxMonitorService, IAsyncDisposable
         // Format value properly based on DPT type
         var formattedValue = FormatValueForLogging(message.Value, dptType);
 
-        // Use structured logging for enterprise-grade logging
+        // Use structured logging
         // The LogDetailedKnxMessage will handle the formatting appropriately
         this.LogDetailedKnxMessage(
             message.Timestamp.ToString("HH:mm:ss.fff"),

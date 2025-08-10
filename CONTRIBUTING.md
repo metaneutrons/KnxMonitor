@@ -13,7 +13,7 @@ Thank you for your interest in contributing to KNX Monitor! This document provid
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/yourusername/KnxMonitor.git
+   git clone https://github.com/metaneutrons/KnxMonitor.git
    cd KnxMonitor
    ```
 3. Build the project:
@@ -171,8 +171,8 @@ By contributing to KNX Monitor, you agree that your contributions will be licens
 
 ## 📞 Getting Help
 
-- Check existing [Issues](https://github.com/yourusername/KnxMonitor/issues)
-- Start a [Discussion](https://github.com/yourusername/KnxMonitor/discussions)
-- Review the [Wiki](https://github.com/yourusername/KnxMonitor/wiki)
+- Check existing [Issues](https://github.com/metaneutrons/KnxMonitor/issues)
+- Start a [Discussion](https://github.com/metaneutrons/KnxMonitor/discussions)
+- Review the [Wiki](https://github.com/metaneutrons/KnxMonitor/wiki)
 
 Thank you for contributing to KNX Monitor! 🎉

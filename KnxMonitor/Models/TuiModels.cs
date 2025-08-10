@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace KnxMonitor.Models;
 
 /// <summary>
-/// Enterprise-grade data model for Terminal.Gui TableView integration.
+/// Data model for Terminal.Gui TableView integration.
 /// Provides observable collection with real-time updates and filtering capabilities.
 /// </summary>
 public class KnxMessageTableModel : INotifyPropertyChanged
@@ -147,7 +147,7 @@ public class KnxMessageTableModel : INotifyPropertyChanged
 }
 
 /// <summary>
-/// Enterprise-grade row model for KNX message display in TableView.
+/// Row model for KNX message display in TableView.
 /// Provides formatted display values and color coding information.
 /// </summary>
 public class KnxMessageRow
@@ -333,7 +333,7 @@ public class KnxMessageRow
 }
 
 /// <summary>
-/// Enterprise-grade connection status model for real-time display updates.
+/// Connection status model for real-time display updates.
 /// </summary>
 public class ConnectionStatusModel : INotifyPropertyChanged
 {
