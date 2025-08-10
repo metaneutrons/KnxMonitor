@@ -142,11 +142,13 @@ jobs:
               --verbosity minimal
           else
             echo "DEBUG: Using self-contained deployment for non-Linux platforms"
-            # Self-contained deployment without single-file for other platforms
+            # Self-contained deployment with proper single executable
             dotnet publish ${{ env.PROJECT_NAME }} \
               --configuration Release \
               --runtime ${{ matrix.runtime }} \
               --self-contained true \
+              --property:PublishSingleFile=true \
+              --property:IncludeNativeLibrariesForSelfExtract=true \
               --output ./publish/${{ matrix.runtime }} \
               --verbosity minimal
           fi
