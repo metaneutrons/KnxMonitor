@@ -133,11 +133,8 @@ jobs:
           dotnet publish ${{ env.PROJECT_NAME }} \
             --configuration Release \
             --runtime ${{ matrix.runtime }} \
-            --self-contained true \
+            --self-contained false \
             --output ./publish/${{ matrix.runtime }} \
-            -p:PublishSingleFile=true \
-            -p:PublishTrimmed=false \
-            -p:IncludeNativeLibrariesForSelfExtract=true \
             --verbosity minimal
 
       - name: Code sign macOS binaries
@@ -327,8 +324,15 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a ${{ needs.calculate-version.outputs.tag }} -m "Release ${{ needs.calculate-version.outputs.tag }}"
-          git push origin ${{ needs.calculate-version.outputs.tag }}
+          
+          # Check if tag already exists
+          if git rev-parse "${{ needs.calculate-version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Tag ${{ needs.calculate-version.outputs.tag }} already exists, skipping tag creation"
+          else
+            echo "Creating new tag ${{ needs.calculate-version.outputs.tag }}"
+            git tag -a ${{ needs.calculate-version.outputs.tag }} -m "Release ${{ needs.calculate-version.outputs.tag }}"
+            git push origin ${{ needs.calculate-version.outputs.tag }}
+          fi
 
       - name: Generate release notes
         id: release_notes
