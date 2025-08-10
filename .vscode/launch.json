@@ -1,0 +1,99 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "KnxMonitor - Router Mode",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/KnxMonitor/bin/Debug/net9.0/KnxMonitor.dll",
+            "args": [
+                "--connection-type",
+                "routing",
+                "--verbose"
+            ],
+            "cwd": "${workspaceFolder}/KnxMonitor",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "KnxMonitor - Tunnel Mode",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/KnxMonitor/bin/Debug/net9.0/KnxMonitor.dll",
+            "args": [
+                "--connection-type",
+                "tunneling",
+                "--host",
+                "192.168.1.100",
+                "--verbose"
+            ],
+            "cwd": "${workspaceFolder}/KnxMonitor",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "KnxMonitor - Router with CSV",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/KnxMonitor/bin/Debug/net9.0/KnxMonitor.dll",
+            "args": [
+                "--connection-type",
+                "routing",
+                "--csv-path",
+                "knx-addresses.csv",
+                "--verbose"
+            ],
+            "cwd": "${workspaceFolder}/KnxMonitor",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "KnxMonitor - Help",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/KnxMonitor/bin/Debug/net9.0/KnxMonitor.dll",
+            "args": [
+                "--help"
+            ],
+            "cwd": "${workspaceFolder}/KnxMonitor",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "KnxMonitor - Health Check Mode",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/KnxMonitor/bin/Debug/net9.0/KnxMonitor.dll",
+            "args": [
+                "--connection-type",
+                "routing",
+                "--health-check-port",
+                "8080",
+                "--verbose"
+            ],
+            "cwd": "${workspaceFolder}/KnxMonitor",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
+        }
+    ]
+}

@@ -60,12 +60,13 @@ coverage*.info
 # JetBrains Rider
 *.sln.iml
 
-# VS Code
-.vscode/
+# VS Code (allow project configuration)
+# .vscode/ - commented out to allow project-specific VS Code config
 *.code-workspace
 
 # KnxMonitor specific
 *.csv
+!knx-addresses.csv  # Allow sample CSV file
 config/
 logs/
 temp/

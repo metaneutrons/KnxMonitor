@@ -1,0 +1,48 @@
+[
+    {
+        "key": "shift+cmd+b",
+        "command": "workbench.action.tasks.runTask",
+        "args": "build and run",
+        "when": "!inDebugMode"
+    },
+    {
+        "key": "shift+cmd+r",
+        "command": "workbench.action.tasks.runTask",
+        "args": "run-router"
+    },
+    {
+        "key": "shift+cmd+t",
+        "command": "workbench.action.tasks.runTask",
+        "args": "run-tunnel"
+    },
+    {
+        "key": "shift+cmd+w",
+        "command": "workbench.action.tasks.runTask",
+        "args": "watch"
+    },
+    {
+        "key": "cmd+k cmd+t",
+        "command": "workbench.action.tasks.runTask",
+        "args": "test"
+    },
+    {
+        "key": "cmd+k cmd+c",
+        "command": "workbench.action.tasks.runTask",
+        "args": "clean"
+    },
+    {
+        "key": "f5",
+        "command": "workbench.action.debug.start",
+        "when": "debuggersAvailable && !inDebugMode"
+    },
+    {
+        "key": "shift+f5",
+        "command": "workbench.action.debug.stop",
+        "when": "inDebugMode"
+    },
+    {
+        "key": "ctrl+f5",
+        "command": "workbench.action.debug.run",
+        "when": "debuggersAvailable && !inDebugMode"
+    }
+]
