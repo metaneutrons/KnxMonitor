@@ -128,6 +128,45 @@ jobs:
             -p:PublishSingleFile=true \
             --verbosity minimal
 
+      - name: Code sign macOS binaries
+        if: startsWith(matrix.runtime, 'osx-')
+        env:
+          APPLE_CERTIFICATE_P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_DEVELOPER_ID: ${{ secrets.APPLE_DEVELOPER_ID }}
+        run: |
+          # Create temporary keychain
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+          
+          # Create keychain and set as default
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH"
+          
+          # Import certificate
+          echo "$APPLE_CERTIFICATE_P12" | base64 --decode > certificate.p12
+          security import certificate.p12 -k "$KEYCHAIN_PATH" -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          
+          # Sign the binary
+          BINARY_PATH="./publish/${{ matrix.runtime }}/${{ env.PROJECT_NAME }}"
+          codesign --sign "Developer ID Application: Fabian Schmieder ($APPLE_DEVELOPER_ID)" \
+                   --verbose \
+                   --force \
+                   --options runtime \
+                   --timestamp \
+                   "$BINARY_PATH"
+          
+          # Verify signature
+          codesign --verify --verbose "$BINARY_PATH"
+          spctl --assess --type execute --verbose "$BINARY_PATH"
+          
+          # Clean up
+          rm certificate.p12
+          security delete-keychain "$KEYCHAIN_PATH"
+
       - name: Create archive
         run: |
           cd ./publish/${{ matrix.runtime }}
