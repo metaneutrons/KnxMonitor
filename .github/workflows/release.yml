@@ -45,13 +45,6 @@ jobs:
         with:
           versionSpec: "6.x"
 
-      - name: Create and checkout tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag ${{ github.event.inputs.tag }}
-          git checkout ${{ github.event.inputs.tag }}
-
       - name: Determine Version
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
@@ -79,9 +72,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Checkout tag
-        run: git checkout ${{ github.event.inputs.tag }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -158,9 +148,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout tag
-        run: git checkout ${{ github.event.inputs.tag }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -229,10 +216,11 @@ jobs:
           find ./artifacts -name "*.zip" -o -name "*.tar.gz" | xargs -I {} cp {} ./release-assets/
           ls -la ./release-assets/
 
-      - name: Push Git tag
+      - name: Create and push Git tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ github.event.inputs.tag }} -m "Release ${{ github.event.inputs.tag }}"
           git push origin ${{ github.event.inputs.tag }}
 
       - name: Generate release notes
@@ -304,6 +292,45 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  update-homebrew:
+    needs: [calculate-version, release]
+    if: needs.calculate-version.outputs.is-prerelease == 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ env.PROJECT_NAME }}-osx-*
+          path: ./macos-artifacts
+
+      - name: Calculate checksums
+        id: checksums
+        run: |
+          # Calculate SHA256 for macOS x64
+          MACOS_X64_SHA=$(sha256sum ./macos-artifacts/${{ env.PROJECT_NAME }}-osx-x64/${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-osx-x64.tar.gz | cut -d' ' -f1)
+          echo "macos_x64_sha=${MACOS_X64_SHA}" >> $GITHUB_OUTPUT
+          
+          # Calculate SHA256 for macOS ARM64
+          MACOS_ARM64_SHA=$(sha256sum ./macos-artifacts/${{ env.PROJECT_NAME }}-osx-arm64/${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-osx-arm64.tar.gz | cut -d' ' -f1)
+          echo "macos_arm64_sha=${MACOS_ARM64_SHA}" >> $GITHUB_OUTPUT
+          
+          echo "macOS x64 SHA256: ${MACOS_X64_SHA}"
+          echo "macOS ARM64 SHA256: ${MACOS_ARM64_SHA}"
+
+      - name: Update Homebrew formula
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: metaneutrons/homebrew-tap
+          event-type: update-formula
+          client-payload: |
+            {
+              "version": "${{ needs.calculate-version.outputs.version }}",
+              "macos_x64_sha": "${{ steps.checksums.outputs.macos_x64_sha }}",
+              "macos_arm64_sha": "${{ steps.checksums.outputs.macos_arm64_sha }}"
+            }
+
       - name: Release Summary
         run: |
           echo "## 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY
@@ -318,7 +345,11 @@ jobs:
           if [[ "${{ inputs.create_docker }}" == "true" ]]; then
             echo "- Docker image: \`ghcr.io/metaneutrons/knxmonitor:${{ needs.calculate-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
           fi
+          if [[ "${{ needs.calculate-version.outputs.is-prerelease }}" == "false" ]]; then
+            echo "- Homebrew formula will be updated automatically" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
           echo "- [Release Page](https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.tag }})" >> $GITHUB_STEP_SUMMARY
           echo "- [Docker Image](https://github.com/${{ github.repository }}/pkgs/container/knxmonitor)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Homebrew Tap](https://github.com/metaneutrons/homebrew-tap)" >> $GITHUB_STEP_SUMMARY
