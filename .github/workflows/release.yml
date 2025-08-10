@@ -318,7 +318,26 @@ jobs:
           echo "macOS x64 SHA256: ${MACOS_X64_SHA}"
           echo "macOS ARM64 SHA256: ${MACOS_ARM64_SHA}"
 
-      - name: Create Homebrew update instructions
+      - name: Update Homebrew formula (if token available)
+        if: env.HOMEBREW_UPDATE_TOKEN != ''
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
+          repository: metaneutrons/homebrew-tap
+          event-type: update-formula
+          client-payload: |
+            {
+              "version": "${{ needs.calculate-version.outputs.version }}",
+              "macos_x64_sha": "${{ steps.checksums.outputs.macos_x64_sha }}",
+              "macos_arm64_sha": "${{ steps.checksums.outputs.macos_arm64_sha }}"
+            }
+        env:
+          HOMEBREW_UPDATE_TOKEN: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
+
+      - name: Create Homebrew update instructions (fallback)
+        if: env.HOMEBREW_UPDATE_TOKEN == ''
+        env:
+          HOMEBREW_UPDATE_TOKEN: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
         run: |
           cat << EOF > homebrew-update.md
           ## 🍺 Homebrew Formula Update Required
@@ -354,6 +373,8 @@ jobs:
           retention-days: 30
 
       - name: Display update information
+        env:
+          HOMEBREW_UPDATE_TOKEN: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
         run: |
           echo "## 🍺 Homebrew Update Information" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -361,7 +382,11 @@ jobs:
           echo "**macOS x64 SHA256**: \`${{ steps.checksums.outputs.macos_x64_sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**macOS ARM64 SHA256**: \`${{ steps.checksums.outputs.macos_arm64_sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "ℹ️ Homebrew formula needs to be updated manually or via the homebrew-tap repository workflow." >> $GITHUB_STEP_SUMMARY
+          if [[ -n "$HOMEBREW_UPDATE_TOKEN" ]]; then
+            echo "✅ Homebrew formula updated automatically via repository dispatch." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ Homebrew formula needs to be updated manually. Check the homebrew-update-instructions artifact." >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Release Summary
         run: |
