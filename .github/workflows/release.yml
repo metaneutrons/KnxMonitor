@@ -137,7 +137,6 @@ jobs:
     if: inputs.create_docker
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    continue-on-error: true  # Don't fail the entire release if Docker build fails
     permissions:
       contents: read
       packages: write
@@ -194,6 +193,7 @@ jobs:
 
   release:
     needs: [calculate-version, build]
+    if: always() && needs.calculate-version.result == 'success' && needs.build.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -293,7 +293,7 @@ jobs:
 
   update-homebrew:
     needs: [calculate-version, release]
-    if: needs.calculate-version.outputs.is-prerelease == 'false'
+    if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: true  # Don't fail the entire release if Homebrew update fails
@@ -410,3 +410,60 @@ jobs:
           echo "- [Release Page](https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.tag }})" >> $GITHUB_STEP_SUMMARY
           echo "- [Docker Image](https://github.com/${{ github.repository }}/pkgs/container/knxmonitor)" >> $GITHUB_STEP_SUMMARY
           echo "- [Homebrew Tap](https://github.com/metaneutrons/homebrew-tap)" >> $GITHUB_STEP_SUMMARY
+
+  # Summary job to show overall status
+  summary:
+    needs: [calculate-version, build, docker, release, update-homebrew]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release Summary
+        run: |
+          echo "## 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ needs.calculate-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: ${{ github.event.inputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "**GitVersion**: ${{ needs.calculate-version.outputs.informational-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Prerelease**: ${{ needs.calculate-version.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Job Status" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version Calculation**: ${{ needs.calculate-version.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build**: ${{ needs.build.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Docker**: ${{ needs.docker.result == 'success' && '✅' || needs.docker.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release**: ${{ needs.release.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Homebrew**: ${{ needs.update-homebrew.result == 'success' && '✅' || needs.update-homebrew.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Assets" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.build.result }}" == "success" ]]; then
+            echo "- ✅ Platform binaries created" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [[ "${{ needs.docker.result }}" == "success" ]]; then
+            echo "- ✅ Docker image: \`ghcr.io/metaneutrons/knxmonitor:${{ needs.calculate-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.docker.result }}" == "failure" ]]; then
+            echo "- ❌ Docker image build failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [[ "${{ needs.update-homebrew.result }}" == "success" ]]; then
+            echo "- ✅ Homebrew formula updated automatically" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.update-homebrew.result }}" == "failure" ]]; then
+            echo "- ❌ Homebrew formula update failed (check artifacts for manual instructions)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.release.result }}" == "success" ]]; then
+            echo "- [Release Page](https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.tag }})" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [[ "${{ needs.docker.result }}" == "success" ]]; then
+            echo "- [Docker Image](https://github.com/${{ github.repository }}/pkgs/container/knxmonitor)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "- [Homebrew Tap](https://github.com/metaneutrons/homebrew-tap)" >> $GITHUB_STEP_SUMMARY
+          
+          # Set overall workflow status
+          if [[ "${{ needs.build.result }}" != "success" || "${{ needs.release.result }}" != "success" ]]; then
+            echo "❌ Release failed - critical components failed" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          elif [[ "${{ needs.docker.result }}" == "failure" && "${{ inputs.create_docker }}" == "true" ]]; then
+            echo "⚠️ Release completed with warnings - Docker build failed" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ Release completed successfully" >> $GITHUB_STEP_SUMMARY
+          fi
