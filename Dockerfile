@@ -28,7 +28,9 @@ RUN dotnet publish "KnxMonitor/KnxMonitor.csproj" \
     --runtime linux-musl-x64 \
     --self-contained true \
     --output /app/publish \
-    -p:PublishSingleFile=true
+    -p:PublishSingleFile=true \
+    -p:UseAppHost=true \
+    -p:Version=${VERSION:-1.0.0}
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-alpine AS runtime

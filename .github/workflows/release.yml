@@ -137,6 +137,7 @@ jobs:
     if: inputs.create_docker
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    continue-on-error: true  # Don't fail the entire release if Docker build fails
     permissions:
       contents: read
       packages: write
@@ -295,6 +296,7 @@ jobs:
     if: needs.calculate-version.outputs.is-prerelease == 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    continue-on-error: true  # Don't fail the entire release if Homebrew update fails
     steps:
       - name: Download macOS artifacts
         uses: actions/download-artifact@v4
@@ -316,18 +318,50 @@ jobs:
           echo "macOS x64 SHA256: ${MACOS_X64_SHA}"
           echo "macOS ARM64 SHA256: ${MACOS_ARM64_SHA}"
 
-      - name: Update Homebrew formula
-        uses: peter-evans/repository-dispatch@v3
+      - name: Create Homebrew update instructions
+        run: |
+          cat << EOF > homebrew-update.md
+          ## 🍺 Homebrew Formula Update Required
+          
+          **Version**: ${{ needs.calculate-version.outputs.version }}
+          **macOS x64 SHA256**: \`${{ steps.checksums.outputs.macos_x64_sha }}\`
+          **macOS ARM64 SHA256**: \`${{ steps.checksums.outputs.macos_arm64_sha }}\`
+          
+          ### Manual Update Steps:
+          
+          1. Go to [homebrew-tap repository](https://github.com/metaneutrons/homebrew-tap)
+          2. Edit \`knxmonitor.rb\`
+          3. Update version to: \`${{ needs.calculate-version.outputs.version }}\`
+          4. Update Intel Mac SHA256 to: \`${{ steps.checksums.outputs.macos_x64_sha }}\`
+          5. Update Apple Silicon SHA256 to: \`${{ steps.checksums.outputs.macos_arm64_sha }}\`
+          
+          ### Or run the update workflow manually:
+          
+          \`\`\`bash
+          gh workflow run update-formula.yml \\
+            --repo metaneutrons/homebrew-tap \\
+            --field version=${{ needs.calculate-version.outputs.version }} \\
+            --field macos_x64_sha=${{ steps.checksums.outputs.macos_x64_sha }} \\
+            --field macos_arm64_sha=${{ steps.checksums.outputs.macos_arm64_sha }}
+          \`\`\`
+          EOF
+
+      - name: Upload Homebrew update instructions
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: metaneutrons/homebrew-tap
-          event-type: update-formula
-          client-payload: |
-            {
-              "version": "${{ needs.calculate-version.outputs.version }}",
-              "macos_x64_sha": "${{ steps.checksums.outputs.macos_x64_sha }}",
-              "macos_arm64_sha": "${{ steps.checksums.outputs.macos_arm64_sha }}"
-            }
+          name: homebrew-update-instructions
+          path: homebrew-update.md
+          retention-days: 30
+
+      - name: Display update information
+        run: |
+          echo "## 🍺 Homebrew Update Information" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ needs.calculate-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**macOS x64 SHA256**: \`${{ steps.checksums.outputs.macos_x64_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**macOS ARM64 SHA256**: \`${{ steps.checksums.outputs.macos_arm64_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ Homebrew formula needs to be updated manually or via the homebrew-tap repository workflow." >> $GITHUB_STEP_SUMMARY
 
       - name: Release Summary
         run: |
