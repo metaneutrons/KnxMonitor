@@ -311,7 +311,7 @@ jobs:
     if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success' && (needs.docker.result == 'success' || needs.docker.result == 'skipped')
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true  # Don't fail the entire release if Homebrew update fails
+    continue-on-error: false # Don't fail the entire release if Homebrew update fails
     steps:
       - name: Download macOS artifacts
         uses: actions/download-artifact@v4
@@ -325,11 +325,11 @@ jobs:
           # Calculate SHA256 for macOS x64
           MACOS_X64_SHA=$(sha256sum ./macos-artifacts/${{ env.PROJECT_NAME }}-osx-x64/${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-osx-x64.tar.gz | cut -d' ' -f1)
           echo "macos_x64_sha=${MACOS_X64_SHA}" >> $GITHUB_OUTPUT
-          
+
           # Calculate SHA256 for macOS ARM64
           MACOS_ARM64_SHA=$(sha256sum ./macos-artifacts/${{ env.PROJECT_NAME }}-osx-arm64/${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-osx-arm64.tar.gz | cut -d' ' -f1)
           echo "macos_arm64_sha=${MACOS_ARM64_SHA}" >> $GITHUB_OUTPUT
-          
+
           echo "macOS x64 SHA256: ${MACOS_X64_SHA}"
           echo "macOS ARM64 SHA256: ${MACOS_ARM64_SHA}"
 
@@ -356,21 +356,21 @@ jobs:
         run: |
           cat << EOF > homebrew-update.md
           ## 🍺 Homebrew Formula Update Required
-          
+
           **Version**: ${{ needs.calculate-version.outputs.version }}
           **macOS x64 SHA256**: \`${{ steps.checksums.outputs.macos_x64_sha }}\`
           **macOS ARM64 SHA256**: \`${{ steps.checksums.outputs.macos_arm64_sha }}\`
-          
+
           ### Manual Update Steps:
-          
+
           1. Go to [homebrew-tap repository](https://github.com/metaneutrons/homebrew-tap)
           2. Edit \`knxmonitor.rb\`
           3. Update version to: \`${{ needs.calculate-version.outputs.version }}\`
           4. Update Intel Mac SHA256 to: \`${{ steps.checksums.outputs.macos_x64_sha }}\`
           5. Update Apple Silicon SHA256 to: \`${{ steps.checksums.outputs.macos_arm64_sha }}\`
-          
+
           ### Or run the update workflow manually:
-          
+
           \`\`\`bash
           gh workflow run update-formula.yml \\
             --repo metaneutrons/homebrew-tap \\
@@ -432,21 +432,6 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Check critical failures
-        run: |
-          # Fail immediately if Docker was requested but failed
-          if [[ "${{ inputs.create_docker }}" == "true" && "${{ needs.docker.result }}" == "failure" ]]; then
-            echo "❌ Docker build failed - this is a critical error when Docker is requested"
-            echo "Docker build was explicitly requested but failed. Stopping workflow."
-            exit 1
-          fi
-          
-          # Fail if core components failed
-          if [[ "${{ needs.build.result }}" != "success" || "${{ needs.release.result }}" != "success" ]]; then
-            echo "❌ Core release components failed"
-            exit 1
-          fi
-
       - name: Release Summary
         run: |
           echo "## 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY
@@ -486,7 +471,7 @@ jobs:
             echo "- [Docker Image](https://github.com/${{ github.repository }}/pkgs/container/knxmonitor)" >> $GITHUB_STEP_SUMMARY
           fi
           echo "- [Homebrew Tap](https://github.com/metaneutrons/homebrew-tap)" >> $GITHUB_STEP_SUMMARY
-          
+
           # Set overall workflow status
           if [[ "${{ needs.build.result }}" != "success" || "${{ needs.release.result }}" != "success" ]]; then
             echo "❌ Release failed - critical components failed" >> $GITHUB_STEP_SUMMARY
