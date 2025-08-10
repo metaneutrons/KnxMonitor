@@ -17,14 +17,6 @@ on:
       - ".gitignore"
       - "docs/**"
       - "homebrew/**"
-  pull_request:
-    branches: [main, develop]
-    paths-ignore:
-      - ".gitignore"
-      - ".github/**"
-      - "**/*.md"
-      - "docs/**"
-      - "homebrew/**"
 
 env:
   DOTNET_VERSION: '9.0.x'
