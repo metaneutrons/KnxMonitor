@@ -1,6 +1,6 @@
-# Runtime-only Docker image with multi-architecture support
-# Application is built in GitHub Actions and copied as pre-built binary
-FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-alpine
+# Runtime Docker image with multi-architecture support
+# Application is built in GitHub Actions and copied as framework-dependent deployment
+FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine
 
 # Build arguments
 ARG VERSION=1.0.0
@@ -24,16 +24,15 @@ WORKDIR /app
 # Copy pre-built application based on target architecture
 COPY publish-${TARGETARCH}/ ./
 
-# Set ownership and make executable
-RUN chown -R knxmonitor:knxmonitor /app && \
-    chmod +x ./KnxMonitor
+# Set ownership
+RUN chown -R knxmonitor:knxmonitor /app
 
 # Switch to non-root user
 USER knxmonitor
 
-# Health check
+# Health check using dotnet
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ./KnxMonitor --version || exit 1
+    CMD dotnet KnxMonitor.dll --version || exit 1
 
 # Labels
 LABEL org.opencontainers.image.title="KNX Monitor" \
@@ -46,6 +45,6 @@ LABEL org.opencontainers.image.title="KNX Monitor" \
       org.opencontainers.image.documentation="https://github.com/metaneutrons/KnxMonitor/blob/main/README.md" \
       org.opencontainers.image.licenses="GPL-3.0"
 
-# Default command
-ENTRYPOINT ["./KnxMonitor"]
+# Default command - use dotnet to run the DLL
+ENTRYPOINT ["dotnet", "KnxMonitor.dll"]
 CMD ["--help"]
