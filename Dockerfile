@@ -1,4 +1,4 @@
-# Runtime-only Docker image
+# Runtime-only Docker image with multi-architecture support
 # Application is built in GitHub Actions and copied as pre-built binary
 FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-alpine
 
@@ -6,6 +6,7 @@ FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-alpine
 ARG VERSION=1.0.0
 ARG BUILD_DATE
 ARG VCS_REF
+ARG TARGETARCH
 
 # Install runtime dependencies
 RUN apk add --no-cache \
@@ -20,11 +21,12 @@ RUN addgroup -g 1001 -S knxmonitor \
 # Set working directory
 WORKDIR /app
 
-# Copy pre-built application from GitHub Actions
-COPY publish/ ./
+# Copy pre-built application based on target architecture
+COPY publish-${TARGETARCH}/ ./
 
-# Set ownership
-RUN chown -R knxmonitor:knxmonitor /app
+# Set ownership and make executable
+RUN chown -R knxmonitor:knxmonitor /app && \
+    chmod +x ./KnxMonitor
 
 # Switch to non-root user
 USER knxmonitor

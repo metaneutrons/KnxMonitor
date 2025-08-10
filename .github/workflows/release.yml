@@ -81,7 +81,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runtime: [win-x64, linux-x64, osx-x64, osx-arm64]
+        runtime: [win-x64, linux-x64, linux-arm64, osx-x64, osx-arm64]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -189,20 +189,35 @@ jobs:
             org.opencontainers.image.documentation=${{ github.server_url }}/${{ github.repository }}/blob/main/README.md
             org.opencontainers.image.licenses=GPL-3.0
 
-      - name: Download Linux binary for Docker
+      - name: Download Linux binaries for Docker
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.PROJECT_NAME }}-linux-x64
-          path: ./docker-context
+          pattern: ${{ env.PROJECT_NAME }}-linux-*
+          path: ./docker-artifacts
+          merge-multiple: false
 
-      - name: Extract Linux binary and prepare Docker context
+      - name: Prepare Docker context for multi-arch build
         run: |
-          cd docker-context
+          mkdir -p docker-context/publish-amd64 docker-context/publish-arm64
+          
+          # Extract x64 binary (maps to amd64 in Docker)
+          cd docker-artifacts/${{ env.PROJECT_NAME }}-linux-x64
           tar -xzf ${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-linux-x64.tar.gz
-          mkdir -p publish
-          mv KnxMonitor publish/
-          cp ../Dockerfile .
-          ls -la publish/
+          mv KnxMonitor ../docker-context/publish-amd64/
+          
+          # Extract arm64 binary
+          cd ../${{ env.PROJECT_NAME }}-linux-arm64
+          tar -xzf ${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-linux-arm64.tar.gz
+          mv KnxMonitor ../docker-context/publish-arm64/
+          
+          # Copy Dockerfile
+          cp ../Dockerfile ../docker-context/
+          
+          # Verify binaries
+          echo "AMD64 binary:"
+          ls -la ../docker-context/publish-amd64/
+          echo "ARM64 binary:"
+          ls -la ../docker-context/publish-arm64/
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
