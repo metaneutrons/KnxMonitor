@@ -130,7 +130,7 @@ jobs:
 
       - name: Build and publish
         run: |
-          if [[ "${{ matrix.runtime }}" == linux-* ]]; then
+          if [[ "${{ matrix.runtime }}" == "linux-x64" || "${{ matrix.runtime }}" == "linux-arm64" ]]; then
             # Framework-dependent deployment for Docker (Linux)
             dotnet publish ${{ env.PROJECT_NAME }} \
               --configuration Release \
