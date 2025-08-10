@@ -7,31 +7,16 @@
 
 > **KNX/EIB bus monitoring and debugging tool built with modern .NET 9**
 
-KNX Monitor is a professional-grade command-line application for monitoring, debugging, and analyzing KNX/EIB building automation networks. Built with enterprise-level architecture patterns, it provides real-time visualization of KNX bus traffic with comprehensive logging and analysis capabilities.
+KNX Monitor is a command-line application for monitoring, debugging, and analyzing KNX/EIB building automation networks. Built with best-practice architecture patterns, it provides real-time visualization of KNX bus traffic with comprehensive logging and analysis capabilities.
 
 ## ✨ Features
-
-### 🎯 **Core Monitoring**
 
 - **Real-time KNX bus monitoring** with millisecond precision
 - **Multiple connection types**: IP Tunneling, IP Routing, USB
 - **Group address resolution** via CSV database import
 - **Data Point Type (DPT) decoding** for human-readable values
 - **Advanced filtering** with regex pattern support
-
-### 🏗️ **Architecture**
-
-- **High-performance logging** with zero-allocation LoggerMessage
-- **Systematic event IDs** (1000-4999 hierarchical structure)
-- **Clean architecture** with CQRS patterns
-- **Comprehensive error handling** with graceful degradation
-- **Resource management** with proper async disposal
-
-### 🔧 **Professional Features**
-
 - **Health check endpoints** for monitoring integration
-- **Configuration validation** with constants
-- **Custom console formatting** for clean output
 - **Docker containerization** with multi-architecture support
 - **Cross-platform compatibility** (Windows, macOS, Linux)
 
@@ -86,6 +71,7 @@ knxmonitor --version
 ```
 
 **Example output:**
+
 ```
 Version:    1.0.1
 GitVersion: 1.0.1+Branch.main.Sha.8c6f5fd4d70c35e1d68e8fd5d0a7cb1e50bfbe21
@@ -257,75 +243,6 @@ dotnet run --project KnxMonitor -- --connection-type routing --csv-path test.csv
 # Debug build
 dotnet build --configuration Debug
 ```
-
-## 🏗️ Architecture
-
-KNX Monitor follows architectural patterns:
-
-### **Clean Architecture**
-
-- **Domain Layer**: Core KNX protocol handling
-- **Application Layer**: CQRS command/query handlers
-- **Infrastructure Layer**: External integrations (KNX SDK, file system)
-- **Presentation Layer**: Console interface and health endpoints
-
-### **Key Components**
-
-- **KnxMonitorService**: Core monitoring engine
-- **KnxGroupAddressDatabase**: CSV-based address resolution
-- **KnxDptDecoder**: Data Point Type value decoding
-- **DisplayService**: Real-time console output
-- **HealthCheckService**: HTTP health endpoints
-
-### **Enterprise Features**
-
-- **Systematic Event IDs**: 1000-4999 hierarchical logging
-- **High-Performance Logging**: Zero-allocation LoggerMessage
-- **Resource Management**: Proper IAsyncDisposable patterns
-- **Error Handling**: Comprehensive exception management
-- **Configuration Management**: Type-safe validation
-
-## 📊 Performance
-
-### **Benchmarks**
-
-- **Message Processing**: >10,000 messages/second
-- **Memory Usage**: <50MB baseline
-- **CPU Usage**: <5% on modern hardware
-- **Startup Time**: <2 seconds
-
-### **Scalability**
-
-- **Concurrent Connections**: Up to 100 simultaneous
-- **Message Queue**: 10,000 message buffer
-- **Database Size**: Supports 100,000+ group addresses
-
-## 🔒 Security
-
-- **Non-root Docker execution**
-- **Minimal attack surface**
-- **No persistent data storage**
-- **Network isolation support**
-- **Secure defaults**
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Code Standards
-
-- Follow [.NET coding conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
-- Maintain test coverage >90%
-- Use structured logging with proper event IDs
-- Document public APIs with XML comments
 
 ## 📝 License
 

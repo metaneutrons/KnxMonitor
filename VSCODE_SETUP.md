@@ -3,7 +3,9 @@
 ## ✅ COMPLETE CONFIGURATION CREATED
 
 ### 🚀 Primary Development Shortcut
+
 **Shift+Cmd+B** - Build and run KnxMonitor in router mode
+
 - This is your main development shortcut
 - Builds the project and immediately runs it
 - Perfect for quick testing and development
@@ -57,6 +59,7 @@
 ### 📊 Sample Data Included
 
 **knx-addresses.csv** - Sample KNX group addresses:
+
 - Lighting controls (0/1/x)
 - Dimming controls (0/2/x)  
 - Temperature sensors (1/1/x)
@@ -76,9 +79,11 @@
 
 1. **Builds** the KnxMonitor project
 2. **Runs** the application with these arguments:
+
    ```bash
    --connection-type routing --verbose
    ```
+
 3. **Opens** a new terminal panel
 4. **Starts** monitoring KNX traffic in router mode
 5. **Shows** verbose logging output
@@ -97,9 +102,9 @@
 - **VS Code Guide**: [.vscode/README.md](.vscode/README.md)
 - **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
 
-## 🎉 Ready for Development!
+## 🎉 Ready for Development
 
-Your KnxMonitor VS Code environment is fully configured and ready for professional development. Just press **Shift+Cmd+B** to get started!
+Your KnxMonitor VS Code environment is fully configured and ready for development. Just press **Shift+Cmd+B** to get started!
 
 ---
 

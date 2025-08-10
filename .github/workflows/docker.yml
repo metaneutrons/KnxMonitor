@@ -9,11 +9,11 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Git tag to build Docker image from (e.g., v1.0.0)'
+        description: "Git tag to build Docker image from (e.g., v1.0.0)"
         required: true
         type: string
       push_latest:
-        description: 'Also tag as latest'
+        description: "Also tag as latest"
         required: false
         default: true
         type: boolean
@@ -106,7 +106,7 @@ jobs:
             type=raw,value=latest,enable=${{ inputs.push_latest }}
           labels: |
             org.opencontainers.image.title=KNX Monitor
-            org.opencontainers.image.description=Professional KNX/EIB bus monitoring and debugging tool
+            org.opencontainers.image.description=KNX/EIB bus monitoring and debugging tool
             org.opencontainers.image.vendor=metaneutrons
             org.opencontainers.image.version=${{ steps.gitversion.outputs.semVer }}
             org.opencontainers.image.revision=${{ github.sha }}
@@ -136,14 +136,14 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.gitversion.outputs.semVer }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          format: "sarif"
+          output: "trivy-results.sarif"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: "trivy-results.sarif"
 
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
@@ -163,7 +163,7 @@ jobs:
         run: |
           # Test that the image runs and shows version
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.gitversion.outputs.semVer }} --version
-          
+
           # Test that help works
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.gitversion.outputs.semVer }} --help
 
@@ -174,7 +174,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ env.IMAGE_NAME }}
-          short-description: "Professional KNX/EIB bus monitoring and debugging tool"
+          short-description: "KNX/EIB bus monitoring and debugging tool"
           readme-filepath: ./README.md
 
       - name: Summary
