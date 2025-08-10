@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using KnxMonitor.Models;
 using Microsoft.Extensions.Logging;
@@ -140,6 +141,11 @@ public partial class TuiDisplayService : IDisplayService
         {
             this.LogErrorStoppingTuiDisplayService(ex);
         }
+        finally
+        {
+            // Ensure cursor visibility is restored even if stop fails
+            RestoreCursorVisibility();
+        }
     }
 
     public void Shutdown()
@@ -148,11 +154,82 @@ public partial class TuiDisplayService : IDisplayService
         {
             this.Stop();
             Application.Shutdown();
+            
+            // Explicitly restore cursor visibility for macOS terminal compatibility
+            // This fixes the issue where cursor becomes invisible after TUI exit
+            RestoreCursorVisibility();
+            
             this.LogTerminalGuiShutdownCompleted();
         }
         catch (Exception ex)
         {
             this.LogErrorDuringTerminalGuiShutdown(ex);
+            
+            // Ensure cursor is restored even if shutdown fails
+            RestoreCursorVisibility();
+        }
+    }
+
+    /// <summary>
+    /// Restores terminal cursor visibility after TUI shutdown.
+    /// This is particularly important on macOS where Terminal.Gui may not properly restore the cursor.
+    /// </summary>
+    private static void RestoreCursorVisibility()
+    {
+        try
+        {
+            // Send ANSI escape sequences to restore cursor
+            Console.Write("\x1b[?25h"); // Show cursor
+            Console.Write("\x1b[0m");   // Reset all attributes
+            Console.Out.Flush();
+        }
+        catch
+        {
+            // Ignore any errors during cursor restoration
+            // This is a best-effort attempt to fix terminal state
+        }
+    }
+
+    /// <summary>
+    /// Gets the application version string for display purposes.
+    /// </summary>
+    /// <returns>Version string in format "vX.X.X"</returns>
+    private static string GetVersionString()
+    {
+        try
+        {
+            // Try to get GitVersion information first
+            var assembly = Assembly.GetExecutingAssembly();
+            var informationalVersion = assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion;
+
+            if (!string.IsNullOrEmpty(informationalVersion))
+            {
+                // Extract semantic version from informational version
+                var semanticVersion = informationalVersion;
+                if (informationalVersion.Contains("+") || informationalVersion.Contains("-"))
+                {
+                    var parts = informationalVersion.Split(
+                        new[] { '+', '-' },
+                        2,
+                        StringSplitOptions.RemoveEmptyEntries
+                    );
+                    if (parts.Length > 0)
+                    {
+                        semanticVersion = parts[0];
+                    }
+                }
+                return $"v{semanticVersion}";
+            }
+
+            // Fallback to assembly version
+            var version = assembly.GetName().Version?.ToString(3) ?? "Unknown";
+            return $"v{version}";
+        }
+        catch
+        {
+            return "vUnknown";
         }
     }
 
@@ -160,7 +237,7 @@ public partial class TuiDisplayService : IDisplayService
     {
         this._mainWindow = new Window
         {
-            Title = "KNX Monitor - Terminal.Gui V2",
+            Title = $"KNX Monitor {GetVersionString()}",
             X = 0,
             Y = 0,
             Width = Dim.Fill(),
