@@ -31,6 +31,11 @@
         "args": "clean"
     },
     {
+        "key": "cmd+k cmd+v",
+        "command": "workbench.action.tasks.runTask",
+        "args": "version"
+    },
+    {
         "key": "f5",
         "command": "workbench.action.debug.start",
         "when": "debuggersAvailable && !inDebugMode"

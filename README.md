@@ -12,13 +12,15 @@ KNX Monitor is a professional-grade command-line application for monitoring, deb
 ## ✨ Features
 
 ### 🎯 **Core Monitoring**
+
 - **Real-time KNX bus monitoring** with millisecond precision
 - **Multiple connection types**: IP Tunneling, IP Routing, USB
 - **Group address resolution** via CSV database import
 - **Data Point Type (DPT) decoding** for human-readable values
 - **Advanced filtering** with regex pattern support
 
-### 🏗️ **Enterprise Architecture**
+### 🏗️ **Architecture**
+
 - **High-performance logging** with zero-allocation LoggerMessage
 - **Systematic event IDs** (1000-4999 hierarchical structure)
 - **Clean architecture** with CQRS patterns
@@ -26,6 +28,7 @@ KNX Monitor is a professional-grade command-line application for monitoring, deb
 - **Resource management** with proper async disposal
 
 ### 🔧 **Professional Features**
+
 - **Health check endpoints** for monitoring integration
 - **Configuration validation** with constants
 - **Custom console formatting** for clean output
@@ -37,16 +40,19 @@ KNX Monitor is a professional-grade command-line application for monitoring, deb
 ### Installation
 
 #### Homebrew (macOS/Linux)
+
 ```bash
 brew install metaneutrons/tap/knxmonitor
 ```
 
 #### Docker
+
 ```bash
 docker run --rm -it ghcr.io/metaneutrons/knxmonitor:latest --help
 ```
 
 #### Manual Installation
+
 Download the latest release from [GitHub Releases](https://github.com/metaneutrons/KnxMonitor/releases).
 
 ### Basic Usage
@@ -70,16 +76,19 @@ knxmonitor --connection-type routing --health-check-port 8080
 ### Connection Types
 
 #### IP Tunneling
+
 ```bash
 knxmonitor --connection-type tunneling --host <knx-gateway-ip> [--port 3671]
 ```
 
 #### IP Routing (Multicast)
+
 ```bash
 knxmonitor --connection-type routing [--multicast-address 224.0.23.12]
 ```
 
 #### USB Interface
+
 ```bash
 knxmonitor --connection-type usb [--device /dev/ttyUSB0]
 ```
@@ -93,6 +102,7 @@ knxmonitor --csv-path group_addresses.csv --connection-type routing
 ```
 
 **CSV Format:**
+
 ```csv
 "Group address";"Name";"Central function";"Unfiltered";"Description";"DatapointType";"Security"
 "0/1/1";"Living Room Light";"Switching";"No";"Main living room lighting";"DPST-1-1";"Auto"
@@ -102,6 +112,7 @@ knxmonitor --csv-path group_addresses.csv --connection-type routing
 ### Advanced Configuration
 
 #### Environment Variables
+
 ```bash
 export KNX_CONNECTION_TYPE=tunneling
 export KNX_HOST=192.168.1.100
@@ -110,7 +121,9 @@ export KNX_LOG_LEVEL=Information
 ```
 
 #### Configuration File
+
 Create `knxmonitor.json`:
+
 ```json
 {
   "ConnectionType": "tunneling",
@@ -125,6 +138,7 @@ Create `knxmonitor.json`:
 ## 🐳 Docker Usage
 
 ### Basic Monitoring
+
 ```bash
 docker run --rm -it --network host \
   ghcr.io/metaneutrons/knxmonitor:latest \
@@ -132,6 +146,7 @@ docker run --rm -it --network host \
 ```
 
 ### With Volume Mapping
+
 ```bash
 docker run --rm -it --network host \
   -v $(pwd)/config:/app/config \
@@ -142,6 +157,7 @@ docker run --rm -it --network host \
 ```
 
 ### Docker Compose
+
 ```yaml
 version: '3.8'
 services:
@@ -165,6 +181,7 @@ services:
 ## 🛠️ Development
 
 ### Prerequisites
+
 - [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [Git](https://git-scm.com/)
 - [VS Code](https://code.visualstudio.com/) (recommended)
@@ -174,12 +191,14 @@ services:
 This project includes comprehensive VS Code configuration for optimal development experience:
 
 #### Quick Start
+
 1. Open the project in VS Code
 2. Install recommended extensions (VS Code will prompt)
 3. **Press Shift+Cmd+B** to build and run the application
 4. Use **F5** to debug with breakpoints
 
 #### Key Shortcuts
+
 - **Shift+Cmd+B**: Build and run in router mode (primary development shortcut)
 - **Shift+Cmd+R**: Run in IP routing mode
 - **Shift+Cmd+T**: Run in IP tunneling mode
@@ -190,6 +209,7 @@ This project includes comprehensive VS Code configuration for optimal developmen
 See [.vscode/README.md](.vscode/README.md) for complete VS Code documentation.
 
 ### Building from Source
+
 ```bash
 git clone https://github.com/metaneutrons/KnxMonitor.git
 cd KnxMonitor
@@ -198,11 +218,13 @@ dotnet build --configuration Release
 ```
 
 ### Running Tests
+
 ```bash
 dotnet test --configuration Release --verbosity normal
 ```
 
 ### Development Environment
+
 ```bash
 # Run with hot reload
 dotnet run --project KnxMonitor -- --connection-type routing --csv-path test.csv
@@ -216,12 +238,14 @@ dotnet build --configuration Debug
 KNX Monitor follows architectural patterns:
 
 ### **Clean Architecture**
+
 - **Domain Layer**: Core KNX protocol handling
 - **Application Layer**: CQRS command/query handlers
 - **Infrastructure Layer**: External integrations (KNX SDK, file system)
 - **Presentation Layer**: Console interface and health endpoints
 
 ### **Key Components**
+
 - **KnxMonitorService**: Core monitoring engine
 - **KnxGroupAddressDatabase**: CSV-based address resolution
 - **KnxDptDecoder**: Data Point Type value decoding
@@ -229,6 +253,7 @@ KNX Monitor follows architectural patterns:
 - **HealthCheckService**: HTTP health endpoints
 
 ### **Enterprise Features**
+
 - **Systematic Event IDs**: 1000-4999 hierarchical logging
 - **High-Performance Logging**: Zero-allocation LoggerMessage
 - **Resource Management**: Proper IAsyncDisposable patterns
@@ -238,12 +263,14 @@ KNX Monitor follows architectural patterns:
 ## 📊 Performance
 
 ### **Benchmarks**
+
 - **Message Processing**: >10,000 messages/second
 - **Memory Usage**: <50MB baseline
 - **CPU Usage**: <5% on modern hardware
 - **Startup Time**: <2 seconds
 
 ### **Scalability**
+
 - **Concurrent Connections**: Up to 100 simultaneous
 - **Message Queue**: 10,000 message buffer
 - **Database Size**: Supports 100,000+ group addresses
@@ -261,6 +288,7 @@ KNX Monitor follows architectural patterns:
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Workflow
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
@@ -268,6 +296,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 5. Open a Pull Request
 
 ### Code Standards
+
 - Follow [.NET coding conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
 - Maintain test coverage >90%
 - Use structured logging with proper event IDs

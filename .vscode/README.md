@@ -14,6 +14,7 @@ This directory contains VS Code configuration files for optimal development expe
 | **Shift+Cmd+W** | Watch Mode | Run with hot reload (dotnet watch) |
 | **Cmd+K Cmd+T** | Run Tests | Execute all unit tests |
 | **Cmd+K Cmd+C** | Clean | Clean build artifacts |
+| **Cmd+K Cmd+V** | Version | Show version information |
 | **F5** | Debug | Start debugging with breakpoints |
 | **Ctrl+F5** | Run | Run without debugging |
 | **Shift+F5** | Stop | Stop debugging session |
@@ -36,6 +37,7 @@ This directory contains VS Code configuration files for optimal development expe
 - **watch**: Hot reload development mode
 - **test**: Runs unit tests
 - **clean**: Cleans build artifacts
+- **version**: Shows comprehensive version information
 
 ### `launch.json` - Debug Configurations
 - **KnxMonitor - Router Mode**: Debug in IP routing mode
@@ -43,6 +45,7 @@ This directory contains VS Code configuration files for optimal development expe
 - **KnxMonitor - Router with CSV**: Debug with group address database
 - **KnxMonitor - Help**: Debug help command
 - **KnxMonitor - Health Check Mode**: Debug with health check endpoint
+- **KnxMonitor - Version Info**: Debug version information display
 
 ### `settings.json` - Project Settings
 - .NET and C# development optimizations

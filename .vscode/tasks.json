@@ -142,6 +142,25 @@
             }
         },
         {
+            "label": "version",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}/KnxMonitor/KnxMonitor.csproj",
+                "--",
+                "--version"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "test",
             "command": "dotnet",
             "type": "process",

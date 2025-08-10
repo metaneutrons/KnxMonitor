@@ -94,6 +94,22 @@
             "env": {
                 "DOTNET_ENVIRONMENT": "Development"
             }
+        },
+        {
+            "name": "KnxMonitor - Version Info",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/KnxMonitor/bin/Debug/net9.0/KnxMonitor.dll",
+            "args": [
+                "--version"
+            ],
+            "cwd": "${workspaceFolder}/KnxMonitor",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
         }
     ]
 }

@@ -1,6 +1,8 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Net.Sockets;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using KnxMonitor.Logging;
 using KnxMonitor.Models;
 using KnxMonitor.Services;
@@ -97,6 +99,11 @@ public static partial class Program
                     "Enable HTTP health check service on port 8080 (automatically enabled in Docker containers)",
             };
 
+            Option<bool> versionOption = new("--version")
+            {
+                Description = "Show version information including GitVersion details",
+            };
+
             // Create root command using modern pattern
             RootCommand rootCommand = new("KNX Monitor - Visual debugging tool for KNX/EIB bus activity");
             rootCommand.Options.Add(gatewayOption);
@@ -108,6 +115,7 @@ public static partial class Program
             rootCommand.Options.Add(csvOption);
             rootCommand.Options.Add(loggingModeOption);
             rootCommand.Options.Add(enableHealthCheckOption);
+            rootCommand.Options.Add(versionOption);
 
             // Parse the command line arguments
             ParseResult parseResult = rootCommand.Parse(args);
@@ -118,11 +126,34 @@ public static partial class Program
                 Console.WriteLine(rootCommand.Description);
                 Console.WriteLine();
                 Console.WriteLine("Options:");
-                foreach (var option in rootCommand.Options)
+                
+                // Define help entries explicitly for better control
+                var helpEntries = new[]
                 {
-                    var aliases = string.Join(", ", option.Aliases);
-                    Console.WriteLine($"  {aliases, -20} {option.Description}");
+                    ("-h, -?, --help", "Show help and usage information"),
+                    ("--version", "Show version information including GitVersion details"),
+                    ("-g, --gateway", "KNX gateway address (required for tunnel connections only)"),
+                    ("-c, --connection-type", "Connection type: tunnel (default), router, usb"),
+                    ("-m, --multicast-address", "Use router mode with multicast address (default: 224.0.23.12)"),
+                    ("-p, --port", "Port number (default: 3671)"),
+                    ("-v, --verbose", "Enable verbose logging"),
+                    ("-f, --filter", "Group address filter pattern"),
+                    ("--csv, --groupaddress-csv", "Path to KNX group address CSV file (ETS export format)"),
+                    ("-l, --logging-mode", "Force simple logging mode instead of TUI"),
+                    ("--enable-health-check", "Enable HTTP health check service on port 8080")
+                };
+
+                foreach (var (aliases, description) in helpEntries)
+                {
+                    Console.WriteLine($"  {aliases, -27} {description}");
                 }
+                return 0;
+            }
+
+            // Check if version was requested
+            if (args.Contains("--version"))
+            {
+                DisplayVersionInformation();
                 return 0;
             }
 
@@ -681,5 +712,111 @@ public static partial class Program
 
             throw new InvalidOperationException($"Failed to connect after 4 attempts. Last error: {errorMessage}", ex);
         }
+    }
+
+    /// <summary>
+    /// Displays comprehensive version information including GitVersion details.
+    /// </summary>
+    private static void DisplayVersionInformation()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var assemblyName = assembly.GetName();
+        
+        // Get version information
+        var version = assemblyName.Version?.ToString() ?? "Unknown";
+        var fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? "Unknown";
+        var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Unknown";
+        var product = assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? "KNX Monitor";
+        var company = assembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "KnxMonitor";
+        var copyright = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? "";
+        var description = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? "";
+
+        // Display header
+        Console.WriteLine($"{product}");
+        Console.WriteLine(new string('=', product.Length));
+        Console.WriteLine();
+
+        // Display version information
+        Console.WriteLine("Version Information:");
+        Console.WriteLine($"  Version:              {version}");
+        Console.WriteLine($"  File Version:         {fileVersion}");
+        Console.WriteLine($"  Informational:        {informationalVersion}");
+        Console.WriteLine();
+
+        // Display GitVersion information (if available in informational version)
+        if (informationalVersion.Contains("+") || informationalVersion.Contains("-"))
+        {
+            Console.WriteLine("GitVersion Details:");
+            var parts = informationalVersion.Split(new[] { '+', '-' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 0)
+            {
+                Console.WriteLine($"  Semantic Version:     {parts[0]}");
+            }
+            if (parts.Length > 1)
+            {
+                Console.WriteLine($"  Build Metadata:       {string.Join("-", parts.Skip(1))}");
+            }
+            Console.WriteLine();
+        }
+
+        // Display assembly information
+        Console.WriteLine("Assembly Information:");
+        Console.WriteLine($"  Product:              {product}");
+        Console.WriteLine($"  Company:              {company}");
+        Console.WriteLine($"  Description:          {description}");
+        if (!string.IsNullOrEmpty(copyright))
+        {
+            Console.WriteLine($"  Copyright:            {copyright}");
+        }
+        Console.WriteLine();
+
+        // Display runtime information
+        Console.WriteLine("Runtime Information:");
+        Console.WriteLine($"  .NET Version:         {Environment.Version}");
+        Console.WriteLine($"  Runtime:              {RuntimeInformation.FrameworkDescription}");
+        Console.WriteLine($"  OS:                   {RuntimeInformation.OSDescription}");
+        Console.WriteLine($"  Architecture:         {RuntimeInformation.OSArchitecture}");
+        Console.WriteLine($"  Process Architecture: {RuntimeInformation.ProcessArchitecture}");
+        Console.WriteLine();
+
+        // Display build information
+        Console.WriteLine("Build Information:");
+        Console.WriteLine($"  Build Date:           {GetBuildDate(assembly):yyyy-MM-dd HH:mm:ss} UTC");
+        Console.WriteLine($"  Assembly Location:    {assembly.Location}");
+        Console.WriteLine();
+
+        // Display repository information
+        var repositoryUrl = "https://github.com/metaneutrons/KnxMonitor";
+        Console.WriteLine("Repository Information:");
+        Console.WriteLine($"  Repository:           {repositoryUrl}");
+        Console.WriteLine($"  License:              GPL-3.0-or-later");
+        Console.WriteLine($"  Issues:               {repositoryUrl}/issues");
+        Console.WriteLine($"  Releases:             {repositoryUrl}/releases");
+    }
+
+    /// <summary>
+    /// Gets the build date from the assembly.
+    /// </summary>
+    /// <param name="assembly">The assembly to get the build date from.</param>
+    /// <returns>The build date in UTC.</returns>
+    private static DateTime GetBuildDate(Assembly assembly)
+    {
+        try
+        {
+            // Try to get build date from PE header
+            var location = assembly.Location;
+            if (!string.IsNullOrEmpty(location) && File.Exists(location))
+            {
+                var fileInfo = new FileInfo(location);
+                return fileInfo.LastWriteTimeUtc;
+            }
+        }
+        catch
+        {
+            // Fallback to a reasonable default
+        }
+
+        // Fallback to current time if we can't determine build date
+        return DateTime.UtcNow;
     }
 }
