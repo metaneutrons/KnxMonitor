@@ -715,108 +715,28 @@ public static partial class Program
     }
 
     /// <summary>
-    /// Displays comprehensive version information including GitVersion details.
+    /// Displays concise version information including GitVersion details.
     /// </summary>
     private static void DisplayVersionInformation()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var assemblyName = assembly.GetName();
         
         // Get version information
-        var version = assemblyName.Version?.ToString() ?? "Unknown";
-        var fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? "Unknown";
         var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Unknown";
-        var product = assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? "KNX Monitor";
-        var company = assembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "KnxMonitor";
-        var copyright = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? "";
-        var description = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? "";
 
-        // Display header
-        Console.WriteLine($"{product}");
-        Console.WriteLine(new string('=', product.Length));
-        Console.WriteLine();
-
-        // Display version information
-        Console.WriteLine("Version Information:");
-        Console.WriteLine($"  Version:              {version}");
-        Console.WriteLine($"  File Version:         {fileVersion}");
-        Console.WriteLine($"  Informational:        {informationalVersion}");
-        Console.WriteLine();
-
-        // Display GitVersion information (if available in informational version)
+        // Extract semantic version from informational version
+        var semanticVersion = informationalVersion;
         if (informationalVersion.Contains("+") || informationalVersion.Contains("-"))
         {
-            Console.WriteLine("GitVersion Details:");
-            var parts = informationalVersion.Split(new[] { '+', '-' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = informationalVersion.Split(new[] { '+', '-' }, 2, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length > 0)
             {
-                Console.WriteLine($"  Semantic Version:     {parts[0]}");
-            }
-            if (parts.Length > 1)
-            {
-                Console.WriteLine($"  Build Metadata:       {string.Join("-", parts.Skip(1))}");
-            }
-            Console.WriteLine();
-        }
-
-        // Display assembly information
-        Console.WriteLine("Assembly Information:");
-        Console.WriteLine($"  Product:              {product}");
-        Console.WriteLine($"  Company:              {company}");
-        Console.WriteLine($"  Description:          {description}");
-        if (!string.IsNullOrEmpty(copyright))
-        {
-            Console.WriteLine($"  Copyright:            {copyright}");
-        }
-        Console.WriteLine();
-
-        // Display runtime information
-        Console.WriteLine("Runtime Information:");
-        Console.WriteLine($"  .NET Version:         {Environment.Version}");
-        Console.WriteLine($"  Runtime:              {RuntimeInformation.FrameworkDescription}");
-        Console.WriteLine($"  OS:                   {RuntimeInformation.OSDescription}");
-        Console.WriteLine($"  Architecture:         {RuntimeInformation.OSArchitecture}");
-        Console.WriteLine($"  Process Architecture: {RuntimeInformation.ProcessArchitecture}");
-        Console.WriteLine();
-
-        // Display build information
-        Console.WriteLine("Build Information:");
-        Console.WriteLine($"  Build Date:           {GetBuildDate(assembly):yyyy-MM-dd HH:mm:ss} UTC");
-        Console.WriteLine($"  Assembly Location:    {assembly.Location}");
-        Console.WriteLine();
-
-        // Display repository information
-        var repositoryUrl = "https://github.com/metaneutrons/KnxMonitor";
-        Console.WriteLine("Repository Information:");
-        Console.WriteLine($"  Repository:           {repositoryUrl}");
-        Console.WriteLine($"  License:              GPL-3.0-or-later");
-        Console.WriteLine($"  Issues:               {repositoryUrl}/issues");
-        Console.WriteLine($"  Releases:             {repositoryUrl}/releases");
-    }
-
-    /// <summary>
-    /// Gets the build date from the assembly.
-    /// </summary>
-    /// <param name="assembly">The assembly to get the build date from.</param>
-    /// <returns>The build date in UTC.</returns>
-    private static DateTime GetBuildDate(Assembly assembly)
-    {
-        try
-        {
-            // Try to get build date from PE header
-            var location = assembly.Location;
-            if (!string.IsNullOrEmpty(location) && File.Exists(location))
-            {
-                var fileInfo = new FileInfo(location);
-                return fileInfo.LastWriteTimeUtc;
+                semanticVersion = parts[0];
             }
         }
-        catch
-        {
-            // Fallback to a reasonable default
-        }
 
-        // Fallback to current time if we can't determine build date
-        return DateTime.UtcNow;
+        // Display concise version information
+        Console.WriteLine($"Version:    {semanticVersion}");
+        Console.WriteLine($"GitVersion: {informationalVersion}");
     }
 }
