@@ -130,12 +130,23 @@ jobs:
 
       - name: Build and publish
         run: |
-          dotnet publish ${{ env.PROJECT_NAME }} \
-            --configuration Release \
-            --runtime ${{ matrix.runtime }} \
-            --self-contained false \
-            --output ./publish/${{ matrix.runtime }} \
-            --verbosity minimal
+          if [[ "${{ matrix.runtime }}" == linux-* ]]; then
+            # Framework-dependent deployment for Docker (Linux)
+            dotnet publish ${{ env.PROJECT_NAME }} \
+              --configuration Release \
+              --runtime ${{ matrix.runtime }} \
+              --self-contained false \
+              --output ./publish/${{ matrix.runtime }} \
+              --verbosity minimal
+          else
+            # Self-contained deployment without single-file for other platforms
+            dotnet publish ${{ env.PROJECT_NAME }} \
+              --configuration Release \
+              --runtime ${{ matrix.runtime }} \
+              --self-contained true \
+              --output ./publish/${{ matrix.runtime }} \
+              --verbosity minimal
+          fi
 
       - name: Code sign macOS binaries
         if: startsWith(matrix.runtime, 'osx-')
