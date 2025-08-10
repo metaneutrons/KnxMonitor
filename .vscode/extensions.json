@@ -1,50 +1,22 @@
 {
-    "recommendations": [
-        // Essential .NET development
-        "ms-dotnettools.csharp",
-        "ms-dotnettools.csdevkit",
-        "ms-dotnettools.vscode-dotnet-runtime",
-        
-        // Code quality and formatting
-        "editorconfig.editorconfig",
-        "ms-vscode.vscode-json",
-        
-        // Git and version control
-        "eamodio.gitlens",
-        "github.vscode-pull-request-github",
-        
-        // Docker support
-        "ms-vscode-remote.remote-containers",
-        "ms-azuretools.vscode-docker",
-        
-        // YAML support for GitHub Actions
-        "redhat.vscode-yaml",
-        
-        // Markdown support for documentation
-        "yzhang.markdown-all-in-one",
-        "davidanson.vscode-markdownlint",
-        
-        // XML support for project files
-        "redhat.vscode-xml",
-        
-        // Terminal enhancements
-        "ms-vscode.powershell",
-        
-        // Code spell checking
-        "streetsidesoftware.code-spell-checker",
-        
-        // TODO highlighting
-        "wayou.vscode-todo-highlight",
-        
-        // Bracket pair colorization
-        "coenraads.bracket-pair-colorizer-2",
-        
-        // Path intellisense
-        "christian-kohler.path-intellisense"
-    ],
-    "unwantedRecommendations": [
-        // Avoid conflicting extensions
-        "ms-vscode.csharp",
-        "formulahendry.dotnet-test-explorer"
-    ]
+  "recommendations": [
+    // Essential .NET development
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.csdevkit",
+    "ms-dotnettools.vscode-dotnet-runtime",
+    // Code quality and formatting
+    "editorconfig.editorconfig",
+    "ms-vscode.vscode-json",
+    // YAML support for GitHub Actions
+    "redhat.vscode-yaml",
+    // Code spell checking
+    "streetsidesoftware.code-spell-checker",
+    // Path intellisense
+    "christian-kohler.path-intellisense"
+  ],
+  "unwantedRecommendations": [
+    // Avoid conflicting extensions
+    "ms-vscode.csharp",
+    "formulahendry.dotnet-test-explorer"
+  ]
 }
