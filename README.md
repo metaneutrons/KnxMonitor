@@ -58,6 +58,12 @@ Download the latest release from [GitHub Releases](https://github.com/metaneutro
 ### Basic Usage
 
 ```bash
+# Show version information
+knxmonitor --version
+
+# Show help and all options
+knxmonitor --help
+
 # Monitor KNX bus via IP tunneling
 knxmonitor --connection-type tunneling --host 192.168.1.100
 
@@ -70,6 +76,24 @@ knxmonitor --connection-type tunneling --host 192.168.1.100 --filter "1/1/*"
 # Run with health check endpoint
 knxmonitor --connection-type routing --health-check-port 8080
 ```
+
+## 📋 Version Information
+
+Get comprehensive version and build information:
+
+```bash
+knxmonitor --version
+```
+
+**Output includes:**
+- **Version Information**: Assembly version, file version, and GitVersion details
+- **GitVersion Details**: Semantic version and build metadata
+- **Assembly Information**: Product, company, description, and copyright
+- **Runtime Information**: .NET version, OS, and architecture details
+- **Build Information**: Build date and assembly location
+- **Repository Information**: GitHub links for issues, releases, and documentation
+
+Perfect for troubleshooting, support requests, and deployment verification.
 
 ## 📖 Documentation
 
