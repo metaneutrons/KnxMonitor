@@ -1,0 +1,198 @@
+.TH KNXMONITOR 1 "2025-08-11" "KNX Monitor" "User Commands"
+.SH NAME
+knxmonitor \- KNX/EIB bus monitoring and debugging tool
+.SH SYNOPSIS
+.B knxmonitor
+[\fIOPTION\fR]...
+.SH DESCRIPTION
+KNX Monitor is a command-line application for monitoring, debugging, and analyzing KNX/EIB building automation networks. Built with modern .NET 9, it provides real-time visualization of KNX bus traffic with comprehensive logging and analysis capabilities.
+.PP
+The application features a Terminal.Gui V2 interface for interactive monitoring, advanced DPT (Data Point Type) decoding using the Falcon SDK, CSV export functionality, and support for multiple connection types including IP Tunneling, IP Routing, and USB interfaces.
+.PP
+When run in an interactive terminal, KNX Monitor automatically launches a rich Terminal User Interface (TUI). When output is redirected or running in containers, it switches to logging mode for scripting and automation.
+.SH OPTIONS
+.TP
+\fB\-g\fR, \fB\-\-gateway\fR \fIADDRESS\fR
+Specify the KNX gateway address. This can be an IP address for KNX/IP gateways or a hostname. Default is "knxd" for local knxd daemon.
+.TP
+\fB\-p\fR, \fB\-\-port\fR \fIPORT\fR
+Specify the KNX gateway port. Default is 3671 (standard KNX/IP port).
+.TP
+\fB\-c\fR, \fB\-\-connection\-type\fR \fITYPE\fR
+Specify the connection type. Valid options are:
+.RS
+.IP \(bu 2
+\fBtunnel\fR \- IP Tunneling (default, most common)
+.IP \(bu 2
+\fBrouter\fR \- IP Routing (multicast)
+.IP \(bu 2
+\fBusb\fR \- USB interface
+.RE
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Enable verbose logging output. Shows detailed connection information and internal processing details.
+.TP
+\fB\-l\fR, \fB\-\-logging\-mode\fR
+Force logging mode instead of the Terminal User Interface. Useful for scripting, automation, or when running in environments without proper terminal support.
+.TP
+\fB\-\-csv\fR \fIFILE\fR
+Load group addresses from a CSV file in ETS export format. This enables advanced DPT decoding and shows meaningful names for group addresses instead of raw addresses.
+.TP
+\fB\-f\fR, \fB\-\-filter\fR \fIPATTERN\fR
+Filter group addresses using pattern matching. Supports wildcards, for example:
+.RS
+.IP \(bu 2
+\fB1/2/*\fR \- All addresses in main group 1, middle group 2
+.IP \(bu 2
+\fB1/*/5\fR \- All addresses with main group 1 and sub group 5
+.IP \(bu 2
+\fB*/2/3\fR \- All addresses with middle group 2 and sub group 3
+.RE
+.TP
+\fB\-t\fR, \fB\-\-test\fR
+Run DPT decoding tests and exit. Used for development and testing purposes.
+.TP
+\fB\-\-help\fR
+Show help information and exit.
+.TP
+\fB\-\-version\fR
+Show version information and exit.
+.SH INTERACTIVE MODE
+When running in an interactive terminal, KNX Monitor displays a rich Terminal User Interface with the following features:
+.TP
+\fBReal-time Message Display\fR
+Shows KNX messages in a scrollable table with timestamps, source/destination addresses, decoded values, and group address names (if CSV loaded).
+.TP
+\fBColor Coding\fR
+Messages are color-coded based on age and operation type:
+.RS
+.IP \(bu 2
+Green: Recent messages, Write operations, Connected status
+.IP \(bu 2
+Yellow: Medium age messages, Response operations
+.IP \(bu 2
+Cyan: Read operations, IP Tunneling connections
+.IP \(bu 2
+Magenta: IP Routing connections
+.IP \(bu 2
+Red: System priority, Disconnected status, Errors
+.RE
+.TP
+\fBKeyboard Shortcuts\fR
+.RS
+.IP \(bu 2
+\fBF1\fR: Show help dialog
+.IP \(bu 2
+\fBF2\fR: Open filter dialog
+.IP \(bu 2
+\fBF3\fR: Clear all messages
+.IP \(bu 2
+\fBF5\fR: Refresh display
+.IP \(bu 2
+\fBF9\fR: Export messages to CSV
+.IP \(bu 2
+\fBF10\fR or \fBCtrl+C\fR: Exit application
+.IP \(bu 2
+\fBArrow Keys\fR: Navigate message table
+.IP \(bu 2
+\fBPage Up/Down\fR: Scroll through messages
+.IP \(bu 2
+\fBHome/End\fR: Jump to first/last message
+.RE
+.SH LOGGING MODE
+When output is redirected or \fB\-l\fR is specified, KNX Monitor runs in logging mode, outputting structured log messages suitable for scripting and automation:
+.PP
+.nf
+[14:32:15.123] Write 1.1.5 -> 1/2/1 = 75% (Normal)
+[14:32:15.456] Read 1.1.10 -> 1/2/5 = Empty (Normal)
+[14:32:15.789] Response 1.1.5 -> 1/2/5 = false (Normal)
+.fi
+.SH DPT DECODING
+KNX Monitor features advanced Data Point Type (DPT) decoding using the Falcon SDK. Supported DPT types include:
+.TP
+\fBDPT 1.xxx\fR
+Boolean values with context-aware formatting (On/Off, Up/Down, Open/Close)
+.TP
+\fBDPT 5.xxx\fR
+8-bit unsigned values (Scaling percentages, Angles)
+.TP
+\fBDPT 9.xxx\fR
+2-byte float values with proper units (Temperature, Illuminance, Wind Speed, Pressure, Humidity)
+.TP
+\fBDPT 14.xxx\fR
+4-byte IEEE 754 float values (Electric Current, Frequency, Power, Voltage)
+.PP
+When a CSV file with group address definitions is loaded, values are automatically decoded and displayed with appropriate units and formatting.
+.SH CSV FORMAT
+The CSV file should be in ETS export format with the following columns:
+.PP
+.nf
+Group Address,Name,Central Function,Unfiltered,Description,DatapointType,Security
+1/2/1,Living Room Light,Switching,,,DPT-1,None
+1/2/5,Living Room Dimmer,Dimming,,,DPT-5.001,None
+1/3/1,Temperature Sensor,Value,,,DPT-9.001,None
+.fi
+.SH EXAMPLES
+.TP
+Monitor KNX bus via IP tunneling to a local knxd daemon:
+.B knxmonitor
+.TP
+Monitor KNX bus via IP tunneling to a specific gateway:
+.B knxmonitor \-g 192.168.1.100
+.TP
+Monitor with CSV decoding and verbose logging:
+.B knxmonitor \-g 192.168.1.100 \-\-csv addresses.csv \-v
+.TP
+Monitor specific group addresses in logging mode:
+.B knxmonitor \-g 192.168.1.100 \-f "1/2/*" \-l
+.TP
+Monitor via IP routing (multicast):
+.B knxmonitor \-c router \-g 224.0.23.12
+.TP
+Monitor USB interface:
+.B knxmonitor \-c usb
+.TP
+Export monitoring session to file:
+.B knxmonitor \-g 192.168.1.100 \-l > knx_log.txt
+.SH FILES
+.TP
+\fI~/.config/knxmonitor/\fR
+User configuration directory (future use)
+.TP
+\fI/usr/share/doc/knxmonitor/examples/\fR
+Example CSV files and configuration
+.SH ENVIRONMENT
+.TP
+\fBTERM\fR
+Terminal type, affects TUI display capabilities
+.TP
+\fBCOLORTERM\fR
+Color terminal support detection
+.SH EXIT STATUS
+.TP
+\fB0\fR
+Success
+.TP
+\fB1\fR
+General error (connection failed, invalid arguments, etc.)
+.TP
+\fB2\fR
+Configuration error (invalid CSV file, missing dependencies, etc.)
+.SH SEE ALSO
+.BR knxd (1),
+.BR docker (1),
+.BR ets (1)
+.PP
+KNX Association: https://www.knx.org/
+.PP
+ETS Software: https://www.knx.org/knx-en/for-professionals/software/ets-professional/
+.SH AUTHOR
+KNX Monitor Team
+.SH REPORTING BUGS
+Report bugs at: https://github.com/metaneutrons/KnxMonitor/issues
+.PP
+For support and discussions: https://github.com/metaneutrons/KnxMonitor/discussions
+.SH COPYRIGHT
+Copyright \(co 2025 KNX Monitor Team. License GPL-3.0-or-later: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+.PP
+This is free software: you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law.

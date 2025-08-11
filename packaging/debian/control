@@ -4,7 +4,7 @@ Section: utils
 Priority: optional
 Architecture: amd64
 Depends: libc6 (>= 2.17), libgcc-s1 (>= 3.0), libssl3 (>= 3.0.0)
-Maintainer: KNX Monitor Team <support@knxmonitor.dev>
+Maintainer: Fabian Schmieder <github@schmieder.eu>
 Description: KNX/EIB bus monitoring and debugging tool
  KNX Monitor is a command-line application for monitoring, debugging, and
  analyzing KNX/EIB building automation networks. Built with modern .NET 9,
@@ -12,10 +12,11 @@ Description: KNX/EIB bus monitoring and debugging tool
  logging and analysis capabilities.
  .
  Features:
-  * Real-time KNX bus monitoring
-  * Advanced DPT decoding with Falcon SDK
-  * Terminal.Gui V2 interface
-  * CSV export functionality
-  * Docker support
-  * Multiple connection types (IP Tunneling, IP Routing, USB)
-Homepage: https://github.com/metaneutrons/KnxMonitor
+
+* Real-time KNX bus monitoring
+* Advanced DPT decoding with Falcon SDK
+* Terminal.Gui V2 interface
+* CSV export functionality
+* Docker support
+* Multiple connection types (IP Tunneling, IP Routing, USB)
+Homepage: <https://github.com/metaneutrons/KnxMonitor>
