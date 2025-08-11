@@ -208,11 +208,33 @@ jobs:
 
       - name: Create archive
         run: |
-          cd ./publish/${{ matrix.runtime }}
+          # Create a staging directory with all files for the archive
+          mkdir -p ./archive-staging
+          
+          # Copy the binary
+          cp ./publish/${{ matrix.runtime }}/KnxMonitor ./archive-staging/
+          
+          # Copy documentation files
+          cp README.md ./archive-staging/ 2>/dev/null || echo "README.md not found"
+          cp LICENSE ./archive-staging/ 2>/dev/null || echo "LICENSE not found"
+          
+          # Copy man page
+          if [ -f "docs/knxmonitor.1" ]; then
+            mkdir -p ./archive-staging/docs
+            cp docs/knxmonitor.1 ./archive-staging/docs/
+          fi
+          
+          # Copy example CSV file
+          if [ -f "knx-addresses.csv" ]; then
+            cp knx-addresses.csv ./archive-staging/
+          fi
+          
+          # Create the archive
+          cd ./archive-staging
           if [[ "${{ matrix.runtime }}" == win-* ]]; then
-            zip -r ../../${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-${{ matrix.runtime }}.zip .
+            zip -r ../${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-${{ matrix.runtime }}.zip .
           else
-            tar -czf ../../${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-${{ matrix.runtime }}.tar.gz .
+            tar -czf ../${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-${{ matrix.runtime }}.tar.gz .
           fi
 
       - name: Upload artifacts
