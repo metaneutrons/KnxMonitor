@@ -424,6 +424,121 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  package-linux:
+    name: Package for Linux distributions
+    needs: [calculate-version, build]
+    runs-on: ubuntu-latest
+    if: needs.calculate-version.outputs.should-release == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: KnxMonitor-linux-*
+          path: ./artifacts
+          merge-multiple: false
+
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev
+
+      - name: Make packaging scripts executable
+        run: |
+          chmod +x packaging/build-deb.sh
+
+      - name: Build Debian packages
+        run: |
+          # Build for amd64
+          ./packaging/build-deb.sh ${{ needs.calculate-version.outputs.version }} amd64
+          
+          # Build for arm64
+          ./packaging/build-deb.sh ${{ needs.calculate-version.outputs.version }} arm64
+
+      - name: Upload Debian packages to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.calculate-version.outputs.tag }}
+          files: "*.deb"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create AUR package files
+        run: |
+          VERSION="${{ needs.calculate-version.outputs.version }}"
+          
+          # Calculate SHA256 for source tarball
+          TARBALL_URL="https://github.com/metaneutrons/KnxMonitor/archive/refs/tags/v${VERSION}.tar.gz"
+          TARBALL_SHA=$(curl -sL "$TARBALL_URL" | sha256sum | cut -d' ' -f1)
+          
+          # Update PKGBUILD with correct version and SHA
+          sed -i "s/pkgver=.*/pkgver=${VERSION}/" packaging/arch/PKGBUILD
+          sed -i "s/sha256sums=('SKIP')/sha256sums=('${TARBALL_SHA}')/" packaging/arch/PKGBUILD
+          
+          # Create .SRCINFO file (requires makepkg, so we'll create a basic one)
+          cd packaging/arch
+          cat > .SRCINFO << EOF
+          pkgbase = knxmonitor
+          	pkgdesc = KNX/EIB bus monitoring and debugging tool
+          	pkgver = ${VERSION}
+          	pkgrel = 1
+          	url = https://github.com/metaneutrons/KnxMonitor
+          	arch = x86_64
+          	arch = aarch64
+          	license = GPL3
+          	makedepends = dotnet-sdk>=9.0
+          	depends = glibc
+          	depends = gcc-libs
+          	depends = openssl
+          	optdepends = knxd: KNX daemon for local KNX/IP gateway
+          	optdepends = docker: For containerized deployment
+          	source = knxmonitor-${VERSION}.tar.gz::https://github.com/metaneutrons/KnxMonitor/archive/refs/tags/v${VERSION}.tar.gz
+          	sha256sums = ${TARBALL_SHA}
+
+          pkgname = knxmonitor
+          EOF
+
+      - name: Upload AUR package files
+        uses: actions/upload-artifact@v4
+        with:
+          name: aur-package-${{ needs.calculate-version.outputs.version }}
+          path: |
+            packaging/arch/PKGBUILD
+            packaging/arch/.SRCINFO
+          retention-days: 90
+
+      - name: Create packaging summary
+        run: |
+          echo "## 📦 Linux Packaging Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Debian Packages" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ knxmonitor_${{ needs.calculate-version.outputs.version }}_amd64.deb" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ knxmonitor_${{ needs.calculate-version.outputs.version }}_arm64.deb" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Arch Linux AUR" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ PKGBUILD updated with version ${{ needs.calculate-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ .SRCINFO generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Installation Instructions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Debian/Ubuntu:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "wget https://github.com/metaneutrons/KnxMonitor/releases/download/v${{ needs.calculate-version.outputs.version }}/knxmonitor_${{ needs.calculate-version.outputs.version }}_amd64.deb" >> $GITHUB_STEP_SUMMARY
+          echo "sudo dpkg -i knxmonitor_${{ needs.calculate-version.outputs.version }}_amd64.deb" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Arch Linux:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "yay -S knxmonitor" >> $GITHUB_STEP_SUMMARY
+          echo "# or" >> $GITHUB_STEP_SUMMARY
+          echo "git clone https://aur.archlinux.org/knxmonitor.git" >> $GITHUB_STEP_SUMMARY
+          echo "cd knxmonitor && makepkg -si" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
   update-homebrew:
     needs: [calculate-version, release, docker]
     if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success' && (needs.docker.result == 'success' || needs.docker.result == 'skipped')
@@ -546,7 +661,7 @@ jobs:
 
   # Summary job to show overall status
   summary:
-    needs: [calculate-version, build, docker, release, update-homebrew]
+    needs: [calculate-version, build, docker, release, package-linux, update-homebrew]
     if: always()
     runs-on: ubuntu-latest
     steps:

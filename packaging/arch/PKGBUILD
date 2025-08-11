@@ -1,0 +1,143 @@
+# Maintainer: KNX Monitor Team <support@knxmonitor.dev>
+pkgname=knxmonitor
+pkgver=0.9.17
+pkgrel=1
+pkgdesc="KNX/EIB bus monitoring and debugging tool"
+arch=('x86_64' 'aarch64')
+url="https://github.com/metaneutrons/KnxMonitor"
+license=('GPL3')
+depends=('glibc' 'gcc-libs' 'openssl')
+makedepends=('dotnet-sdk>=9.0')
+optdepends=(
+    'knxd: KNX daemon for local KNX/IP gateway'
+    'docker: For containerized deployment'
+)
+source=("$pkgname-$pkgver.tar.gz::https://github.com/metaneutrons/KnxMonitor/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')  # Will be updated with actual SHA
+
+prepare() {
+    cd "$srcdir/KnxMonitor-$pkgver"
+    
+    # Restore NuGet packages
+    dotnet restore KnxMonitor/KnxMonitor.csproj
+}
+
+build() {
+    cd "$srcdir/KnxMonitor-$pkgver"
+    
+    # Determine runtime based on architecture
+    case "$CARCH" in
+        x86_64)
+            _runtime="linux-x64"
+            ;;
+        aarch64)
+            _runtime="linux-arm64"
+            ;;
+        *)
+            error "Unsupported architecture: $CARCH"
+            return 1
+            ;;
+    esac
+    
+    # Build the application
+    dotnet publish KnxMonitor/KnxMonitor.csproj \
+        --configuration Release \
+        --runtime "$_runtime" \
+        --self-contained true \
+        --output publish \
+        -p:PublishSingleFile=true \
+        -p:IncludeNativeLibrariesForSelfExtract=true \
+        -p:IncludeAllContentForSelfExtract=true \
+        -p:EnableCompressionInSingleFile=true
+}
+
+check() {
+    cd "$srcdir/KnxMonitor-$pkgver"
+    
+    # Basic functionality test
+    ./publish/KnxMonitor --version
+    ./publish/KnxMonitor --help
+}
+
+package() {
+    cd "$srcdir/KnxMonitor-$pkgver"
+    
+    # Install binary
+    install -Dm755 publish/KnxMonitor "$pkgdir/usr/bin/knxmonitor"
+    
+    # Install documentation
+    install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    
+    # Install example CSV file
+    if [ -f "knx-addresses.csv" ]; then
+        install -Dm644 knx-addresses.csv "$pkgdir/usr/share/doc/$pkgname/examples/knx-addresses.csv"
+    fi
+    
+    # Create man page
+    mkdir -p "$pkgdir/usr/share/man/man1"
+    cat > "$pkgdir/usr/share/man/man1/knxmonitor.1" << 'EOF'
+.TH KNXMONITOR 1 "2025-08-11" "KNX Monitor 0.9.17" "User Commands"
+.SH NAME
+knxmonitor \- KNX/EIB bus monitoring and debugging tool
+.SH SYNOPSIS
+.B knxmonitor
+[\fIOPTION\fR]...
+.SH DESCRIPTION
+KNX Monitor is a command-line application for monitoring, debugging, and analyzing KNX/EIB building automation networks built with modern .NET 9.
+.PP
+Features include real-time KNX bus monitoring, advanced DPT decoding with Falcon SDK, Terminal.Gui V2 interface, CSV export functionality, and support for multiple connection types.
+.SH OPTIONS
+.TP
+\fB\-g\fR, \fB\-\-gateway\fR \fIADDRESS\fR
+KNX gateway address (default: knxd)
+.TP
+\fB\-p\fR, \fB\-\-port\fR \fIPORT\fR
+KNX gateway port (default: 3671)
+.TP
+\fB\-c\fR, \fB\-\-connection\-type\fR \fITYPE\fR
+Connection type: tunnel, router, or usb (default: tunnel)
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Enable verbose logging
+.TP
+\fB\-l\fR, \fB\-\-logging\-mode\fR
+Force logging mode instead of TUI
+.TP
+\fB\-\-csv\fR \fIFILE\fR
+Load group addresses from CSV file (ETS export format)
+.TP
+\fB\-f\fR, \fB\-\-filter\fR \fIPATTERN\fR
+Filter group addresses (e.g., 1/2/*)
+.TP
+\fB\-\-help\fR
+Show help information
+.TP
+\fB\-\-version\fR
+Show version information
+.SH EXAMPLES
+.TP
+Monitor KNX bus via IP tunneling:
+.B knxmonitor \-g 192.168.1.100
+.TP
+Monitor with CSV decoding:
+.B knxmonitor \-g 192.168.1.100 \-\-csv addresses.csv
+.TP
+Monitor specific group addresses:
+.B knxmonitor \-g 192.168.1.100 \-f "1/2/*"
+.TP
+Use logging mode for scripting:
+.B knxmonitor \-g 192.168.1.100 \-l \-v
+.SH FILES
+.TP
+\fI/usr/share/doc/knxmonitor/examples/knx-addresses.csv\fR
+Example CSV file showing ETS export format
+.SH SEE ALSO
+.BR knxd (1),
+.BR docker (1)
+.SH AUTHOR
+KNX Monitor Team
+.SH REPORTING BUGS
+Report bugs at: https://github.com/metaneutrons/KnxMonitor/issues
+EOF
+}
