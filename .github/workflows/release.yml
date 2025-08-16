@@ -148,9 +148,6 @@ jobs:
               --self-contained false \
               --property:UseAppHost=true \
               --property:PublishSingleFile=false \
-              --property:PublishReadyToRun=false \
-              --property:PublishTrimmed=false \
-              --property:EnableCompressionInSingleFile=false \
               --output ./publish/${{ matrix.runtime }} \
               --verbosity normal \
               --nologo
@@ -678,6 +675,40 @@ jobs:
           pattern: KnxMonitor-linux-*
           path: ./artifacts
           merge-multiple: false
+
+      - name: Extract Linux artifacts
+        run: |
+          echo "INFO: Extracting Linux artifacts for packaging..."
+          
+          # Extract AMD64 artifacts
+          if [ -d "artifacts/KnxMonitor-linux-x64" ]; then
+            cd artifacts/KnxMonitor-linux-x64
+            if [ -f "KnxMonitor-${{ needs.calculate-version.outputs.version }}-linux-x64.tar.gz" ]; then
+              tar -xzf "KnxMonitor-${{ needs.calculate-version.outputs.version }}-linux-x64.tar.gz"
+              echo "INFO: AMD64 artifacts extracted"
+              ls -la
+            else
+              echo "ERROR: AMD64 archive not found"
+              exit 1
+            fi
+            cd ../..
+          fi
+          
+          # Extract ARM64 artifacts
+          if [ -d "artifacts/KnxMonitor-linux-arm64" ]; then
+            cd artifacts/KnxMonitor-linux-arm64
+            if [ -f "KnxMonitor-${{ needs.calculate-version.outputs.version }}-linux-arm64.tar.gz" ]; then
+              tar -xzf "KnxMonitor-${{ needs.calculate-version.outputs.version }}-linux-arm64.tar.gz"
+              echo "INFO: ARM64 artifacts extracted"
+              ls -la
+            else
+              echo "ERROR: ARM64 archive not found"
+              exit 1
+            fi
+            cd ../..
+          fi
+          
+          echo "INFO: All Linux artifacts extracted successfully"
 
       - name: Install packaging tools
         run: |
