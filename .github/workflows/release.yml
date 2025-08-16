@@ -666,7 +666,7 @@ jobs:
     name: Package for Linux distributions
     needs: [calculate-version, build]
     runs-on: ubuntu-latest
-    if: needs.calculate-version.outputs.should-release == 'true'
+    if: needs.calculate-version.outputs.is-prerelease == 'false'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
