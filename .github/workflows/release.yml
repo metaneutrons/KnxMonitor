@@ -703,6 +703,7 @@ jobs:
           echo "### 📊 Job Status" >> $GITHUB_STEP_SUMMARY
           echo "- **Version Calculation**: ${{ needs.calculate-version.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Build**: ${{ needs.build.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Linux Packaging**: ${{ needs.package-linux.result == 'success' && '✅' || needs.package-linux.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Docker**: ${{ needs.docker.result == 'success' && '✅' || needs.docker.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Release**: ${{ needs.release.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Homebrew**: ${{ needs.update-homebrew.result == 'success' && '✅' || needs.update-homebrew.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
@@ -710,6 +711,11 @@ jobs:
           echo "### 📦 Assets" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.build.result }}" == "success" ]]; then
             echo "- ✅ Platform binaries created" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [[ "${{ needs.package-linux.result }}" == "success" ]]; then
+            echo "- ✅ Linux packages (.deb, AUR) created" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.package-linux.result }}" == "failure" ]]; then
+            echo "- ❌ Linux packaging failed" >> $GITHUB_STEP_SUMMARY
           fi
           if [[ "${{ needs.docker.result }}" == "success" ]]; then
             echo "- ✅ Docker image: \`ghcr.io/metaneutrons/knxmonitor:${{ needs.calculate-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
