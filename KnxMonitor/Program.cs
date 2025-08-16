@@ -358,7 +358,7 @@ public static partial class Program
         IKnxMonitorService? monitorService = null;
         IDisplayService? displayService = null;
         HealthCheckService? healthCheckService = null;
-        WebUiService? webUiService = null;
+        WebService? webService = null;
 
         try
         {
@@ -440,7 +440,7 @@ public static partial class Program
                     else
                     {
                         services.AddSingleton<IDisplayService, DisplayService>();
-                        services.AddSingleton<WebUiService>();
+                        services.AddSingleton<WebService>();
                     }
                 });
 
@@ -451,7 +451,7 @@ public static partial class Program
             displayService = host.Services.GetRequiredService<IDisplayService>();
             if (!ShouldUseTuiMode(loggingMode))
             {
-                webUiService = host.Services.GetRequiredService<WebUiService>();
+                webService = host.Services.GetRequiredService<WebService>();
             }
 
             // Health endpoints are integrated into the Web UI; no separate health listener is started.
@@ -471,10 +471,10 @@ public static partial class Program
             }
 
             // Start web UI when not in TUI mode
-            if (webUiService != null)
+            if (webService != null)
             {
                 var prefixes = BuildHttpPrefixes(httpUrls, httpHost, httpPort, httpPathBase);
-                await webUiService.StartAsync(prefixes, httpPathBase, httpHealthEnabled, httpHealthPath, httpReadyPath, _applicationCancellationTokenSource.Token);
+                await webService.StartAsync(prefixes, httpPathBase, httpHealthEnabled, httpHealthPath, httpReadyPath, _applicationCancellationTokenSource.Token);
                 Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI started on: {string.Join(", ", prefixes)}");
             }
 
@@ -518,7 +518,7 @@ public static partial class Program
         finally
         {
             // Ensure graceful cleanup of all services
-            await CleanupServicesAsync(host, monitorService, displayService, healthCheckService);
+            await CleanupServicesAsync(host, monitorService, displayService, healthCheckService, webService);
         }
     }
 
@@ -529,13 +529,13 @@ public static partial class Program
     /// <param name="monitorService">The KNX monitor service.</param>
     /// <param name="displayService">The display service.</param>
     /// <param name="healthCheckService">The health check service.</param>
-    /// <param name="webUiService">The web user interface service.</param>
+    /// <param name="webService">The web service.</param>
     private static async Task CleanupServicesAsync(
         IHost? host,
         IKnxMonitorService? monitorService,
         IDisplayService? displayService,
         HealthCheckService? healthCheckService = null,
-        WebUiService? webUiService = null
+        WebService? webService = null
     )
     {
         try
@@ -560,17 +560,17 @@ public static partial class Program
                 }
             }
 
-            // Stop web UI
-            if (webUiService != null)
+            // Stop web service
+            if (webService != null)
             {
                 try
                 {
-                    await webUiService.StopAsync();
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI stopped");
+                    await webService.StopAsync();
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web service stopped");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Error stopping Web UI: {ex.Message}");
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Error stopping web service: {ex.Message}");
                 }
             }
 
