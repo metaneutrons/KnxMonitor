@@ -176,54 +176,17 @@ public static partial class Program
             rootCommand.Options.Add(httpHealthPathOption);
             rootCommand.Options.Add(httpReadyPathOption);
 
-            // Parse the command line arguments
-            ParseResult parseResult = rootCommand.Parse(args);
+            // Parse and handle commands
+            var parseResult = rootCommand.Parse(args);
 
-            // Check if help was requested - print concise help and exit
-            if (args.Contains("--help") || args.Contains("-h") || args.Contains("-?"))
+            // Check if parsing failed or help was requested
+            if (parseResult.Errors.Count > 0 || args.Contains("--help") || args.Contains("-h") || args.Contains("--version"))
             {
-                Console.WriteLine(rootCommand.Description);
-                Console.WriteLine();
-                Console.WriteLine("Options:");
-
-                var helpEntries = new[]
+                var result = parseResult.Invoke();
+                if (result != 0 || args.Contains("--help") || args.Contains("-h") || args.Contains("--version"))
                 {
-                    ("-h, -?, --help", "Show help and usage information"),
-                    ("--version", "Show version information including GitVersion details"),
-                    ("-g, --gateway", "KNX gateway address (required for tunnel connections only)"),
-                    ("-c, --connection-type", "Connection type: tunnel (default), router, usb"),
-                    ("-m, --multicast-address", "Use router mode with multicast address (default: 224.0.23.12)"),
-                    ("-p, --port", "Port number (default: 3671)"),
-                    ("-v, --verbose", "Enable verbose logging"),
-                    ("-f, --filter", "Group address filter pattern"),
-                    ("--csv, --groupaddress-csv", "Path to KNX group address CSV file (ETS export format)"),
-                    ("-l, --logging-mode", "Force simple logging mode instead of TUI"),
-                    ("--enable-health-check", "Enable HTTP health check service on port 8080"),
-                    ("--http-port", "HTTP port for the web interface (default: 8671)"),
-                };
-
-                foreach (var (aliases, description) in helpEntries)
-                {
-                    Console.WriteLine($"  {aliases,-27} {description}");
+                    return result;
                 }
-                return 0;
-            }
-
-            // Check if version was requested
-            if (args.Contains("--version"))
-            {
-                DisplayVersionInformation();
-                return 0;
-            }
-
-            // Check for parsing errors
-            if (parseResult.Errors.Count > 0)
-            {
-                foreach (ParseError parseError in parseResult.Errors)
-                {
-                    Console.Error.WriteLine(parseError.Message);
-                }
-                return 1;
             }
 
             // Extract parsed values with null checks
