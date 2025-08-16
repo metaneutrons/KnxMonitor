@@ -1,4 +1,4 @@
-.TH KNXMONITOR 1 "2025-08-11" "KNX Monitor" "User Commands"
+.TH KNXMONITOR 1 "2025-08-16" "KNX Monitor" "User Commands"
 .SH NAME
 knxmonitor \- KNX/EIB bus monitoring and debugging tool
 .SH SYNOPSIS
@@ -7,16 +7,13 @@ knxmonitor \- KNX/EIB bus monitoring and debugging tool
 .SH DESCRIPTION
 KNX Monitor is a command-line application for monitoring, debugging, and analyzing KNX/EIB building automation networks. Built with modern .NET 9, it provides real-time visualization of KNX bus traffic with comprehensive logging and analysis capabilities.
 .PP
-The application features a Terminal.Gui V2 interface for interactive monitoring, advanced DPT (Data Point Type) decoding using the Falcon SDK, CSV export functionality, and support for multiple connection types including IP Tunneling, IP Routing, and USB interfaces.
+The application features three distinct modes: a Terminal.Gui V2 interface for interactive monitoring, a modern web interface for browser-based monitoring, and a logging mode for scripting and automation. Advanced DPT (Data Point Type) decoding using the Falcon SDK provides intelligent interpretation of KNX data with support for CSV and XML group address databases.
 .PP
-When run in an interactive terminal, KNX Monitor automatically launches a rich Terminal User Interface (TUI). When output is redirected or running in containers, it switches to logging mode for scripting and automation.
+When run in an interactive terminal, KNX Monitor automatically launches a rich Terminal User Interface (TUI). When output is redirected, running in containers, or when explicitly requested, it switches to web interface mode or logging mode for different use cases.
 .SH OPTIONS
 .TP
 \fB\-g\fR, \fB\-\-gateway\fR \fIADDRESS\fR
-Specify the KNX gateway address. This can be an IP address for KNX/IP gateways or a hostname. Default is "knxd" for local knxd daemon.
-.TP
-\fB\-p\fR, \fB\-\-port\fR \fIPORT\fR
-Specify the KNX gateway port. Default is 3671 (standard KNX/IP port).
+Specify the KNX gateway address. This can be an IP address for KNX/IP gateways or a hostname. Required for tunnel connections. Default is "knxd" for local knxd daemon when using tunnel mode.
 .TP
 \fB\-c\fR, \fB\-\-connection\-type\fR \fITYPE\fR
 Specify the connection type. Valid options are:
@@ -29,17 +26,14 @@ Specify the connection type. Valid options are:
 \fBusb\fR \- USB interface
 .RE
 .TP
+\fB\-m\fR, \fB\-\-multicast\-address\fR \fIADDRESS\fR
+Use router mode with specified multicast address. Default is 224.0.23.12 for KNX/IP routing.
+.TP
+\fB\-p\fR, \fB\-\-port\fR \fIPORT\fR
+Specify the KNX gateway port. Default is 3671 (standard KNX/IP port).
+.TP
 \fB\-v\fR, \fB\-\-verbose\fR
 Enable verbose logging output. Shows detailed connection information and internal processing details.
-.TP
-\fB\-l\fR, \fB\-\-logging\-mode\fR
-Force logging mode instead of the Terminal User Interface. Useful for scripting, automation, or when running in environments without proper terminal support.
-.TP
-\fB\-\-http\-port\fR \fIPORT\fR
-Set the HTTP port for the web interface when not in TUI mode. Default is 8671.
-.TP
-\fB\-\-csv\fR \fIFILE\fR
-Load group addresses from a CSV file in ETS export format. This enables advanced DPT decoding and shows meaningful names for group addresses instead of raw addresses.
 .TP
 \fB\-f\fR, \fB\-\-filter\fR \fIPATTERN\fR
 Filter group addresses using pattern matching. Supports wildcards, for example:
@@ -52,19 +46,51 @@ Filter group addresses using pattern matching. Supports wildcards, for example:
 \fB*/2/3\fR \- All addresses with middle group 2 and sub group 3
 .RE
 .TP
-\fB\-t\fR, \fB\-\-test\fR
-Run DPT decoding tests and exit. Used for development and testing purposes.
+\fB\-\-csv\fR \fIFILE\fR
+Load group addresses from a CSV file in ETS export format (3/1, semicolon separated). This enables advanced DPT decoding and shows meaningful names for group addresses instead of raw addresses.
 .TP
-\fB\-\-help\fR
-Show help information and exit.
+\fB\-\-xml\fR \fIFILE\fR
+Load group addresses from an XML file in KNX GA Export 01 format. Alternative to CSV format with the same functionality for group address resolution and DPT decoding.
+.TP
+\fB\-l\fR, \fB\-\-logging\-mode\fR
+Force logging mode instead of the Terminal User Interface or web interface. Useful for scripting, automation, or when running in environments without proper terminal support. Outputs structured log messages to stdout.
+.TP
+\fB\-\-enable\-health\-check\fR
+Enable HTTP health check service on port 8080. Provides /health and /ready endpoints for monitoring. Automatically enabled in Docker containers.
+.TP
+\fB\-\-http\-port\fR \fIPORT\fR
+Set the HTTP port for the web interface when not in TUI mode. Default is 8671.
+.TP
+\fB\-\-http\-host\fR \fIHOST\fR
+HTTP host/interface to bind the web server to. Examples: localhost, 0.0.0.0, 192.168.1.10. Default is localhost.
+.TP
+\fB\-\-http\-path\-base\fR \fIPATH\fR
+Base path for the web interface and APIs. Example: /knx. Default is /.
+.TP
+\fB\-\-http\-url\fR \fIURL\fR
+Full HttpListener prefix(es) to bind (overrides host/port/path-base). Can be repeated for multiple bindings. Example: http://+:8080/knx/
+.TP
+\fB\-\-http\-health\-enabled\fR
+Expose /health and /ready endpoints on the same HTTP server as the web interface. Default is true.
+.TP
+\fB\-\-http\-health\-path\fR \fIPATH\fR
+Path for the health endpoint. Default is /health.
+.TP
+\fB\-\-http\-ready\-path\fR \fIPATH\fR
+Path for the readiness endpoint. Default is /ready.
 .TP
 \fB\-\-version\fR
-Show version information and exit.
-.SH INTERACTIVE MODE
+Show version information including GitVersion details and exit.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show help information and exit.
+.SH DISPLAY MODES
+KNX Monitor operates in three distinct modes depending on the environment and user preferences:
+.SS Interactive Mode (Terminal.Gui V2)
 When running in an interactive terminal, KNX Monitor displays a rich Terminal User Interface with the following features:
 .TP
 \fBReal-time Message Display\fR
-Shows KNX messages in a scrollable table with timestamps, source/destination addresses, decoded values, and group address names (if CSV loaded).
+Shows KNX messages in a scrollable table with timestamps, source/destination addresses, decoded values, and group address names (if CSV/XML loaded).
 .TP
 \fBColor Coding\fR
 Messages are color-coded based on age and operation type:
@@ -102,8 +128,27 @@ Red: System priority, Disconnected status, Errors
 .IP \(bu 2
 \fBHome/End\fR: Jump to first/last message
 .RE
-.SH LOGGING MODE
-When output is redirected or \fB\-l\fR is specified, KNX Monitor runs in logging mode, outputting structured log messages suitable for scripting and automation:
+.SS Web Interface Mode
+When not in TUI mode (containers, redirected output, or \fB\-l\fR specified), KNX Monitor provides a modern web interface:
+.TP
+\fBFeatures\fR
+.RS
+.IP \(bu 2
+Real-time message table with live updates
+.IP \(bu 2
+Advanced filtering with pattern matching
+.IP \(bu 2
+CSV export functionality
+.IP \(bu 2
+Connection status and message count display
+.IP \(bu 2
+Clean, responsive design
+.RE
+.TP
+\fBAccess\fR
+Open http://localhost:8671 in your browser (or the configured port/host).
+.SS Logging Mode
+When \fB\-l\fR is specified, KNX Monitor outputs structured log messages suitable for scripting and automation:
 .PP
 .nf
 [14:32:15.123] Write 1.1.5 -> 1/2/1 = 75% (Normal)
@@ -125,16 +170,19 @@ Boolean values with context-aware formatting (On/Off, Up/Down, Open/Close)
 \fBDPT 14.xxx\fR
 4-byte IEEE 754 float values (Electric Current, Frequency, Power, Voltage)
 .PP
-When a CSV file with group address definitions is loaded, values are automatically decoded and displayed with appropriate units and formatting.
-.SH CSV FORMAT
-The CSV file should be in ETS export format with the following columns:
+When a CSV or XML file with group address definitions is loaded, values are automatically decoded and displayed with appropriate units and formatting.
+.SH FILE FORMATS
+.SS CSV Format
+The CSV file should be in ETS export format (3/1, semicolon separated) with the following columns:
 .PP
 .nf
-Group Address,Name,Central Function,Unfiltered,Description,DatapointType,Security
-1/2/1,Living Room Light,Switching,,,DPT-1,None
-1/2/5,Living Room Dimmer,Dimming,,,DPT-5.001,None
-1/3/1,Temperature Sensor,Value,,,DPT-9.001,None
+Group Address;Name;Central Function;Unfiltered;Description;DatapointType;Security
+1/2/1;Living Room Light;Switching;;;DPT-1;None
+1/2/5;Living Room Dimmer;Dimming;;;DPT-5.001;None
+1/3/1;Temperature Sensor;Value;;;DPT-9.001;None
 .fi
+.SS XML Format
+The XML file should be in KNX GA Export 01 format as exported by ETS or compatible tools.
 .SH EXAMPLES
 .TP
 Monitor KNX bus via IP tunneling to a local knxd daemon:
@@ -150,21 +198,43 @@ Monitor specific group addresses in logging mode:
 .B knxmonitor \-g 192.168.1.100 \-f "1/2/*" \-l
 .TP
 Monitor via IP routing (multicast):
-.B knxmonitor \-c router \-g 224.0.23.12
+.B knxmonitor \-c router \-m 224.0.23.12
 .TP
 Monitor USB interface:
 .B knxmonitor \-c usb
 .TP
+Use web interface on custom port:
+.B knxmonitor \-l \-\-http\-port 9000
+.TP
+Web interface accessible from network:
+.B knxmonitor \-l \-\-http\-host 0.0.0.0 \-\-http\-port 8080
+.TP
 Export monitoring session to file:
 .B knxmonitor \-g 192.168.1.100 \-l > knx_log.txt
+.SH HEALTH CHECKS
+KNX Monitor provides HTTP health check endpoints for monitoring and orchestration:
+.TP
+\fB/health\fR
+General health status of the application
+.TP
+\fB/ready\fR
+Readiness status indicating if the application is ready to serve requests
+.PP
+Health checks are automatically enabled in Docker containers and can be manually enabled with \fB\-\-enable\-health\-check\fR.
 .SH FILES
 .TP
 \fI~/.config/knxmonitor/\fR
 User configuration directory (future use)
 .TP
 \fI/usr/share/doc/knxmonitor/examples/\fR
-Example CSV files and configuration
+Example CSV and XML files
 .SH ENVIRONMENT
+.TP
+\fBKNX_MONITOR_LOGGING_MODE\fR
+Set to "true" to force logging mode
+.TP
+\fBDOTNET_RUNNING_IN_CONTAINER\fR
+Automatically detected container environment
 .TP
 \fBTERM\fR
 Terminal type, affects TUI display capabilities
@@ -180,7 +250,7 @@ Success
 General error (connection failed, invalid arguments, etc.)
 .TP
 \fB2\fR
-Configuration error (invalid CSV file, missing dependencies, etc.)
+Configuration error (invalid CSV/XML file, missing dependencies, etc.)
 .SH SEE ALSO
 .BR knxd (1),
 .BR docker (1),
