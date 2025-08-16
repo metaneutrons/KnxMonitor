@@ -498,7 +498,7 @@ class KnxMonitor {
 
     async updateStatus() {
         try {
-            const response = await fetch('/api/status');
+            const response = await fetch('api/status');
             const data = await response.json();
             
             const statusEl = document.getElementById('status');
@@ -524,7 +524,7 @@ class KnxMonitor {
 
     async loadMessages() {
         try {
-            const url = this.filter ? `/api/messages?filter=${encodeURIComponent(this.filter)}` : '/api/messages';
+            const url = this.filter ? `api/messages?filter=${encodeURIComponent(this.filter)}` : 'api/messages';
             const response = await fetch(url);
             const messages = await response.json();
             
@@ -569,7 +569,7 @@ class KnxMonitor {
         const filter = filterInput.value.trim();
         
         try {
-            await fetch('/api/filter', {
+            await fetch('api/filter', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ filter: filter || null })
@@ -589,7 +589,7 @@ class KnxMonitor {
 
     async exportCsv() {
         try {
-            const response = await fetch('/api/export');
+            const response = await fetch('api/export');
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
