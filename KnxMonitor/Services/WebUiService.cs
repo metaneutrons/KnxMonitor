@@ -33,17 +33,45 @@ public class WebUiService
         _knx.MessageReceived += OnMessage;
     }
 
-    public Task StartAsync(int port, CancellationToken token = default)
+    public Task StartAsync(IEnumerable<string> prefixes, string pathBase, bool healthEnabled, string healthPath, string readyPath, CancellationToken token = default)
     {
         if (_listener != null) return Task.CompletedTask;
 
+        // Normalize paths
+        string NormalizeBase(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return "/";
+            if (!s.StartsWith('/')) s = "/" + s;
+            return s.EndsWith('/') ? s : s + "/";
+        }
+        string NormalizePath(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return "/";
+            if (!s.StartsWith('/')) s = "/" + s;
+            return s;
+        }
+        var basePath = NormalizeBase(pathBase);
+        var health = NormalizePath(healthPath);
+        var ready = NormalizePath(readyPath);
+
         _listener = new HttpListener();
-        _listener.Prefixes.Add($"http://+:{port}/");
+        foreach (var p in prefixes)
+        {
+            var pp = p.EndsWith("/") ? p : p + "/";
+            _listener.Prefixes.Add(pp);
+        }
         _listener.Start();
 
         _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
         _loop = Task.Run(() => LoopAsync(_cts.Token), _cts.Token);
-        _logger.LogInformation("Web UI listening on port {Port}", port);
+        _logger.LogInformation("Web UI listening on: {Prefixes}", string.Join(", ", _listener.Prefixes));
+
+        // Store config for routing
+        _pathBase = basePath;
+        _healthEnabled = healthEnabled;
+        _healthPath = health;
+        _readyPath = ready;
+
         return Task.CompletedTask;
     }
 
@@ -84,13 +112,25 @@ public class WebUiService
         }
     }
 
+    private string _pathBase = "/";
+    private bool _healthEnabled = true;
+    private string _healthPath = "/health";
+    private string _readyPath = "/ready";
+
     private async Task HandleAsync(HttpListenerContext ctx)
     {
         try
         {
             var req = ctx.Request;
             var res = ctx.Response;
-            var path = req.Url?.AbsolutePath ?? "/";
+            var absPath = req.Url?.AbsolutePath ?? "/";
+            // Strip path base if present
+            string path = absPath;
+            if (!string.IsNullOrEmpty(_pathBase) && _pathBase != "/" && absPath.StartsWith(_pathBase, StringComparison.OrdinalIgnoreCase))
+            {
+                var rest = absPath.Substring(_pathBase.Length);
+                path = "/" + rest.TrimStart('/');
+            }
 
             switch (path)
             {
@@ -159,6 +199,16 @@ public class WebUiService
                         break;
                     }
                 default:
+                    if (_healthEnabled && string.Equals(path, _healthPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        await HandleHealthAsync(res);
+                        break;
+                    }
+                    if (_healthEnabled && string.Equals(path, _readyPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        await HandleReadyAsync(res);
+                        break;
+                    }
                     res.StatusCode = 404;
                     await WriteAsync(res, "Not Found");
                     break;
@@ -248,6 +298,30 @@ public class WebUiService
     private static int ParseInt(string? s, int fallback)
     {
         return int.TryParse(s, out var v) && v > 0 ? v : fallback;
+    }
+
+    private async Task HandleHealthAsync(HttpListenerResponse res)
+    {
+        var payload = new
+        {
+            status = "healthy",
+            timestamp = DateTime.UtcNow,
+            knx = new { connected = _knx.IsConnected, connectionStatus = _knx.ConnectionStatus, messagesReceived = _knx.MessageCount }
+        };
+        await JsonAsync(res, payload);
+    }
+
+    private async Task HandleReadyAsync(HttpListenerResponse res)
+    {
+        var ready = _knx.IsConnected;
+        var payload = new
+        {
+            status = ready ? "ready" : "not ready",
+            timestamp = DateTime.UtcNow,
+            knx = new { connected = _knx.IsConnected, connectionStatus = _knx.ConnectionStatus }
+        };
+        res.StatusCode = ready ? 200 : 503;
+        await JsonAsync(res, payload);
     }
 
     private static async Task JsonAsync(HttpListenerResponse res, object data)

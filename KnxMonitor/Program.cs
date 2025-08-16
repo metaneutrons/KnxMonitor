@@ -117,6 +117,43 @@ public static partial class Program
                 DefaultValueFactory = _ => 8671,
             };
 
+            Option<string> httpHostOption = new("--http-host")
+            {
+                Description = "HTTP host/interface to bind (e.g., localhost, 0.0.0.0, 192.168.1.10)",
+                DefaultValueFactory = _ => "localhost",
+            };
+
+            Option<string> httpPathBaseOption = new("--http-path-base")
+            {
+                Description = "Base path for the web interface and APIs (e.g., /knx)",
+                DefaultValueFactory = _ => "/",
+            };
+
+            Option<string[]> httpUrlOption = new("--http-url")
+            {
+                Description = "Full HttpListener prefix(es) to bind (overrides host/port/path-base). Can be repeated.",
+                Arity = ArgumentArity.ZeroOrMore,
+            };
+            httpUrlOption.AllowMultipleArgumentsPerToken = true;
+
+            Option<bool> httpHealthEnabledOption = new("--http-health-enabled")
+            {
+                Description = "Expose /health and /ready endpoints on the same HTTP server",
+                DefaultValueFactory = _ => true,
+            };
+
+            Option<string> httpHealthPathOption = new("--http-health-path")
+            {
+                Description = "Path for the health endpoint",
+                DefaultValueFactory = _ => "/health",
+            };
+
+            Option<string> httpReadyPathOption = new("--http-ready-path")
+            {
+                Description = "Path for the readiness endpoint",
+                DefaultValueFactory = _ => "/ready",
+            };
+
             // Create root command using modern pattern
             RootCommand rootCommand = new(
                 "KNX Monitor - Visual debugging tool for KNX/EIB bus activity"
@@ -132,6 +169,12 @@ public static partial class Program
             rootCommand.Options.Add(enableHealthCheckOption);
             rootCommand.Options.Add(versionOption);
             rootCommand.Options.Add(httpPortOption);
+            rootCommand.Options.Add(httpHostOption);
+            rootCommand.Options.Add(httpPathBaseOption);
+            rootCommand.Options.Add(httpUrlOption);
+            rootCommand.Options.Add(httpHealthEnabledOption);
+            rootCommand.Options.Add(httpHealthPathOption);
+            rootCommand.Options.Add(httpReadyPathOption);
 
             // Parse the command line arguments
             ParseResult parseResult = rootCommand.Parse(args);
@@ -194,6 +237,12 @@ public static partial class Program
             bool loggingMode = parseResult.GetValue(loggingModeOption);
             bool enableHealthCheck = parseResult.GetValue(enableHealthCheckOption);
             int httpPort = parseResult.GetValue(httpPortOption);
+            string httpHost = parseResult.GetValue(httpHostOption) ?? "localhost";
+            string httpPathBase = parseResult.GetValue(httpPathBaseOption) ?? "/";
+            string[] httpUrls = parseResult.GetValue(httpUrlOption) ?? Array.Empty<string>();
+            bool httpHealthEnabled = parseResult.GetValue(httpHealthEnabledOption);
+            string httpHealthPath = parseResult.GetValue(httpHealthPathOption) ?? "/health";
+            string httpReadyPath = parseResult.GetValue(httpReadyPathOption) ?? "/ready";
 
             // If -m/--multicast-address was specified, automatically switch to router mode
             bool multicastOptionUsed = args.Contains("-m") || args.Contains("--multicast-address");
@@ -242,7 +291,13 @@ public static partial class Program
                 csvPath,
                 loggingMode,
                 enableHealthCheck,
-                httpPort
+                httpPort,
+                httpHost,
+                httpPathBase,
+                httpUrls,
+                httpHealthEnabled,
+                httpHealthPath,
+                httpReadyPath
             );
         }
         finally
@@ -293,6 +348,12 @@ public static partial class Program
     /// <param name="loggingMode">Force simple logging mode instead of TUI.</param>
     /// <param name="enableHealthCheck">Enable HTTP health check service (auto-enabled in containers).</param>
     /// <param name="httpPort">HTTP port for the web UI (default 8671).</param>
+    /// <param name="httpHost">HTTP host/interface (default localhost).</param>
+    /// <param name="httpPathBase">Base path for UI and APIs (default "/").</param>
+    /// <param name="httpUrls">Explicit HttpListener prefixes (overrides host/port/path-base).</param>
+    /// <param name="httpHealthEnabled">Whether to expose /health and /ready on the same server.</param>
+    /// <param name="httpHealthPath">Path for health (default /health).</param>
+    /// <param name="httpReadyPath">Path for ready (default /ready).</param>
     /// <returns>Exit code (0 = success, >0 = error).</returns>
     private static async Task<int> RunMonitorAsync(
         string? gateway,
@@ -304,7 +365,13 @@ public static partial class Program
         string? csvPath,
         bool loggingMode,
         bool enableHealthCheck,
-        int httpPort
+        int httpPort,
+        string httpHost,
+        string httpPathBase,
+        string[] httpUrls,
+        bool httpHealthEnabled,
+        string httpHealthPath,
+        string httpReadyPath
     )
     {
         IHost? host = null;
@@ -378,18 +445,7 @@ public static partial class Program
                     // 🚀 Use simplified Falcon SDK-only KNX monitoring service
                     services.AddSingleton<IKnxMonitorService, KnxMonitorService>();
 
-                    // Health check service registration logic:
-                    // - Enabled by default in Docker containers (for container health monitoring)
-                    // - Disabled by default in standalone mode (unless --enable-health-check is used)
-                    bool shouldEnableHealthCheck =
-                        enableHealthCheck
-                        || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")
-                            == "true";
-
-                    if (shouldEnableHealthCheck)
-                    {
-                        services.AddSingleton<HealthCheckService>();
-                    }
+                    // Health endpoints are served from WebUiService now; no separate service by default.
 
                     // Register appropriate display service based on environment
                     if (ShouldUseTuiMode(loggingMode))
@@ -417,27 +473,7 @@ public static partial class Program
                 webUiService = host.Services.GetRequiredService<WebUiService>();
             }
 
-            // Conditionally get health check service (same logic as registration)
-            bool shouldEnableHealthCheck =
-                enableHealthCheck
-                || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-
-            if (shouldEnableHealthCheck)
-            {
-                healthCheckService = host.Services.GetRequiredService<HealthCheckService>();
-            }
-
-            // Start health check service if enabled
-            if (healthCheckService != null)
-            {
-                await healthCheckService.StartAsync(
-                    8080,
-                    _applicationCancellationTokenSource.Token
-                );
-                Console.WriteLine(
-                    $"[{DateTime.Now:HH:mm:ss.fff}] Health check service started on port 8080"
-                );
-            }
+            // Health endpoints are integrated into the Web UI; no separate health listener is started.
 
             // Start monitoring service first
             try
@@ -456,8 +492,9 @@ public static partial class Program
             // Start web UI when not in TUI mode
             if (webUiService != null)
             {
-                await webUiService.StartAsync(httpPort, _applicationCancellationTokenSource.Token);
-                Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI started on http://localhost:{httpPort}");
+                var prefixes = BuildHttpPrefixes(httpUrls, httpHost, httpPort, httpPathBase);
+                await webUiService.StartAsync(prefixes, httpPathBase, httpHealthEnabled, httpHealthPath, httpReadyPath, _applicationCancellationTokenSource.Token);
+                Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI started on: {string.Join(", ", prefixes)}");
             }
 
             // Start display service with proper lifecycle coordination
@@ -619,6 +656,33 @@ public static partial class Program
         {
             Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Error during cleanup: {ex.Message}");
         }
+    }
+
+    private static List<string> BuildHttpPrefixes(string[] urls, string host, int port, string pathBase)
+    {
+        static string EnsureTrailingSlash(string s) => s.EndsWith("/") ? s : s + "/";
+        static string NormalizePathBase(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return "/";
+            if (!s.StartsWith('/')) s = "/" + s;
+            return s.EndsWith('/') ? s : s + "/";
+        }
+
+        var list = new List<string>();
+        if (urls != null && urls.Length > 0)
+        {
+            foreach (var u in urls)
+            {
+                if (string.IsNullOrWhiteSpace(u)) continue;
+                list.Add(EnsureTrailingSlash(u));
+            }
+            return list;
+        }
+
+        var basePath = NormalizePathBase(pathBase);
+        var prefix = $"http://{host}:{port}{basePath}";
+        list.Add(prefix);
+        return list;
     }
 
     /// <summary>
