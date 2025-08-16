@@ -64,7 +64,21 @@ public sealed class KnxConsoleFormatter : ConsoleFormatter
         // Include exception details if present
         if (logEntry.Exception != null)
         {
-            textWriter.WriteLine($"[{timestamp}] EXCEPTION: {logEntry.Exception}");
+            if (_options.VerboseExceptions)
+            {
+                textWriter.WriteLine($"[{timestamp}] EXCEPTION: {logEntry.Exception}");
+            }
+            else
+            {
+                // Clean exception format - just the message
+                var exMessage = logEntry.Exception.Message;
+                if (logEntry.Exception.InnerException != null && !exMessage.Contains(logEntry.Exception.InnerException.Message))
+                {
+                    exMessage += $" ({logEntry.Exception.InnerException.Message})";
+                }
+                textWriter.WriteLine($"[{timestamp}] ERROR: {exMessage}");
+                textWriter.WriteLine($"[{timestamp}] Use --verbose flag to see full stack trace");
+            }
         }
     }
 }
@@ -83,4 +97,9 @@ public class KnxConsoleFormatterOptions : ConsoleFormatterOptions
     /// Gets or sets a value indicating whether to use clean format for KNX messages.
     /// </summary>
     public bool UseCleanKnxFormat { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to show full exception stack traces.
+    /// </summary>
+    public bool VerboseExceptions { get; set; } = false;
 }

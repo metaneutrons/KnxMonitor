@@ -411,7 +411,10 @@ public static partial class Program
                         logging.AddConsoleFormatter<
                             KnxConsoleFormatter,
                             KnxConsoleFormatterOptions
-                        >();
+                        >(options =>
+                        {
+                            options.VerboseExceptions = verbose;
+                        });
                         logging.SetMinimumLevel(verbose ? LogLevel.Debug : LogLevel.Information);
                     }
                 })
@@ -467,6 +470,10 @@ public static partial class Program
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {ex.Message} Exiting.");
+                if (!verbose)
+                {
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Use --verbose flag to see full stack trace");
+                }
                 return 2; // Exit code 2 for connection failure
             }
 
@@ -512,7 +519,7 @@ public static partial class Program
         }
         catch (Exception ex)
         {
-            AnsiConsole.WriteException(ex);
+            WriteException(ex, verbose);
             return 1; // General error
         }
         finally
@@ -913,5 +920,51 @@ public static partial class Program
         // Display concise version information
         Console.WriteLine($"Version:    {semanticVersion}");
         Console.WriteLine($"GitVersion: {informationalVersion}");
+    }
+
+    /// <summary>
+    /// Formats exception for user-friendly display
+    /// </summary>
+    /// <param name="ex">The exception to format</param>
+    /// <param name="verbose">Whether to include full stack trace</param>
+    /// <returns>Formatted exception message</returns>
+    private static string FormatException(Exception ex, bool verbose)
+    {
+        if (verbose)
+        {
+            // Full exception details for debugging
+            return ex.ToString();
+        }
+
+        // Clean, user-friendly format
+        var message = ex.Message;
+        
+        // Add inner exception message if it provides additional context
+        if (ex.InnerException != null && !message.Contains(ex.InnerException.Message))
+        {
+            message += $" ({ex.InnerException.Message})";
+        }
+
+        return $"ERROR: {message}";
+    }
+
+    /// <summary>
+    /// Writes exception to console with appropriate formatting based on verbose flag
+    /// </summary>
+    /// <param name="ex">The exception to write</param>
+    /// <param name="verbose">Whether to show full stack trace</param>
+    private static void WriteException(Exception ex, bool verbose)
+    {
+        if (verbose)
+        {
+            // Use Spectre.Console for full exception display in verbose mode
+            AnsiConsole.WriteException(ex);
+        }
+        else
+        {
+            // Clean, simple error message
+            Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {FormatException(ex, false)}");
+            Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Use --verbose flag to see full stack trace");
+        }
     }
 }
