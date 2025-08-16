@@ -141,16 +141,30 @@ jobs:
             echo "DEBUG: Using enterprise-grade framework-dependent deployment for Docker (Linux)"
             
             # Framework-dependent deployment optimized for Docker containers
-            # This creates both KnxMonitor.dll and KnxMonitor executable for maximum compatibility
+            # This creates KnxMonitor.dll for Docker and KnxMonitor executable for packaging
             dotnet publish ${{ env.PROJECT_NAME }} \
               --configuration Release \
               --runtime ${{ matrix.runtime }} \
               --self-contained false \
-              --property:UseAppHost=true \
-              --property:PublishSingleFile=false \
               --output ./publish/${{ matrix.runtime }} \
               --verbosity normal \
               --nologo
+              
+            # Also create a self-contained executable for Linux packaging
+            dotnet publish ${{ env.PROJECT_NAME }} \
+              --configuration Release \
+              --runtime ${{ matrix.runtime }} \
+              --self-contained true \
+              --property:PublishSingleFile=true \
+              --output ./publish/${{ matrix.runtime }}/standalone \
+              --verbosity normal \
+              --nologo
+              
+            # Copy the standalone executable to the main directory for packaging
+            if [[ -f "./publish/${{ matrix.runtime }}/standalone/KnxMonitor" ]]; then
+              cp "./publish/${{ matrix.runtime }}/standalone/KnxMonitor" "./publish/${{ matrix.runtime }}/KnxMonitor"
+              chmod +x "./publish/${{ matrix.runtime }}/KnxMonitor"
+            fi
               
             echo "DEBUG: Framework-dependent deployment completed"
             

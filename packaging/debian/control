@@ -11,12 +11,7 @@ Description: KNX/EIB bus monitoring and debugging tool
  it provides real-time visualization of KNX bus traffic with comprehensive
  logging and analysis capabilities.
  .
- Features:
-
-* Real-time KNX bus monitoring
-* Advanced DPT decoding with Falcon SDK
-* Terminal.Gui V2 interface
-* CSV export functionality
-* Docker support
-* Multiple connection types (IP Tunneling, IP Routing, USB)
-Homepage: <https://github.com/metaneutrons/KnxMonitor>
+ Features include real-time KNX bus monitoring, advanced DPT decoding with
+ Falcon SDK, Terminal.Gui V2 interface, CSV export functionality, Docker
+ support, and multiple connection types (IP Tunneling, IP Routing, USB).
+Homepage: https://github.com/metaneutrons/KnxMonitor
