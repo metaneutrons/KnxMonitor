@@ -566,8 +566,8 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   update-homebrew:
-    needs: [calculate-version, release, docker]
-    if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success' && (needs.docker.result == 'success' || needs.docker.result == 'skipped')
+    needs: [calculate-version, release]
+    if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: false # Don't fail the entire release if Homebrew update fails
