@@ -48,8 +48,13 @@ public class WebService
             options.ListenAnyIP(port);
         });
 
-        // Minimal logging setup
-        builder.Logging.ClearProviders().AddConsole();
+        // Minimal logging setup - suppress ASP.NET Core startup messages
+        builder.Logging.ClearProviders()
+            .AddConsole()
+            .AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None)
+            .AddFilter("Microsoft.AspNetCore", LogLevel.Warning)
+            .AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.None)
+            .AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.None);
 
         _app = builder.Build();
 
