@@ -231,7 +231,7 @@ public class WebService
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KNX Monitor</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -285,7 +285,7 @@ public class WebService
         </div>
     </div>
 
-    <script src="/app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
 """;

@@ -127,15 +127,9 @@ public static partial class Program
                 DefaultValueFactory = _ => "localhost",
             };
 
-            Option<string> httpPathBaseOption = new("--http-path-base")
-            {
-                Description = "Base path for the web interface and APIs (e.g., /knx)",
-                DefaultValueFactory = _ => "/",
-            };
-
             Option<string[]> httpUrlOption = new("--http-url")
             {
-                Description = "Full HttpListener prefix(es) to bind (overrides host/port/path-base). Can be repeated.",
+                Description = "Full HttpListener prefix(es) to bind (overrides host/port). Can be repeated.",
                 Arity = ArgumentArity.ZeroOrMore,
             };
             httpUrlOption.AllowMultipleArgumentsPerToken = true;
@@ -156,7 +150,6 @@ public static partial class Program
             rootCommand.Options.Add(versionOption);
             rootCommand.Options.Add(httpPortOption);
             rootCommand.Options.Add(httpHostOption);
-            rootCommand.Options.Add(httpPathBaseOption);
             rootCommand.Options.Add(httpUrlOption);
 
             // Parse and handle commands
@@ -184,7 +177,6 @@ public static partial class Program
             bool loggingMode = parseResult.GetValue(loggingModeOption);
             int httpPort = parseResult.GetValue(httpPortOption);
             string httpHost = parseResult.GetValue(httpHostOption) ?? "localhost";
-            string httpPathBase = parseResult.GetValue(httpPathBaseOption) ?? "/";
             string[] httpUrls = parseResult.GetValue(httpUrlOption) ?? Array.Empty<string>();
             // If -m/--multicast-address was specified, automatically switch to router mode
             bool multicastOptionUsed = args.Contains("-m") || args.Contains("--multicast-address");
@@ -243,7 +235,7 @@ public static partial class Program
                 true, // Health check always enabled
                 httpPort,
                 httpHost,
-                httpPathBase,
+                "/", // Fixed base path - no longer configurable
                 httpUrls,
                 true, // Health endpoints always enabled
                 "/health", // Fixed health path
@@ -300,7 +292,7 @@ public static partial class Program
     /// <param name="enableHealthCheck">Health check service (always enabled).</param>
     /// <param name="httpPort">HTTP port for the web UI (default 8671).</param>
     /// <param name="httpHost">HTTP host/interface (default localhost).</param>
-    /// <param name="httpPathBase">Base path for UI and APIs (default "/").</param>
+    /// <param name="httpPathBase">Base path always "/" (relative paths used for assets).</param>
     /// <param name="httpUrls">Explicit HttpListener prefixes (overrides host/port/path-base).</param>
     /// <param name="httpHealthEnabled">Health endpoints always enabled.</param>
     /// <param name="httpHealthPath">Health endpoint path (always /health).</param>
@@ -463,8 +455,8 @@ public static partial class Program
             // Start web UI when not in TUI mode
             if (webService != null)
             {
-                var prefixes = BuildHttpPrefixes(httpUrls, httpHost, httpPort, httpPathBase);
-                await webService.StartAsync(prefixes, httpPathBase, true, "/health", "/ready", _applicationCancellationTokenSource.Token);
+                var prefixes = BuildHttpPrefixes(httpUrls, httpHost, httpPort, "/");
+                await webService.StartAsync(prefixes, "/", true, "/health", "/ready", _applicationCancellationTokenSource.Token);
                 Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI started on: {string.Join(", ", prefixes)}");
             }
 
