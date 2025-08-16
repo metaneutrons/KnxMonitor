@@ -111,6 +111,12 @@ public static partial class Program
                 Description = "Show version information including GitVersion details",
             };
 
+            Option<int> httpPortOption = new("--http-port")
+            {
+                Description = "HTTP port for the web interface (only when not in TUI mode)",
+                DefaultValueFactory = _ => 8671,
+            };
+
             // Create root command using modern pattern
             RootCommand rootCommand = new(
                 "KNX Monitor - Visual debugging tool for KNX/EIB bus activity"
@@ -125,37 +131,32 @@ public static partial class Program
             rootCommand.Options.Add(loggingModeOption);
             rootCommand.Options.Add(enableHealthCheckOption);
             rootCommand.Options.Add(versionOption);
+            rootCommand.Options.Add(httpPortOption);
 
             // Parse the command line arguments
             ParseResult parseResult = rootCommand.Parse(args);
 
-            // Check if help was requested - if so, let the system handle it
+            // Check if help was requested - print concise help and exit
             if (args.Contains("--help") || args.Contains("-h") || args.Contains("-?"))
             {
                 Console.WriteLine(rootCommand.Description);
                 Console.WriteLine();
                 Console.WriteLine("Options:");
 
-                // Define help entries explicitly for better control
                 var helpEntries = new[]
                 {
                     ("-h, -?, --help", "Show help and usage information"),
                     ("--version", "Show version information including GitVersion details"),
                     ("-g, --gateway", "KNX gateway address (required for tunnel connections only)"),
                     ("-c, --connection-type", "Connection type: tunnel (default), router, usb"),
-                    (
-                        "-m, --multicast-address",
-                        "Use router mode with multicast address (default: 224.0.23.12)"
-                    ),
+                    ("-m, --multicast-address", "Use router mode with multicast address (default: 224.0.23.12)"),
                     ("-p, --port", "Port number (default: 3671)"),
                     ("-v, --verbose", "Enable verbose logging"),
                     ("-f, --filter", "Group address filter pattern"),
-                    (
-                        "--csv, --groupaddress-csv",
-                        "Path to KNX group address CSV file (ETS export format)"
-                    ),
+                    ("--csv, --groupaddress-csv", "Path to KNX group address CSV file (ETS export format)"),
                     ("-l, --logging-mode", "Force simple logging mode instead of TUI"),
                     ("--enable-health-check", "Enable HTTP health check service on port 8080"),
+                    ("--http-port", "HTTP port for the web interface (default: 8671)"),
                 };
 
                 foreach (var (aliases, description) in helpEntries)
@@ -192,6 +193,7 @@ public static partial class Program
             string? csvPath = parseResult.GetValue(csvOption);
             bool loggingMode = parseResult.GetValue(loggingModeOption);
             bool enableHealthCheck = parseResult.GetValue(enableHealthCheckOption);
+            int httpPort = parseResult.GetValue(httpPortOption);
 
             // If -m/--multicast-address was specified, automatically switch to router mode
             bool multicastOptionUsed = args.Contains("-m") || args.Contains("--multicast-address");
@@ -239,7 +241,8 @@ public static partial class Program
                 filter,
                 csvPath,
                 loggingMode,
-                enableHealthCheck
+                enableHealthCheck,
+                httpPort
             );
         }
         finally
@@ -289,6 +292,7 @@ public static partial class Program
     /// <param name="csvPath">Path to KNX group address CSV file exported from ETS.</param>
     /// <param name="loggingMode">Force simple logging mode instead of TUI.</param>
     /// <param name="enableHealthCheck">Enable HTTP health check service (auto-enabled in containers).</param>
+    /// <param name="httpPort">HTTP port for the web UI (default 8671).</param>
     /// <returns>Exit code (0 = success, >0 = error).</returns>
     private static async Task<int> RunMonitorAsync(
         string? gateway,
@@ -299,13 +303,15 @@ public static partial class Program
         string? filter,
         string? csvPath,
         bool loggingMode,
-        bool enableHealthCheck
+        bool enableHealthCheck,
+        int httpPort
     )
     {
         IHost? host = null;
         IKnxMonitorService? monitorService = null;
         IDisplayService? displayService = null;
         HealthCheckService? healthCheckService = null;
+        WebUiService? webUiService = null;
 
         try
         {
@@ -397,6 +403,7 @@ public static partial class Program
                     else
                     {
                         services.AddSingleton<IDisplayService, DisplayService>();
+                        services.AddSingleton<WebUiService>();
                     }
                 });
 
@@ -405,6 +412,10 @@ public static partial class Program
             // Get services
             monitorService = host.Services.GetRequiredService<IKnxMonitorService>();
             displayService = host.Services.GetRequiredService<IDisplayService>();
+            if (!ShouldUseTuiMode(loggingMode))
+            {
+                webUiService = host.Services.GetRequiredService<WebUiService>();
+            }
 
             // Conditionally get health check service (same logic as registration)
             bool shouldEnableHealthCheck =
@@ -440,6 +451,13 @@ public static partial class Program
             {
                 Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {ex.Message} Exiting.");
                 return 2; // Exit code 2 for connection failure
+            }
+
+            // Start web UI when not in TUI mode
+            if (webUiService != null)
+            {
+                await webUiService.StartAsync(httpPort, _applicationCancellationTokenSource.Token);
+                Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI started on http://localhost:{httpPort}");
             }
 
             // Start display service with proper lifecycle coordination
@@ -493,11 +511,13 @@ public static partial class Program
     /// <param name="monitorService">The KNX monitor service.</param>
     /// <param name="displayService">The display service.</param>
     /// <param name="healthCheckService">The health check service.</param>
+    /// <param name="webUiService">The web user interface service.</param>
     private static async Task CleanupServicesAsync(
         IHost? host,
         IKnxMonitorService? monitorService,
         IDisplayService? displayService,
-        HealthCheckService? healthCheckService = null
+        HealthCheckService? healthCheckService = null,
+        WebUiService? webUiService = null
     )
     {
         try
@@ -522,7 +542,21 @@ public static partial class Program
                 }
             }
 
-            // Stop display service first (this handles TUI shutdown)
+            // Stop web UI
+            if (webUiService != null)
+            {
+                try
+                {
+                    await webUiService.StopAsync();
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI stopped");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Error stopping Web UI: {ex.Message}");
+                }
+            }
+
+            // Stop display service (this handles TUI shutdown)
             if (displayService != null)
             {
                 try

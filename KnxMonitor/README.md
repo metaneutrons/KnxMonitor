@@ -53,6 +53,16 @@ When running in an interactive terminal, KNX Monitor automatically launches the 
 
 ### Logging Mode (Console Output)
 
+### Web Interface (non-TUI mode)
+
+- Starts automatically when not in interactive TUI mode (e.g., when output is redirected or `-l/--logging-mode` is used)
+- Default URL: `http://localhost:8671` (configurable via `--http-port`)
+- Modern, readable UI with:
+  - Live message table (updates every second)
+  - Filter control supporting patterns like `1/2/*` and exact matches
+  - CSV export
+  - Status header with connection state and total message count
+
 When output is redirected or running in containers, automatically switches to logging mode:
 
 ```plaintext
@@ -112,7 +122,8 @@ dotnet run -- --connection-type tunnel --gateway 192.168.2.8 --verbose
 | `--gateway` | `-g` | KNX gateway address (required for tunnel/router) | `knxd` |
 | `--port` | `-p` | KNX gateway port | `3671` |
 | `--verbose` | `-v` | Enable verbose logging | `false` |
-| `--filter` | `-f` | Filter group addresses (e.g., `1/2/*` or `1/2/3`) | None |
+|| `--filter` | `-f` | Filter group addresses (e.g., `1/2/*` or `1/2/3`) | None |
+|| `--http-port` |  | HTTP port for the web UI (non-TUI mode) | `8671` |
 | `--test` | `-t` | Run DPT decoding tests and exit | `false` |
 
 ## Usage Examples
