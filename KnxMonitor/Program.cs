@@ -110,12 +110,6 @@ public static partial class Program
                     "Force simple logging mode instead of TUI (useful for scripting or non-interactive environments)",
             };
 
-            Option<bool> enableHealthCheckOption = new("--enable-health-check")
-            {
-                Description =
-                    "Enable HTTP health check service on port 8080 (automatically enabled in Docker containers)",
-            };
-
             Option<bool> versionOption = new("--version")
             {
                 Description = "Show version information including GitVersion details",
@@ -177,7 +171,6 @@ public static partial class Program
             rootCommand.Options.Add(csvOption);
             rootCommand.Options.Add(xmlOption);
             rootCommand.Options.Add(loggingModeOption);
-            rootCommand.Options.Add(enableHealthCheckOption);
             rootCommand.Options.Add(versionOption);
             rootCommand.Options.Add(httpPortOption);
             rootCommand.Options.Add(httpHostOption);
@@ -210,7 +203,6 @@ public static partial class Program
             string? csvPath = parseResult.GetValue(csvOption);
             string? xmlPath = parseResult.GetValue(xmlOption);
             bool loggingMode = parseResult.GetValue(loggingModeOption);
-            bool enableHealthCheck = parseResult.GetValue(enableHealthCheckOption);
             int httpPort = parseResult.GetValue(httpPortOption);
             string httpHost = parseResult.GetValue(httpHostOption) ?? "localhost";
             string httpPathBase = parseResult.GetValue(httpPathBaseOption) ?? "/";
@@ -273,7 +265,7 @@ public static partial class Program
                 csvPath,
                 xmlPath,
                 loggingMode,
-                enableHealthCheck,
+                true, // Health check always enabled
                 httpPort,
                 httpHost,
                 httpPathBase,
@@ -330,7 +322,7 @@ public static partial class Program
     /// <param name="csvPath">Path to KNX group address CSV file exported from ETS.</param>
     /// <param name="xmlPath">Path to KNX group address XML export (KNX GA Export 01).</param>
     /// <param name="loggingMode">Force simple logging mode instead of TUI.</param>
-    /// <param name="enableHealthCheck">Enable HTTP health check service (auto-enabled in containers).</param>
+    /// <param name="enableHealthCheck">Health check service (always enabled).</param>
     /// <param name="httpPort">HTTP port for the web UI (default 8671).</param>
     /// <param name="httpHost">HTTP host/interface (default localhost).</param>
     /// <param name="httpPathBase">Base path for UI and APIs (default "/").</param>
