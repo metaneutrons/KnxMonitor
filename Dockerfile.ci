@@ -1,51 +1,197 @@
-# Runtime Docker image with multi-architecture support
-# Application is built in GitHub Actions and copied as framework-dependent deployment
-# This approach is needed for code signing on MacOS.
-FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine
+# Enterprise-grade runtime Docker image for prebuilt KNX Monitor binaries
+# Designed to work with GitVersion-tagged and code-signed prebuilt deployments
+FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine AS runtime
 
-# Build arguments
+# Build arguments with defaults
 ARG VERSION=1.0.0
 ARG BUILD_DATE
 ARG VCS_REF
 ARG TARGETARCH
+ARG TARGETOS
 
-# Install runtime dependencies
-RUN apk add --no-cache \
-    ca-certificates \
-    tzdata \
-    && update-ca-certificates
-
-# Create non-root user
-RUN addgroup -g 1001 -S knxmonitor \
-    && adduser -S knxmonitor -u 1001 -G knxmonitor
-
-# Set working directory
-WORKDIR /app
-
-# Copy pre-built application based on target architecture
-COPY publish-${TARGETARCH}/ ./
-
-# Set ownership
-RUN chown -R knxmonitor:knxmonitor /app
-
-# Switch to non-root user
-USER knxmonitor
-
-# Health check using dotnet
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD dotnet KnxMonitor.dll --version || exit 1
-
-# Labels
+# Metadata labels following OCI specification
 LABEL org.opencontainers.image.title="KNX Monitor" \
-      org.opencontainers.image.description="KNX/EIB bus monitoring and debugging tool built with modern .NET 9" \
+      org.opencontainers.image.description="Enterprise-grade KNX/EIB bus monitoring and debugging tool built with .NET 9" \
       org.opencontainers.image.vendor="metaneutrons" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.source="https://github.com/metaneutrons/KnxMonitor" \
       org.opencontainers.image.documentation="https://github.com/metaneutrons/KnxMonitor/blob/main/README.md" \
-      org.opencontainers.image.licenses="GPL-3.0"
+      org.opencontainers.image.licenses="GPL-3.0" \
+      org.opencontainers.image.url="https://github.com/metaneutrons/KnxMonitor" \
+      maintainer="metaneutrons" \
+      version="${VERSION}"
 
-# Default command - use dotnet to run the DLL
-ENTRYPOINT ["dotnet", "KnxMonitor.dll"]
+# Install runtime dependencies and security updates
+RUN apk update && \
+    apk add --no-cache \
+        ca-certificates \
+        tzdata \
+        curl \
+        bash \
+        file \
+        icu-libs \
+        icu-data-full \
+        && \
+    update-ca-certificates && \
+    rm -rf /var/cache/apk/* && \
+    # Verify critical dependencies
+    dotnet --info && \
+    bash --version
+
+# Create dedicated non-root user with proper permissions
+RUN addgroup -g 1001 -S knxmonitor && \
+    adduser -S knxmonitor -u 1001 -G knxmonitor -h /app -s /bin/bash && \
+    # Create necessary directories with proper permissions
+    mkdir -p /app /tmp/knxmonitor && \
+    chown -R knxmonitor:knxmonitor /app /tmp/knxmonitor
+
+# Set working directory
+WORKDIR /app
+
+# Copy prebuilt application based on target architecture
+# CRITICAL: This preserves GitVersion metadata and code signing from CI/CD
+COPY --chown=knxmonitor:knxmonitor publish-${TARGETARCH}/ ./
+
+# Create enterprise-grade entrypoint script optimized for prebuilt binaries
+RUN cat > /app/entrypoint.sh << 'EOF' && \
+    chmod +x /app/entrypoint.sh && \
+    chown knxmonitor:knxmonitor /app/entrypoint.sh
+#!/bin/bash
+set -euo pipefail
+
+# Enterprise logging with structured format
+log() {
+    echo "[$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")] [KNXMONITOR] $*" >&2
+}
+
+# Optimized detection for prebuilt framework-dependent deployments
+detect_and_execute() {
+    local app_args=("$@")
+    
+    log "INFO: KNX Monitor starting (prebuilt binary mode)"
+    log "INFO: Version: ${VERSION:-unknown}, Platform: ${TARGETOS:-linux}/${TARGETARCH:-unknown}"
+    log "INFO: Working directory: $(pwd), User: $(whoami)"
+    
+    # PRIORITY 1: Framework-dependent DLL (primary deployment method for containers)
+    if [[ -f "KnxMonitor.dll" ]]; then
+        log "INFO: Found framework-dependent deployment: KnxMonitor.dll"
+        
+        # Verify .NET runtime availability
+        if ! command -v dotnet >/dev/null 2>&1; then
+            log "FATAL: .NET runtime not available but KnxMonitor.dll found"
+            exit 1
+        fi
+        
+        # Verify DLL integrity
+        local dll_size
+        dll_size=$(stat -c%s "KnxMonitor.dll" 2>/dev/null || stat -f%z "KnxMonitor.dll" 2>/dev/null || echo "0")
+        if [[ "$dll_size" -lt 1000 ]]; then
+            log "ERROR: KnxMonitor.dll appears corrupted (size: $dll_size bytes)"
+            exit 1
+        fi
+        
+        log "INFO: Executing framework-dependent deployment: dotnet KnxMonitor.dll ${app_args[*]}"
+        exec dotnet KnxMonitor.dll "${app_args[@]}"
+    fi
+    
+    # PRIORITY 2: Native executable (fallback for self-contained deployments)
+    if [[ -f "KnxMonitor" && -x "KnxMonitor" ]]; then
+        log "INFO: Found native executable: KnxMonitor"
+        
+        # Verify it's a proper executable
+        if file KnxMonitor 2>/dev/null | grep -q "executable\|ELF"; then
+            log "INFO: Executing native binary: ./KnxMonitor ${app_args[*]}"
+            exec ./KnxMonitor "${app_args[@]}"
+        else
+            log "WARN: KnxMonitor file exists but is not a valid executable"
+        fi
+    fi
+    
+    # PRIORITY 3: Windows executable (for Windows containers, though not typical)
+    if [[ -f "KnxMonitor.exe" ]]; then
+        log "INFO: Found Windows executable: KnxMonitor.exe"
+        log "INFO: Executing Windows binary: ./KnxMonitor.exe ${app_args[*]}"
+        exec ./KnxMonitor.exe "${app_args[@]}"
+    fi
+    
+    # If we reach here, the prebuilt deployment is invalid
+    log "FATAL: No valid KNX Monitor executable found in prebuilt deployment"
+    log "FATAL: Expected files missing:"
+    log "FATAL:   - KnxMonitor.dll (framework-dependent)"
+    log "FATAL:   - KnxMonitor (native executable)"
+    log "FATAL:   - KnxMonitor.exe (Windows executable)"
+    log "FATAL: Available files in /app:"
+    ls -la /app/ | head -20
+    log "FATAL: This indicates a problem with the prebuilt binary packaging"
+    
+    exit 1
+}
+
+# Handle special cases with optimized paths
+main() {
+    # Validate application directory
+    if [[ ! -d "/app" ]]; then
+        log "FATAL: Application directory /app not found"
+        exit 1
+    fi
+    
+    cd /app
+    
+    # Fast path for version checks (critical for health checks)
+    if [[ "${1:-}" == "--version" ]]; then
+        log "INFO: Version check requested (fast path)"
+        if [[ -f "KnxMonitor.dll" ]] && command -v dotnet >/dev/null 2>&1; then
+            exec dotnet KnxMonitor.dll --version
+        elif [[ -f "KnxMonitor" && -x "KnxMonitor" ]]; then
+            exec ./KnxMonitor --version
+        else
+            log "ERROR: Cannot execute version check - no valid executable found"
+            exit 1
+        fi
+    fi
+    
+    # Fast path for help
+    if [[ "${1:-}" == "--help" || "${1:-}" == "-h" || "${1:-}" == "-?" ]]; then
+        log "INFO: Help requested"
+    fi
+    
+    # Execute main application detection
+    detect_and_execute "$@"
+}
+
+# Graceful shutdown handling
+cleanup() {
+    log "INFO: Received shutdown signal, exiting gracefully..."
+    exit 0
+}
+
+trap cleanup SIGTERM SIGINT SIGQUIT
+
+# Execute main function with all arguments
+main "$@"
+EOF
+
+# Switch to non-root user
+USER knxmonitor
+
+# Optimized environment variables for containerized .NET applications
+ENV DOTNET_RUNNING_IN_CONTAINER=true \
+    DOTNET_USE_POLLING_FILE_WATCHER=true \
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    ASPNETCORE_URLS="" \
+    DOTNET_EnableDiagnostics=0 \
+    DOTNET_CLI_TELEMETRY_OPTOUT=1 \
+    DOTNET_NOLOGO=1 \
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+
+# Robust health check optimized for prebuilt deployments
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD /app/entrypoint.sh --version >/dev/null 2>&1 || exit 1
+
+# Enterprise entrypoint with comprehensive error handling
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Default to help if no arguments provided
 CMD ["--help"]

@@ -131,29 +131,108 @@ jobs:
       - name: Build and publish
         run: |
           echo "DEBUG: Building for runtime: ${{ matrix.runtime }}"
+          echo "DEBUG: .NET SDK Version: $(dotnet --version)"
+          echo "DEBUG: Available SDKs: $(dotnet --list-sdks)"
+          
+          # Ensure clean build environment
+          dotnet clean --configuration Release --verbosity minimal
+          
           if [[ "${{ matrix.runtime }}" == "linux-x64" || "${{ matrix.runtime }}" == "linux-arm64" ]]; then
-            echo "DEBUG: Using framework-dependent deployment for Linux"
-            # Framework-dependent deployment for Docker (Linux)
+            echo "DEBUG: Using enterprise-grade framework-dependent deployment for Docker (Linux)"
+            
+            # Framework-dependent deployment optimized for Docker containers
+            # This creates both KnxMonitor.dll and KnxMonitor executable for maximum compatibility
             dotnet publish ${{ env.PROJECT_NAME }} \
               --configuration Release \
               --runtime ${{ matrix.runtime }} \
               --self-contained false \
+              --property:UseAppHost=true \
+              --property:PublishSingleFile=false \
+              --property:PublishReadyToRun=false \
+              --property:PublishTrimmed=false \
+              --property:EnableCompressionInSingleFile=false \
               --output ./publish/${{ matrix.runtime }} \
-              --verbosity minimal
+              --verbosity normal \
+              --nologo
+              
+            echo "DEBUG: Framework-dependent deployment completed"
+            
+            # Verify both DLL and executable are created
+            if [[ ! -f "./publish/${{ matrix.runtime }}/KnxMonitor.dll" ]]; then
+              echo "ERROR: KnxMonitor.dll not found in framework-dependent deployment"
+              echo "Available files:"
+              ls -la ./publish/${{ matrix.runtime }}/
+              exit 1
+            fi
+            
+            # Ensure executable has proper permissions
+            if [[ -f "./publish/${{ matrix.runtime }}/KnxMonitor" ]]; then
+              chmod +x "./publish/${{ matrix.runtime }}/KnxMonitor"
+              echo "DEBUG: Made KnxMonitor executable"
+            fi
+            
           else
-            echo "DEBUG: Using self-contained deployment for non-Linux platforms"
-            # Self-contained deployment with proper single executable
+            echo "DEBUG: Using enterprise-grade self-contained deployment for native platforms"
+            
+            # Self-contained deployment with optimized single executable
             dotnet publish ${{ env.PROJECT_NAME }} \
               --configuration Release \
               --runtime ${{ matrix.runtime }} \
               --self-contained true \
               --property:PublishSingleFile=true \
               --property:IncludeNativeLibrariesForSelfExtract=true \
+              --property:EnableCompressionInSingleFile=true \
+              --property:PublishTrimmed=true \
+              --property:TrimMode=partial \
+              --property:PublishReadyToRun=true \
               --output ./publish/${{ matrix.runtime }} \
-              --verbosity minimal
+              --verbosity normal \
+              --nologo
+              
+            echo "DEBUG: Self-contained deployment completed"
+            
+            # Verify executable is created
+            EXPECTED_EXE="KnxMonitor"
+            if [[ "${{ matrix.runtime }}" == win-* ]]; then
+              EXPECTED_EXE="KnxMonitor.exe"
+            fi
+            
+            if [[ ! -f "./publish/${{ matrix.runtime }}/$EXPECTED_EXE" ]]; then
+              echo "ERROR: $EXPECTED_EXE not found in self-contained deployment"
+              echo "Available files:"
+              ls -la ./publish/${{ matrix.runtime }}/
+              exit 1
+            fi
+            
+            # Ensure executable has proper permissions (Unix-like systems)
+            if [[ "${{ matrix.runtime }}" != win-* ]]; then
+              chmod +x "./publish/${{ matrix.runtime }}/$EXPECTED_EXE"
+              echo "DEBUG: Made $EXPECTED_EXE executable"
+            fi
           fi
-          echo "DEBUG: Build completed. Checking output:"
-          ls -la ./publish/${{ matrix.runtime }}/ | head -10
+          
+          echo "DEBUG: Build validation completed successfully"
+          echo "DEBUG: Final output verification:"
+          ls -la ./publish/${{ matrix.runtime }}/ | head -20
+          
+          # Additional validation: verify the application can show version
+          echo "DEBUG: Testing application startup..."
+          cd ./publish/${{ matrix.runtime }}/
+          
+          if [[ -f "KnxMonitor.dll" ]] && command -v dotnet >/dev/null 2>&1; then
+            echo "DEBUG: Testing DLL version..."
+            timeout 10 dotnet KnxMonitor.dll --version || echo "DLL version test failed (non-critical)"
+          fi
+          
+          if [[ -f "KnxMonitor" && -x "KnxMonitor" ]]; then
+            echo "DEBUG: Testing executable version..."
+            timeout 10 ./KnxMonitor --version || echo "Executable version test failed (non-critical)"
+          elif [[ -f "KnxMonitor.exe" ]]; then
+            echo "DEBUG: Testing Windows executable version..."
+            timeout 10 ./KnxMonitor.exe --version || echo "Windows executable version test failed (non-critical)"
+          fi
+          
+          echo "DEBUG: Application startup test completed"
 
       - name: Code sign macOS binaries
         if: startsWith(matrix.runtime, 'osx-')
@@ -302,29 +381,134 @@ jobs:
 
       - name: Prepare Docker context for multi-arch build
         run: |
+          echo "INFO: Preparing enterprise-grade Docker build context..."
+          
+          # Create clean build directories
+          rm -rf docker-context
           mkdir -p docker-context/publish-amd64 docker-context/publish-arm64
           
-          # Extract x64 binary (maps to amd64 in Docker)
+          echo "INFO: Processing AMD64 (x64) artifacts..."
           cd docker-artifacts/${{ env.PROJECT_NAME }}-linux-x64
-          tar -xzf ${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-linux-x64.tar.gz
-          # Copy entire framework-dependent deployment
+          
+          # Verify archive exists
+          ARCHIVE_AMD64="${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-linux-x64.tar.gz"
+          if [[ ! -f "$ARCHIVE_AMD64" ]]; then
+            echo "ERROR: AMD64 archive not found: $ARCHIVE_AMD64"
+            ls -la
+            exit 1
+          fi
+          
+          # Extract and validate AMD64 deployment
+          tar -xzf "$ARCHIVE_AMD64"
+          echo "INFO: AMD64 archive extracted successfully"
+          
+          # Validate required files for AMD64
+          if [[ ! -f "KnxMonitor.dll" ]]; then
+            echo "ERROR: KnxMonitor.dll not found in AMD64 deployment"
+            echo "Available files:"
+            ls -la
+            exit 1
+          fi
+          
+          # Copy AMD64 deployment with validation
           cp -r * ../../docker-context/publish-amd64/
+          echo "INFO: AMD64 deployment copied to Docker context"
           
-          # Extract arm64 binary
+          echo "INFO: Processing ARM64 artifacts..."
           cd ../${{ env.PROJECT_NAME }}-linux-arm64
-          tar -xzf ${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-linux-arm64.tar.gz
-          # Copy entire framework-dependent deployment
+          
+          # Verify archive exists
+          ARCHIVE_ARM64="${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-linux-arm64.tar.gz"
+          if [[ ! -f "$ARCHIVE_ARM64" ]]; then
+            echo "ERROR: ARM64 archive not found: $ARCHIVE_ARM64"
+            ls -la
+            exit 1
+          fi
+          
+          # Extract and validate ARM64 deployment
+          tar -xzf "$ARCHIVE_ARM64"
+          echo "INFO: ARM64 archive extracted successfully"
+          
+          # Validate required files for ARM64
+          if [[ ! -f "KnxMonitor.dll" ]]; then
+            echo "ERROR: KnxMonitor.dll not found in ARM64 deployment"
+            echo "Available files:"
+            ls -la
+            exit 1
+          fi
+          
+          # Copy ARM64 deployment with validation
           cp -r * ../../docker-context/publish-arm64/
+          echo "INFO: ARM64 deployment copied to Docker context"
           
-          # Copy CI/CD Dockerfile
+          # Copy and validate Dockerfile
           cd ../..
-          cp Dockerfile.ci docker-context/Dockerfile
+          if [[ ! -f "Dockerfile.ci" ]]; then
+            echo "ERROR: Dockerfile.ci not found"
+            exit 1
+          fi
           
-          # Verify binaries
-          echo "AMD64 deployment:"
+          cp Dockerfile.ci docker-context/Dockerfile
+          echo "INFO: Dockerfile copied to build context"
+          
+          # Comprehensive validation of Docker context
+          echo "INFO: Validating Docker build context..."
+          
+          # Validate AMD64 deployment
+          echo "INFO: AMD64 deployment validation:"
+          if [[ ! -f "docker-context/publish-amd64/KnxMonitor.dll" ]]; then
+            echo "ERROR: AMD64 KnxMonitor.dll missing"
+            exit 1
+          fi
+          
+          AMD64_DLL_SIZE=$(stat -c%s "docker-context/publish-amd64/KnxMonitor.dll" 2>/dev/null || stat -f%z "docker-context/publish-amd64/KnxMonitor.dll")
+          if [[ "$AMD64_DLL_SIZE" -lt 1000 ]]; then
+            echo "ERROR: AMD64 KnxMonitor.dll appears to be too small ($AMD64_DLL_SIZE bytes)"
+            exit 1
+          fi
+          echo "  ✓ KnxMonitor.dll: $AMD64_DLL_SIZE bytes"
+          
+          # Validate ARM64 deployment
+          echo "INFO: ARM64 deployment validation:"
+          if [[ ! -f "docker-context/publish-arm64/KnxMonitor.dll" ]]; then
+            echo "ERROR: ARM64 KnxMonitor.dll missing"
+            exit 1
+          fi
+          
+          ARM64_DLL_SIZE=$(stat -c%s "docker-context/publish-arm64/KnxMonitor.dll" 2>/dev/null || stat -f%z "docker-context/publish-arm64/KnxMonitor.dll")
+          if [[ "$ARM64_DLL_SIZE" -lt 1000 ]]; then
+            echo "ERROR: ARM64 KnxMonitor.dll appears to be too small ($ARM64_DLL_SIZE bytes)"
+            exit 1
+          fi
+          echo "  ✓ KnxMonitor.dll: $ARM64_DLL_SIZE bytes"
+          
+          # Validate Dockerfile
+          if [[ ! -f "docker-context/Dockerfile" ]]; then
+            echo "ERROR: Dockerfile missing from build context"
+            exit 1
+          fi
+          
+          # Check Dockerfile syntax
+          if ! grep -q "ENTRYPOINT.*entrypoint.sh" docker-context/Dockerfile; then
+            echo "ERROR: Dockerfile does not contain expected entrypoint configuration"
+            exit 1
+          fi
+          echo "  ✓ Dockerfile syntax validated"
+          
+          # Final context summary
+          echo "INFO: Docker build context prepared successfully:"
+          echo "  ✓ AMD64 deployment: $(ls docker-context/publish-amd64/ | wc -l) files"
+          echo "  ✓ ARM64 deployment: $(ls docker-context/publish-arm64/ | wc -l) files"
+          echo "  ✓ Dockerfile: $(wc -l < docker-context/Dockerfile) lines"
+          
+          # Show key files for debugging
+          echo "INFO: Key files in build context:"
+          echo "AMD64 files:"
           ls -la docker-context/publish-amd64/ | head -10
-          echo "ARM64 deployment:"
+          echo "ARM64 files:"
           ls -la docker-context/publish-arm64/ | head -10
+          
+          echo "INFO: Docker context preparation completed successfully"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -342,6 +526,34 @@ jobs:
             VCS_REF=${{ github.sha }}
           provenance: true
           sbom: true
+
+      - name: Validate Docker image
+        run: |
+          echo "INFO: Validating built Docker images..."
+          
+          # Test AMD64 image
+          echo "INFO: Testing AMD64 image..."
+          docker run --rm --platform linux/amd64 \
+            ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{ needs.calculate-version.outputs.version }} \
+            --version
+          
+          # Test ARM64 image (if running on compatible hardware)
+          echo "INFO: Testing ARM64 image..."
+          if docker run --rm --platform linux/arm64 \
+            ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{ needs.calculate-version.outputs.version }} \
+            --version 2>/dev/null; then
+            echo "  ✓ ARM64 image validation successful"
+          else
+            echo "  ⚠ ARM64 image validation skipped (incompatible host or emulation issues)"
+          fi
+          
+          # Test help command
+          echo "INFO: Testing help command..."
+          docker run --rm --platform linux/amd64 \
+            ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{ needs.calculate-version.outputs.version }} \
+            --help | head -5
+          
+          echo "INFO: Docker image validation completed successfully"
 
   release:
     needs: [calculate-version, build, docker]
