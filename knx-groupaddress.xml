@@ -1,0 +1,838 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<GroupAddress-Export xmlns="http://knx.org/xml/ga-export/01">
+  <!--GroupRange:-->
+  <!--  @Name: The name of the group range (1 to 255 characters)-->
+  <!--  @RangeStart: The inclusive start address of the range as specified in free group address style-->
+  <!--  @RangeEnd: The inclusive end address of the range as specified in free group address style-->
+  <!--  @Description: The group ranges' description if available-->
+  <!--GroupAddress:-->
+  <!--  @Name: The name of the group range (1 to 255 characters)-->
+  <!--  @Address: The address as specified either in three-level (1/2/3 or two-level (1/3) or numeric (12345) or hexadecimal ($1Fa3 or 0x1fa3) group address value-->
+  <!--  @Central: True if the group address has the Central flag set-->
+  <!--  @Unfiltered: True if the group address has the Unfiltered flag set-->
+  <!--  @Description: The group addresses' description if available-->
+  <!--  @DTPs: The Data Point Types associated with the group address if available, comma separated, e.g. '1.001, 1.002'-->
+  <GroupRange Name="Zentralfunktionen" RangeStart="1" RangeEnd="2047" Unfiltered="true">
+    <GroupRange Name="Zeit/Datum" RangeStart="1" RangeEnd="255" Unfiltered="true">
+      <GroupAddress Name="Zeit" Address="0/0/1" Central="true" Unfiltered="true" DPTs="DPST-10-1" />
+      <GroupAddress Name="Datum" Address="0/0/2" Central="true" Unfiltered="true" DPTs="DPST-11-1" />
+      <GroupAddress Name="Zeit / Datum" Address="0/0/3" Central="true" Unfiltered="true" DPTs="DPST-19-1" />
+      <GroupAddress Name="Tag / Nacht" Address="0/0/4" Central="true" Unfiltered="true" Description="0 = Tag, 1 = Nacht" DPTs="DPST-1-24" />
+      <GroupAddress Name="Tag / Nacht (für Dimmer)" Address="0/0/5" Central="true" Unfiltered="true" Description="0 = Tag, 1 = Nacht" DPTs="DPST-1-24" />
+      <GroupAddress Name="Sommer / Winter" Address="0/0/7" Central="true" Unfiltered="true" Description="1 - Sommer&#xD;&#xA;0 - Winter" DPTs="DPST-1-2" />
+      <GroupAddress Name="Dunkelheit (Sensor)" Address="0/0/10" Central="true" Unfiltered="true" Description="1 = Dämmerung / Dunkelheit&#xD;&#xA;0 = Tageslicht" DPTs="DPST-1-2" />
+      <GroupAddress Name="Dunkelheit (Stand der Sonne)" Address="0/0/11" Central="true" Unfiltered="true" Description="1 = Dämmerung / Dunkelheit&#xD;&#xA;0 = Tageslicht" DPTs="DPST-1-2" />
+    </GroupRange>
+    <GroupRange Name="Alarme / Störungen / Meldungen" RangeStart="256" RangeEnd="511" Unfiltered="true">
+      <GroupAddress Name="Frostalarm" Address="0/1/0" Central="true" Unfiltered="true" DPTs="DPST-1-5" />
+      <GroupAddress Name="Hitzealarm" Address="0/1/1" Central="true" Unfiltered="true" DPTs="DPST-1-5" />
+      <GroupAddress Name="Störung Heizung" Address="0/1/2" Central="true" Unfiltered="true" DPTs="DPST-1-5" />
+      <GroupAddress Name="Diagnosetext Heizung" Address="0/1/3" Central="true" Unfiltered="true" DPTs="DPST-16-1" />
+      <GroupAddress Name="Dimmer 10 - Unterspannung" Address="0/1/10" Central="true" Unfiltered="true" Description="20 - ELT Fehler LED Dimmer 10" DPTs="DPST-1-2" />
+      <GroupAddress Name="Dimmer 10 - Überstrom" Address="0/1/11" Central="true" Unfiltered="true" Description="20 - ELT Fehler LED Dimmer 10" DPTs="DPST-1-2" />
+      <GroupAddress Name="Dimmer 10 - Übertemperatur" Address="0/1/12" Central="true" Unfiltered="true" Description="20 - ELT Fehler LED Dimmer 10" DPTs="DPST-1-2" />
+      <GroupAddress Name="Dimmer 11 - Unterspannung" Address="0/1/20" Central="true" Unfiltered="true" Description="20 - ELT Fehler LED Dimmer 11" DPTs="DPST-1-2" />
+      <GroupAddress Name="Dimmer 11 - Überstrom" Address="0/1/21" Central="true" Unfiltered="true" Description="20 - ELT Fehler LED Dimmer 11" DPTs="DPST-1-2" />
+      <GroupAddress Name="Dimmer 11 - Übertemperatur" Address="0/1/22" Central="true" Unfiltered="true" Description="20 - ELT Fehler LED Dimmer 11" DPTs="DPST-1-2" />
+      <GroupAddress Name="Dimmer 12 - Überstrom" Address="0/1/23" Unfiltered="true" Description="20 - ELT Fehler MDT 2TE LED Dimmer 12" DPTs="DPST-1-5" />
+      <GroupAddress Name="Dimmer 12 - Übertemperatur" Address="0/1/24" Unfiltered="true" Description="20 - ELT Fehler MDT 2TE LED Dimmer 12" DPTs="DPST-1-5" />
+      <GroupAddress Name="Dimmer 13 - Überstrom" Address="0/1/25" Unfiltered="true" Description="20 - ELT Fehler MDT 2TE LED Dimmer 13" DPTs="DPST-1-5" />
+      <GroupAddress Name="Dimmer 13 - Übertemperatur" Address="0/1/26" Unfiltered="true" Description="20 - ELT Fehler MDT 2TE LED Dimmer 13" DPTs="DPST-1-5" />
+      <GroupAddress Name="Dimmer 14 - Überstrom" Address="0/1/27" Unfiltered="true" Description="20 - ELT Fehler MDT 2TE LED Dimmer 14" DPTs="DPST-1-5" />
+      <GroupAddress Name="Dimmer 14 - Übertemperatur" Address="0/1/28" Unfiltered="true" Description="20 - ELT Fehler MDT 2TE LED Dimmer 14" DPTs="DPST-1-5" />
+      <GroupAddress Name="Dimmer TV - Übertstrom" Address="0/1/30" Unfiltered="true" Description="24 - Wohnbereich Fehler LED Dimmer" DPTs="DPST-1-5" />
+      <GroupAddress Name="Dimmer TV - Übertemperatur" Address="0/1/31" Unfiltered="true" Description="24 - Wohnbereich Fehler LED Dimmer" DPTs="DPST-1-5" />
+      <GroupAddress Name="Dimmer BadOG - Übertstrom" Address="0/1/32" Unfiltered="true" Description="30 - Bad OG Fehler LED Dimmer" DPTs="DPST-1-5" />
+      <GroupAddress Name="Dimmer BadOG - Übertemperatur" Address="0/1/33" Unfiltered="true" Description="30 - Bad OG Fehler LED Dimmer" DPTs="DPST-1-5" />
+      <GroupAddress Name="Bad EG - Fester offen (&gt; 15Min.)" Address="0/1/50" Unfiltered="true" Description="23 - Bad EG Fenster offen" DPTs="DPST-1-5" />
+      <GroupAddress Name="Bad OG - Fester offen (&gt; 15Min.)" Address="0/1/55" Unfiltered="true" Description="30 - Bad OG Fenster offen" DPTs="DPST-1-5" />
+      <GroupAddress Name="Batteriewarnung" Address="0/1/110" Central="true" Unfiltered="true" Description="Brandmelder" DPTs="DPST-1-2" />
+      <GroupAddress Name="Testalarm" Address="0/1/111" Central="true" Unfiltered="true" Description="Brandmelder" DPTs="DPST-1-2" />
+      <GroupAddress Name="Feueralarm" Address="0/1/112" Central="true" Unfiltered="true" Description="Brandmelder" DPTs="DPST-1-2" />
+      <GroupAddress Name="Anwesenheitssimulation" Address="0/1/200" Central="true" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="Status Anwesenheitssimulation" Address="0/1/201" Central="true" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="Zentralmeldung" Address="0/1/255" Central="true" Unfiltered="true" DPTs="DPST-16-1" />
+    </GroupRange>
+    <GroupRange Name="Heizung" RangeStart="512" RangeEnd="767" Unfiltered="true">
+      <GroupAddress Name="Betriebsart EG/OG" Address="0/2/0" Central="true" Unfiltered="true" DPTs="DPST-20-102" />
+      <GroupAddress Name="Komfortbetrieb EG/OG" Address="0/2/1" Central="true" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="Economy EG/OG" Address="0/2/2" Central="true" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="Standby EG/OG" Address="0/2/3" Central="true" Unfiltered="true" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Zeitschaltungen" RangeStart="768" RangeEnd="1023" Unfiltered="true">
+      <GroupAddress Name="Schalten Außenbeleuchtung" Address="0/3/0" Unfiltered="true" Description="50 - Außen Zeitschaltungen" DPTs="DPST-1-2" />
+    </GroupRange>
+    <GroupRange Name="Umweltsensoren" RangeStart="1024" RangeEnd="1279" Unfiltered="true">
+      <GroupAddress Name="Parken - Helligkeit" Address="0/4/0" Unfiltered="true" Description="52 - Parken Bewegungsmelder" DPTs="DPST-9-4" />
+      <GroupAddress Name="Parken - Dämmerung" Address="0/4/1" Unfiltered="true" Description="52 - Parken Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="Parken - Dämmerungsschwellwert" Address="0/4/2" Unfiltered="true" Description="52 - Parken Bewegungsmelder" DPTs="DPST-9-4" />
+      <GroupAddress Name="Eingang - Helligkeit" Address="0/4/10" Unfiltered="true" Description="51 - Eingangsbereich Bewegungsmelder" DPTs="DPST-9-4" />
+      <GroupAddress Name="Eingang - Dämmerung" Address="0/4/11" Unfiltered="true" Description="51 - Eingangsbereich Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="Eingang - Dämmerungsschwellwert" Address="0/4/12" Unfiltered="true" Description="51 - Eingangsbereich Bewegungsmelder" DPTs="DPST-9-4" />
+      <GroupAddress Name="HWR - Helligkeit" Address="0/4/20" Unfiltered="true" Description="21 - HWR Präsenzmelder" DPTs="DPST-9-4" />
+      <GroupAddress Name="BadOG - Helligkeit" Address="0/4/30" Unfiltered="true" Description="23 - Bad EG Präsenzmelder" DPTs="DPST-9-4" />
+      <GroupAddress Name="BadOG - Luftfeuchtigkeit (relativ)" Address="0/4/31" Unfiltered="true" Description="30 - Bad OG Sensoren" DPTs="DPST-9-7" />
+      <GroupAddress Name="BadOG - Luftfeuchtigkeit (absolut)" Address="0/4/32" Unfiltered="true" Description="30 - Bad OG Sensoren" DPTs="DPST-9-29" />
+      <GroupAddress Name="BadOG - Temperatur" Address="0/4/33" Unfiltered="true" Description="30 - Bad OG Sensoren" DPTs="DPST-9-1" />
+      <GroupAddress Name="BadOG - Taupunkttemperatur" Address="0/4/34" Unfiltered="true" Description="30 - Bad OG Sensoren" DPTs="DPST-9-1" />
+      <GroupAddress Name="BadOG - Behaglichkeit" Address="0/4/35" Unfiltered="true" Description="30 - Bad OG Sensoren" DPTs="DPST-1-11" />
+      <GroupAddress Name="BadEG - Helligkeit" Address="0/4/40" Unfiltered="true" Description="30 - Bad OG Sensoren" DPTs="DPST-9-4" />
+      <GroupAddress Name="Eingang - Helligkeit" Address="0/4/50" Unfiltered="true" Description="25 - Eingangsbereich Präsenzmelder (Decke)" DPTs="DPST-9-4" />
+      <GroupAddress Name="Hütte - Temperatur" Address="0/4/200" Unfiltered="true" Description="70 - Gartenhaus Temperatur" DPTs="DPST-9-1" />
+    </GroupRange>
+    <GroupRange Name="Netzteile" RangeStart="1280" RangeEnd="1535" Unfiltered="true">
+      <GroupAddress Name="24V - Schalten" Address="0/5/0" Unfiltered="true" Description="20 - ELT 24V Netzteil (LED Streifen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="24V - Schaltstatus" Address="0/5/1" Unfiltered="true" Description="20 - ELT 24V Netzteil (LED Streifen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="24V außen - Schalten" Address="0/5/10" Unfiltered="true" Description="20 - ELT 24V Netzteil (Außenbereich/H801)" DPTs="DPST-1-1" />
+      <GroupAddress Name="24V außen - Schaltstatus" Address="0/5/11" Unfiltered="true" Description="20 - ELT 24V Netzteil (Außenbereich/H801)" DPTs="DPST-1-11" />
+      <GroupAddress Name="24V BadOG - Schalten" Address="0/5/20" Unfiltered="true" Description="30 - Bad OG Netzteil" DPTs="DPST-1-1" />
+      <GroupAddress Name="24V BadOG - Schaltstatus" Address="0/5/21" Unfiltered="true" Description="30 - Bad OG Netzteil" DPTs="DPST-1-11" />
+    </GroupRange>
+    <GroupRange Name="Licht &amp; Steckdosen" RangeStart="1536" RangeEnd="1791" Unfiltered="true">
+      <GroupAddress Name="Lichter ganzes Haus" Address="0/6/0" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="Lichter EG" Address="0/6/10" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="Lichter OG" Address="0/6/20" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="Lichter außen" Address="0/6/30" Unfiltered="true" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Signale" RangeStart="1792" RangeEnd="2047" Unfiltered="true">
+      <GroupAddress Name="Klingel (Haustür) läuten" Address="0/7/0" Unfiltered="true" Description="51 - Eingangsbereich Klingel (Haustür)" DPTs="DPST-1-1" />
+      <GroupAddress Name="Klingel (Haustür) LED schalten" Address="0/7/1" Unfiltered="true" Description="51 - Eingangsbereich Klingel (Haustür)" DPTs="DPST-1-1" />
+      <GroupAddress Name="Klingel (Haustür) LED Schaltstatus" Address="0/7/2" Unfiltered="true" Description="51 - Eingangsbereich Klingel (Haustür)" DPTs="DPST-1-1" />
+      <GroupAddress Name="Summer (Haustür) öffnen" Address="0/7/3" Unfiltered="true" Description="51 - Eingangsbereich Klingel (Haustür)" DPTs="DPST-1-1" />
+      <GroupAddress Name="Summer (Haustür) Schaltstatus" Address="0/7/4" Unfiltered="true" Description="51 - Eingangsbereich Klingel (Haustür)" DPTs="DPST-1-11" />
+      <GroupAddress Name="BadEG - Feuchtigkeitsampel (rot)" Address="0/7/10" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="BadEG - Feuchtigkeitsampel (gelb)" Address="0/7/11" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="BadEG - Feuchtigkeitsampel (grün)" Address="0/7/12" Unfiltered="true" DPTs="DPST-1-1" />
+    </GroupRange>
+  </GroupRange>
+  <GroupRange Name="Licht/Steckdosen EG" RangeStart="2048" RangeEnd="4095" Unfiltered="true">
+    <GroupRange Name="Außen" RangeStart="2048" RangeEnd="2303" Unfiltered="true">
+      <GroupAddress Name="L Eingang - Schalten" Address="1/0/0" Unfiltered="true" Description="51 - Eingangsbereich Wandleuchte" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Eingang - Schaltstatus" Address="1/0/1" Unfiltered="true" Description="51 - Eingangsbereich Wandleuchte" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Terasse - Schalten" Address="1/0/10" Unfiltered="true" Description="53 - Terrasse Terasse Bodenleuchten" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Terasse - Schaltstatus" Address="1/0/11" Unfiltered="true" Description="53 - Terrasse Terasse Bodenleuchten" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Uplights - Schalten" Address="1/0/20" Unfiltered="true" Description="53 - Terrasse (Westen) Terasse Uplights" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Uplights - Schaltstatus" Address="1/0/21" Unfiltered="true" Description="53 - Terrasse (Westen) Terasse Uplights" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Garten - Schalten" Address="1/0/30" Unfiltered="true" Description="53 - Terrasse (Westen) Gartenbeleuchtung" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Garten - Schaltstatus" Address="1/0/31" Unfiltered="true" Description="53 - Terrasse (Westen) Gartenbeleuchtung" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Mauer - Schalten" Address="1/0/40" Unfiltered="true" Description="52 - Weg / Parken Mauer" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Mauer - Schaltstatus" Address="1/0/41" Unfiltered="true" Description="52 - Weg / Parken Mauer" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Parkplatz - Schalten" Address="1/0/50" Unfiltered="true" Description="52 - Weg / Parken Parkplatz" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Parkplatz - Schaltstatus" Address="1/0/51" Unfiltered="true" Description="52 - Weg / Parken Parkplatz" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Beet Süden - Kanal 1 - Schalten" Address="1/0/60" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Beet Süden - Kanal 1 - Schaltstatus" Address="1/0/61" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Beet Süden - Kanal 2 - Schalten" Address="1/0/70" Unfiltered="true" />
+      <GroupAddress Name="L Beet Süden - Kanal 2 - Schaltstatus" Address="1/0/71" Unfiltered="true" />
+      <GroupAddress Name="L Beet Süden - Kanal 3 - Schalten" Address="1/0/80" Unfiltered="true" />
+      <GroupAddress Name="L Beet Süden - Kanal 3 - Schaltstatus" Address="1/0/81" Unfiltered="true" />
+      <GroupAddress Name="S Eingang - Schalten" Address="1/0/102" Unfiltered="true" Description="51 - Eingangsbereich Steckdose (Sockel)" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Eingang - Status" Address="1/0/103" Unfiltered="true" Description="51 - Eingangsbereich Steckdose (Sockel)&#xD;&#xA;" DPTs="DPST-1-11" />
+      <GroupAddress Name="S Osten/HWR - Schalten" Address="1/0/104" Unfiltered="true" Description="51 - Eingangsbereich Steckdose (HWR)" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Osten/HWR - Status" Address="1/0/105" Unfiltered="true" Description="51 - Eingangsbereich Steckdose (HWR)" DPTs="DPST-1-11" />
+      <GroupAddress Name="S Terasse - Schalten" Address="1/0/108" Unfiltered="true" Description="53 - Terrasse Steckdose" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Terasse - Status" Address="1/0/109" Unfiltered="true" Description="53 - Terrasse Steckdose" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Hütte - Decke - Schalten" Address="1/0/200" Unfiltered="true" Description="70 - Gartenhaus Decke" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Hütte - Decke - Dimmen (relativ)" Address="1/0/201" Unfiltered="true" Description="70 - Gartenhaus Decke" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Hütte - Decke - Dimmen (absolut)" Address="1/0/202" Unfiltered="true" Description="70 - Gartenhaus Decke" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Hütte - Decke - Dimmwert" Address="1/0/203" Unfiltered="true" Description="70 - Gartenhaus Decke" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Hütte - Decke - Schaltstatus" Address="1/0/204" Unfiltered="true" Description="70 - Gartenhaus Decke" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Hütte - vorne - Schalten" Address="1/0/210" Unfiltered="true" Description="70 - Gartenhaus vorne" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Hütte - vorne - Dimmen (relativ)" Address="1/0/211" Unfiltered="true" Description="70 - Gartenhaus vorne" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Hütte - vorne - Dimmen (absolut)" Address="1/0/212" Unfiltered="true" Description="70 - Gartenhaus vorne" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Hütte - vorne - Dimmwert" Address="1/0/213" Unfiltered="true" Description="70 - Gartenhaus vorne" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Hütte - vorne - Schaltstatus" Address="1/0/214" Unfiltered="true" Description="70 - Gartenhaus vorne" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Hütte - links - Schalten" Address="1/0/220" Unfiltered="true" Description="70 - Gartenhaus links" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Hütte - links - Dimmen (relativ)" Address="1/0/221" Unfiltered="true" Description="70 - Gartenhaus links" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Hütte - links - Dimmen (absolut)" Address="1/0/222" Unfiltered="true" Description="70 - Gartenhaus links" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Hütte - links - Dimmwert" Address="1/0/223" Unfiltered="true" Description="70 - Gartenhaus links" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Hütte - links - Schaltstatus" Address="1/0/224" Unfiltered="true" Description="70 - Gartenhaus links" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Hütte - rechts - Schalten" Address="1/0/230" Unfiltered="true" Description="70 - Gartenhaus rechts" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Hütte - rechts - Dimmen (relativ)" Address="1/0/231" Unfiltered="true" Description="70 - Gartenhaus rechts" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Hütte - rechts - Dimmen (absolut)" Address="1/0/232" Unfiltered="true" Description="70 - Gartenhaus rechts" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Hütte - rechts - Dimmwert" Address="1/0/233" Unfiltered="true" Description="70 - Gartenhaus rechts" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Hütte - rechts - Schaltstatus" Address="1/0/234" Unfiltered="true" Description="70 - Gartenhaus rechts" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Außen - Schalten (alle)" Address="1/0/254" Unfiltered="true" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="HWR" RangeStart="2304" RangeEnd="2559" Unfiltered="true">
+      <GroupAddress Name="L HWR - Schalten" Address="1/1/0" Unfiltered="true" Description="21 - HWR Spots" DPTs="DPST-1-1" />
+      <GroupAddress Name="L HWR - Schaltstatus" Address="1/1/4" Unfiltered="true" Description="21 - HWR Spots" DPTs="DPST-1-1" />
+      <GroupAddress Name="L HWR - Schalten BWM" Address="1/1/5" Unfiltered="true" Description="21 - HWR Spots" DPTs="DPST-1-1" />
+      <GroupAddress Name="L HWR - Schalten (alle)" Address="1/1/254" Unfiltered="true" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Gäste" RangeStart="2560" RangeEnd="2815" Unfiltered="true">
+      <GroupAddress Name="L GZ - Schalten" Address="1/2/0" Unfiltered="true" Description="22 - Gäste Spots" DPTs="DPST-1-1" />
+      <GroupAddress Name="L GZ - Dimmen (relativ)" Address="1/2/1" Unfiltered="true" Description="22 - Gäste Spots" DPTs="DPST-3-7" />
+      <GroupAddress Name="L GZ - Dimmen (absolut)" Address="1/2/2" Unfiltered="true" Description="22 - Gäste Spots" DPTs="DPST-5-1" />
+      <GroupAddress Name="L GZ - Dimmwert" Address="1/2/3" Unfiltered="true" Description="22 - Gäste Spots" DPTs="DPST-5-1" />
+      <GroupAddress Name="L GZ - Schaltstatus" Address="1/2/4" Unfiltered="true" Description="22 - Gäste Spots" DPTs="DPST-1-1" />
+      <GroupAddress Name="L GZ Stehleuchte (1) - Schalten" Address="1/2/10" Unfiltered="true" Description="22 - Gäste Stehlampe (1)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L GZ Stehleuchte (1) - Schaltstatus" Address="1/2/11" Unfiltered="true" Description="22 - Gäste Stehlampe (1)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L GZ Stehleuchte (2) - Schalten" Address="1/2/20" Unfiltered="true" Description="22 - Gäste Stehlampe (2)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L GZ Stehleuchte (2) - Schaltstatus" Address="1/2/21" Unfiltered="true" Description="22 - Gäste Stehlampe (2)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L GZ - Schalten (alle)" Address="1/2/254" Unfiltered="true" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Bad EG" RangeStart="2816" RangeEnd="3071" Unfiltered="true">
+      <GroupAddress Name="L BadEG - Schalten" Address="1/3/0" Unfiltered="true" Description="23 - Bad EG Spots" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadEG - Dimmen (relativ)" Address="1/3/1" Unfiltered="true" Description="23 - Bad EG Spots" DPTs="DPST-3-7" />
+      <GroupAddress Name="L BadEG - Dimmen (absolut)" Address="1/3/2" Unfiltered="true" Description="23 - Bad EG Spots" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadEG - Dimmwert" Address="1/3/3" Unfiltered="true" Description="23 - Bad EG Spots" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadEG - Schaltstatus" Address="1/3/4" Unfiltered="true" Description="23 - Bad EG Spots" DPTs="DPST-1-11" />
+      <GroupAddress Name="L BadEG - Schalten über Bewegungsmelder" Address="1/3/5" Unfiltered="true" Description="23 - Bad EG Spots" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadEG Spiegel - Schalten" Address="1/3/10" Unfiltered="true" Description="23 - Bad EG Spiegel" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadEG Spiegel - Dimmen (relativ)" Address="1/3/11" Unfiltered="true" Description="23 - Bad EG Spiegel" DPTs="DPST-3-7" />
+      <GroupAddress Name="L BadEG Spiegel - Dimmen (absolut)" Address="1/3/12" Unfiltered="true" Description="23 - Bad EG Spiegel" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadEG Spiegel - Dimmwert" Address="1/3/13" Unfiltered="true" Description="23 - Bad EG Spiegel" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadEG Spiegel - Schaltstatus" Address="1/3/14" Unfiltered="true" Description="23 - Bad EG Spiegel" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadEG Spiegel - Schalten über Bewegungsmelder" Address="1/3/15" Unfiltered="true" Description="23 - Bad EG Spiegel" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadEG - Schlaten (alle)" Address="1/3/254" Central="true" Unfiltered="true" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Eingang" RangeStart="3072" RangeEnd="3327" Unfiltered="true">
+      <GroupAddress Name="L Eingang - Schalten" Address="1/4/0" Unfiltered="true" Description="25 - Eingangsbereich Spots (Eingang)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Eingang - Dimmen (relativ)" Address="1/4/1" Unfiltered="true" Description="25 - Eingangsbereich Spots (Eingang)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Eingang - Dimmen (absolut)" Address="1/4/2" Unfiltered="true" Description="25 - Eingangsbereich Spots (Eingang)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Eingang - Dimmwert" Address="1/4/3" Unfiltered="true" Description="25 - Eingangsbereich Spots (Eingang)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Eingang - Schaltstatus" Address="1/4/4" Unfiltered="true" Description="25 - Eingangsbereich Spots (Eingang)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Eingang - Schalten BWM" Address="1/4/5" Unfiltered="true" Description="25 - Eingangsbereich Spots (Eingang)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Eingang - Schalten BWM-Konstantlicht" Address="1/4/6" Unfiltered="true" Description="25 - Eingangsbereich Spots (Eingang)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Eingang - Dimmen BWM-Konstantlicht (relativ)" Address="1/4/7" Unfiltered="true" Description="25 - Eingangsbereich Spots (Eingang)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Eingang - Dimmen BWM-Konstantlicht (absolut)" Address="1/4/8" Unfiltered="true" Description="25 - Eingangsbereich Spots (Eingang)" DPTs="DPST-5-1" />
+    </GroupRange>
+    <GroupRange Name="Wohnbereich" RangeStart="3328" RangeEnd="3583" Unfiltered="true">
+      <GroupAddress Name="L Küche - Schalten" Address="1/5/0" Unfiltered="true" Description="24 - Wohnbereich Spots (Kochen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Küche - Dimmen (relativ)" Address="1/5/1" Unfiltered="true" Description="24 - Wohnbereich Spots (Kochen)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Küche - Dimmen (absolut)" Address="1/5/2" Unfiltered="true" Description="24 - Wohnbereich Spots (Kochen)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Küche - Dimmwert" Address="1/5/3" Unfiltered="true" Description="24 - Wohnbereich Spots (Kochen)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Küche - Schaltstatus" Address="1/5/4" Unfiltered="true" Description="24 - Wohnbereich Spots (Kochen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kamin - Schalten" Address="1/5/10" Unfiltered="true" Description="24 - Wohnbereich Spots (Kamin)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kamin - Dimmen (relativ)" Address="1/5/11" Unfiltered="true" Description="24 - Wohnbereich Spots (Kamin)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Kamin - Dimmen (absolut)" Address="1/5/12" Unfiltered="true" Description="24 - Wohnbereich Spots (Kamin)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kamin - Dimmwert" Address="1/5/13" Unfiltered="true" Description="24 - Wohnbereich Spots (Kamin)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kamin - Schaltstatus" Address="1/5/14" Unfiltered="true" Description="24 - Wohnbereich Spots (Kamin)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Sofa - Schalten" Address="1/5/20" Unfiltered="true" Description="24 - Wohnbereich Spots (Sofa)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Sofa - Dimmen (relativ)" Address="1/5/21" Unfiltered="true" Description="24 - Wohnbereich Spots (Sofa)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Sofa - Dimmen (absolut)" Address="1/5/22" Unfiltered="true" Description="24 - Wohnbereich Spots (Sofa)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Sofa - Dimmwert" Address="1/5/23" Unfiltered="true" Description="24 - Wohnbereich Spots (Sofa)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Sofa - Schaltstatus" Address="1/5/24" Unfiltered="true" Description="24 - Wohnbereich Spots (Sofa)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Treppe - Schalten" Address="1/5/30" Unfiltered="true" Description="24 - Wohnbereich Spots (Treppe)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Treppe - Dimmen (relativ)" Address="1/5/31" Unfiltered="true" Description="24 - Wohnbereich Spots (Treppe)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Treppe - Dimmen (absolut)" Address="1/5/32" Unfiltered="true" Description="24 - Wohnbereich Spots (Treppe)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Treppe - Dimmwert" Address="1/5/33" Unfiltered="true" Description="24 - Wohnbereich Spots (Treppe)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Treppe - Schaltstatus" Address="1/5/34" Unfiltered="true" Description="24 - Wohnbereich Spots (Treppe)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Flügel - Schalten" Address="1/5/40" Unfiltered="true" Description="24 - Wohnbereich Spots (Flügel)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Flügel - Dimmen (relativ)" Address="1/5/41" Unfiltered="true" Description="24 - Wohnbereich Spots (Flügel)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Flügel - Dimmen (absolut)" Address="1/5/42" Unfiltered="true" Description="24 - Wohnbereich Spots (Flügel)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Flügel - Dimmwert" Address="1/5/43" Unfiltered="true" Description="24 - Wohnbereich Spots (Flügel)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Flügel - Schaltstatus" Address="1/5/44" Unfiltered="true" Description="24 - Wohnbereich Spots (Flügel)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Zugang - Schalten" Address="1/5/60" Unfiltered="true" Description="24 - Wohnbereich Spots (Zugang Gäste/Bad/HWR)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Zugang - Dimmen (relativ)" Address="1/5/61" Unfiltered="true" Description="24 - Wohnbereich Spots (Zugang Gäste/Bad/HWR)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Zugang - Dimmen (absolut)" Address="1/5/62" Unfiltered="true" Description="24 - Wohnbereich Spots (Zugang Gäste/Bad/HWR)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Zugang - Dimmwert" Address="1/5/63" Unfiltered="true" Description="24 - Wohnbereich Spots (Zugang Gäste/Bad/HWR)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Zugang - Schaltstatus" Address="1/5/64" Unfiltered="true" Description="24 - Wohnbereich Spots (Zugang Gäste/Bad/HWR)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Essen - Schalten" Address="1/5/70" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Essen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Essen - Dimmen (relativ)" Address="1/5/71" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Essen)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Essen - Dimmen (absolut)" Address="1/5/72" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Essen)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Essen - Dimmwert" Address="1/5/73" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Essen)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Essen - Schaltstatus" Address="1/5/74" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Essen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Sofa (P) - Schalten" Address="1/5/80" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Couch)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Sofa (P) - Dimmen (relativ)" Address="1/5/81" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Couch)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Sofa (P) - Dimmen (absolut)" Address="1/5/82" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Couch)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Sofa (P) - Dimmwert" Address="1/5/83" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Couch)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Sofa (P) - Schaltstatus" Address="1/5/84" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Couch)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Flügel (P) - Schalten" Address="1/5/90" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Flügel)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Flügel (P) - Dimmen (relativ)" Address="1/5/91" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Flügel)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Flügel (P) - Dimmen (absolut)" Address="1/5/92" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Flügel)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Flügel (P) - Dimmwert" Address="1/5/93" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Flügel)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Flügel (P) - Schaltstatus" Address="1/5/94" Unfiltered="true" Description="24 - Wohnbereich Pendelleuchte (Flügel)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Treppenlicht - Schalten" Address="1/5/100" Unfiltered="true" Description="24 - Wohnbereich Treppenlicht" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Treppenlicht - Dimmen (relativ)" Address="1/5/101" Unfiltered="true" Description="24 - Wohnbereich Treppenlicht" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Treppenlicht - Dimmen (absolut)" Address="1/5/102" Unfiltered="true" Description="24 - Wohnbereich Treppenlicht" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Treppenlicht - Dimmwert" Address="1/5/103" Unfiltered="true" Description="24 - Wohnbereich Treppenlicht" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Treppenlicht - Schaltstatus" Address="1/5/104" Unfiltered="true" Description="24 - Wohnbereich Treppenlicht" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Wandleuchten - Schalten" Address="1/5/110" Unfiltered="true" Description="24 - Wohnbereich Wandleuchten" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Wandleuchten - Dimmen (relativ)" Address="1/5/111" Unfiltered="true" Description="24 - Wohnbereich Wandleuchten" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Wandleuchten - Dimmen (absolut)" Address="1/5/112" Unfiltered="true" Description="24 - Wohnbereich Wandleuchten" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Wandleuchten - Dimmwert" Address="1/5/113" Unfiltered="true" Description="24 - Wohnbereich Wandleuchten" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Wandleuchten - Schaltstatus" Address="1/5/114" Unfiltered="true" Description="24 - Wohnbereich Wandleuchten" DPTs="DPST-1-11" />
+      <GroupAddress Name="S Kamin - Schalten" Address="1/5/120" Unfiltered="true" Description="24 - Wohnbereich Stehleuchte (Steckdose Kamin)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kamin - Schaltstatus" Address="1/5/121" Unfiltered="true" Description="24 - Wohnbereich Stehleuchte (Steckdose Kamin)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L TV Leuchten - Schalten" Address="1/5/130" Unfiltered="true" Description="24 - Wohnbereich Stehleuchte (Bodentank)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L TV Leuchten - Dimmen (relativ)" Address="1/5/131" Unfiltered="true" Description="24 - Wohnbereich Regal (Leuchten)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L TV Leuchten - Dimmen (absolut)" Address="1/5/132" Unfiltered="true" Description="24 - Wohnbereich Regal (Leuchten)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L TV Leuchten - Dimmenwert" Address="1/5/133" Unfiltered="true" Description="24 - Wohnbereich Regal (Leuchten)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L TV Leuchten - Schaltstatus" Address="1/5/134" Unfiltered="true" Description="24 - Wohnbereich Stehleuchte (Bodentank)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Stehleuchte - Schalten" Address="1/5/140" Unfiltered="true" Description="24 - Wohnbereich Stehleuchte Sofa" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Stehleuchte - Schaltstatus" Address="1/5/141" Unfiltered="true" Description="24 - Wohnbereich Stehleuchte Sofa" DPTs="DPST-1-11" />
+      <GroupAddress Name="L TV oben - Schalten" Address="1/5/150" Unfiltered="true" Description="24 - Wohnbereich Regal (Decke)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L TV oben - Dimmen (relativ)" Address="1/5/151" Unfiltered="true" Description="24 - Wohnbereich Regal (Decke)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L TV oben - Dimmen (absolut)" Address="1/5/152" Unfiltered="true" Description="24 - Wohnbereich Regal (Decke)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L TV oben - Dimmwert" Address="1/5/153" Unfiltered="true" Description="24 - Wohnbereich Regal (Decke)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L TV oben - Schaltstatus" Address="1/5/154" Unfiltered="true" Description="24 - Wohnbereich Regal (Decke)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L TV Boden - Schalten" Address="1/5/160" Unfiltered="true" Description="24 - Wohnbereich Regal (Boden)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L TV Boden - Dimmen (relativ)" Address="1/5/161" Unfiltered="true" Description="24 - Wohnbereich Regal (Boden)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L TV Boden - Dimmen (absolut)" Address="1/5/162" Unfiltered="true" Description="24 - Wohnbereich Regal (Boden)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L TV Boden - Dimmwert" Address="1/5/163" Unfiltered="true" Description="24 - Wohnbereich Regal (Boden)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L TV Boden - Schaltstatus" Address="1/5/164" Unfiltered="true" Description="24 - Wohnbereich Regal (Boden)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Novy - Schalten" Address="1/5/170" Unfiltered="true" Description="26 - Küche Novy Dunstabzugshaube" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Novy - Dimmen (relativ)" Address="1/5/171" Unfiltered="true" Description="26 - Küche Novy Dunstabzugshaube" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Novy - Dimmen (absolut)" Address="1/5/172" Unfiltered="true" Description="26 - Küche Novy Dunstabzugshaube" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Novy - Dimmwert" Address="1/5/173" Unfiltered="true" Description="26 - Küche Novy Dunstabzugshaube" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Novy - Schaltstatus" Address="1/5/174" Unfiltered="true" Description="26 - Küche Novy Dunstabzugshaube" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Novy LS - Schalten (Leuchtstoffröhren)" Address="1/5/175" Unfiltered="true" Description="26 - Küche Novy Dunstabzugshaube" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Novy LS - Schaltsstatus (Leuchtstoffröhren)" Address="1/5/176" Unfiltered="true" Description="26 - Küche Novy Dunstabzugshaube" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Küche Auslass - Schalten" Address="1/5/180" Unfiltered="true" Description="26 - Küche Spots Auslass (Kochen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Küche Auslass - Dimmen (relativ)" Address="1/5/181" Unfiltered="true" Description="26 - Küche Spots Auslass (Kochen)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Küche Auslass - Dimmen (absolut)" Address="1/5/182" Unfiltered="true" Description="26 - Küche Spots Auslass (Kochen)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Küche Auslass - Dimmwert" Address="1/5/183" Unfiltered="true" Description="26 - Küche Spots Auslass (Kochen)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Küche Auslass - Schaltstatus" Address="1/5/184" Unfiltered="true" Description="26 - Küche Spots Auslass (Kochen)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Schalten (alle)" Address="1/5/254" Unfiltered="true" DPTs="DPST-1-1" />
+    </GroupRange>
+  </GroupRange>
+  <GroupRange Name="Licht/Steckdosen OG" RangeStart="4096" RangeEnd="6143" Unfiltered="true">
+    <GroupRange Name="Bad OG" RangeStart="4096" RangeEnd="4351" Unfiltered="true">
+      <GroupAddress Name="L BadOG Spots - Schalten" Address="2/0/0" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadOG Spots - Farbtemperatur (Anteil KW in %) (absolut)" Address="2/0/1" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadOG Spots - Helligkeit (absolut)" Address="2/0/2" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadOG Spots - Farbtemperatur (relativ)" Address="2/0/3" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-3-7" />
+      <GroupAddress Name="L BadOG Spots - Helligkeit (relativ)" Address="2/0/4" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-3-7" />
+      <GroupAddress Name="L BadOG Spots - Schaltstatus" Address="2/0/5" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-1-11" />
+      <GroupAddress Name="L BadOG Spots - Status Farbtemperatur (Anteil in %)" Address="2/0/6" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadOG Spots - Status Helligkeit" Address="2/0/7" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadOG Spots - Sperre" Address="2/0/8" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-1-3" />
+      <GroupAddress Name="L BadOG Spots - Status Sperre" Address="2/0/9" Unfiltered="true" Description="30 - Bad OG Spots" DPTs="DPST-1-3" />
+      <GroupAddress Name="L BadOG Spiegel L - Schalten" Address="2/0/10" Unfiltered="true" Description="30 - Bad OG Spiegel (links)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadOG Spiegel L - Dimmen (relativ)" Address="2/0/11" Unfiltered="true" Description="30 - Bad OG Spiegel (links)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L BadOG Spiegel L - Dimmen (absolut)" Address="2/0/12" Unfiltered="true" Description="30 - Bad OG Spiegel (links)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadOG Spiegel L - Dimmwert" Address="2/0/13" Unfiltered="true" Description="30 - Bad OG Spiegel (links)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadOG Spiegel L - Schaltstatus" Address="2/0/14" Unfiltered="true" Description="30 - Bad OG Spiegel (links)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadOG Spiegel R - Schalten" Address="2/0/20" Unfiltered="true" Description="30 - Bad OG Spiegel (rechts)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadOG Spiegel R - Dimmen (relativ)" Address="2/0/21" Unfiltered="true" Description="30 - Bad OG Spiegel (rechts)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L BadOG Spiegel R - Dimmen (absolut)" Address="2/0/22" Unfiltered="true" Description="30 - Bad OG Spiegel (rechts)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadOG Spiegel R - Dimmwert" Address="2/0/23" Unfiltered="true" Description="30 - Bad OG Spiegel (rechts)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadOG Spiegel R - Schaltstatus" Address="2/0/24" Unfiltered="true" Description="30 - Bad OG Spiegel (rechts)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadOG Spiegel - Schalten" Address="2/0/30" Unfiltered="true" Description="30 - Bad OG Spiegel (beide)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadOG Spiegel -  Dimmen (relativ)" Address="2/0/31" Unfiltered="true" Description="30 - Bad OG Spiegel (beide)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L BadOG Spiegel - Dimmen (absolut)" Address="2/0/32" Unfiltered="true" Description="30 - Bad OG Spiegel (beide)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L BadOG Kasten - Schalten" Address="2/0/50" Unfiltered="true" Description="30 - Bad OG Kasten" DPTs="DPST-1-1" />
+      <GroupAddress Name="L BadOG Kasten - Schaltstatus" Address="2/0/54" Unfiltered="true" Description="30 - Bad OG Kasten" DPTs="DPST-1-11" />
+      <GroupAddress Name="L BadOG - Schalten (alle)" Address="2/0/254" Unfiltered="true" Description="30 - Bad OG alle Lichter schalten&#xD;&#xA;" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Galerie" RangeStart="4352" RangeEnd="4607" Unfiltered="true">
+      <GroupAddress Name="L Galerie - Schalten" Address="2/1/0" Unfiltered="true" Description="31 - Galerie Fette&#xD;&#xA;" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Galerie - Dimmen (relativ)" Address="2/1/1" Unfiltered="true" Description="31 - Galerie Fette&#xD;&#xA;" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Galerie - Dimmen (absolut)" Address="2/1/2" Unfiltered="true" Description="31 - Galerie Fette&#xD;&#xA;" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Galerie - Dimmwert" Address="2/1/3" Unfiltered="true" Description="31 - Galerie Fette&#xD;&#xA;" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Galerie - Schaltstatus" Address="2/1/4" Unfiltered="true" Description="31 - Galerie Fette&#xD;&#xA;" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Galerie Pendel - Schalten" Address="2/1/10" Unfiltered="true" Description="31 - Galerie Pendelleuchte (First)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Galerie Pendel - Schaltstatus" Address="2/1/14" Unfiltered="true" Description="31 - Galerie Pendelleuchte (First)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Galerie Balken - Schalten" Address="2/1/20" Unfiltered="true" Description="31 - Galerie Schreibtisch (Balken)&#xD;&#xA;" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Galerie Balken - Dimmen (relativ)" Address="2/1/21" Unfiltered="true" Description="31 - Galerie Schreibtisch (Balken)&#xD;&#xA;" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Galerie Balken - Dimmen (absolut)" Address="2/1/22" Unfiltered="true" Description="31 - Galerie Schreibtisch (Balken)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Galerie Balken - Dimmwert" Address="2/1/23" Unfiltered="true" Description="31 - Galerie Schreibtisch (Balken)&#xD;&#xA;" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Galerie Balken - Schaltstatus" Address="2/1/24" Unfiltered="true" Description="31 - Galerie Schreibtisch (Balken)&#xD;&#xA;" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Galerie WL SL - Schalten" Address="2/1/40" Unfiltered="true" Description="31 - Galerie Wandleuchte (vor Schlafen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Galerie WL SL - Schaltstatus" Address="2/1/44" Unfiltered="true" Description="31 - Galerie Wandleuchte (vor Schlafen)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Galerie WL Ki - Schalten" Address="2/1/50" Unfiltered="true" Description="31 - Galerie Wandleuchte (vor Kinder)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Galerie WL Ki- Schaltstatus" Address="2/1/54" Unfiltered="true" Description="31 - Galerie Wandleuchte (vor Kinder)" DPTs="DPST-1-11" />
+      <GroupAddress Name="S Galerie (gr) - Schalten" Address="2/1/60" Unfiltered="true" Description="31 - Galerie Fette" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Galerie (gr) - Schaltsstatus" Address="2/1/64" Unfiltered="true" Description="31 - Galerie Steckdose (grau)" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Galerie (sw) - Schalten" Address="2/1/70" Unfiltered="true" Description="31 - Galerie Steckdose (schwarz)" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Galerie (sw) - Schaltsstatus" Address="2/1/74" Unfiltered="true" Description="31 - Galerie Steckdose (schwarz)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Galerie - Schalten (alle)" Address="2/1/254" Unfiltered="true" Description="31 - Galerie alle Lichter schalten" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Kind (Maximilian)" RangeStart="4608" RangeEnd="4863" Unfiltered="true">
+      <GroupAddress Name="L Kind M - Schalten" Address="2/2/0" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind M - Dimmen (relativ)" Address="2/2/1" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Kind M - Dimmen (absolut)" Address="2/2/2" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kind M - Dimmwert" Address="2/2/3" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kind M - Schaltstatus" Address="2/2/4" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind M RGB - Schalten" Address="2/2/10" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken RGBW" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind M RGB - Schaltstatus" Address="2/2/14" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken RGBW" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind M RGB - Farbton (H)" Address="2/2/15" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken RGBW" DPTs="DPST-5-3" />
+      <GroupAddress Name="L Kind M RGB - Sättigung (S)" Address="2/2/16" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken RGBW" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kind M RGB - Helligkeit (V)" Address="2/2/17" Unfiltered="true" Description="32 - Kind (Maximilian) LED Kehlbalken RGBW" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kind M Pendel - Schalten" Address="2/2/20" Unfiltered="true" Description="32 - Kind (Maximilian) Pendelleuchte" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind M Pendel - Schaltstatus" Address="2/2/21" Unfiltered="true" Description="32 - Kind (Maximilian) Pendelleuchte" DPTs="DPST-1-11" />
+      <GroupAddress Name="S Kind M (gr) - Schalten" Address="2/2/30" Unfiltered="true" Description="32 - Kind (Maximilian) Steckdose (grau)" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Kind M (gr) - Schaltstatus" Address="2/2/31" Unfiltered="true" Description="32 - Kind (Maximilian) Steckdose (grau)" DPTs="DPST-1-11" />
+      <GroupAddress Name="S Kind M (sw, rechts) - Schalten" Address="2/2/40" Unfiltered="true" Description="32 - Kind (Maximilian) Steckdose (schwarz)" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Kind M (sw, rechts) - Schaltstatus" Address="2/2/41" Unfiltered="true" Description="32 - Kind (Maximilian) Steckdose (schwarz)" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Kind M - Schalten (alle)" Address="2/2/255" Unfiltered="true" Description="32 - Kind (Maximilian) alle Lichter schalten" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Kind (Clemens)" RangeStart="4864" RangeEnd="5119" Unfiltered="true">
+      <GroupAddress Name="L Kind C - Schalten" Address="2/3/0" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken (1)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind C - Dimmen (relativ)" Address="2/3/1" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken (1)" DPTs="DPST-3-7" />
+      <GroupAddress Name="L Kind C - Dimmen (absolut)" Address="2/3/2" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken (1)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kind C - Dimmwert" Address="2/3/3" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken (1)" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kind C - Schaltstatus" Address="2/3/4" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken (1)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind C RGB - Schalten" Address="2/3/10" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken RGBW" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind C RGB - Schaltstatus" Address="2/3/11" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken RGBW" DPTs="DPST-1-11" />
+      <GroupAddress Name="L Kind C RGB - Farbton (H)" Address="2/3/12" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken RGBW" DPTs="DPST-5-3" />
+      <GroupAddress Name="L Kind C RGB - Sättigung (S)" Address="2/3/13" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken RGBW" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kind C RGB - Helligkeit (V)" Address="2/3/14" Unfiltered="true" Description="33 - Kind (Clemens) LED Kehlbalken RGBW" DPTs="DPST-5-1" />
+      <GroupAddress Name="L Kind C Pendel - Schalten" Address="2/3/20" Unfiltered="true" Description="32 - Kind (Clemens) Pendelleuchte" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind C Pendel - Schaltstatus" Address="2/3/21" Unfiltered="true" Description="32 - Kind (Clemens) Pendelleuchte" DPTs="DPST-1-11" />
+      <GroupAddress Name="S Kind C (gr) - Schalten" Address="2/3/30" Unfiltered="true" Description="33 - Kind (Clemens) Steckdose (grau)" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Kind C (gr) - Schaltstatus" Address="2/3/31" Unfiltered="true" Description="33 - Kind (Clemens) Steckdose (grau)" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Kind C (sw) - Schalten" Address="2/3/40" Unfiltered="true" Description="33 - Kind (Clemens) Steckdose (schwarz)" DPTs="DPST-1-1" />
+      <GroupAddress Name="S Kind C (sw) - Schaltstatus" Address="2/3/41" Unfiltered="true" Description="33 - Kind (Clemens) Steckdose (schwarz)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L Kind C - Schalten (alle)" Address="2/3/255" Unfiltered="true" Description="33 - Kind (Clemens) alle Lichter schalten" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Schlafen" RangeStart="5120" RangeEnd="5375" Unfiltered="true">
+      <GroupAddress Name="L SZ Gardrobe L - Schalten (mit Timer)" Address="2/4/0" Unfiltered="true" Description="40 - Schlafen Garderobe&#xD;&#xA; (links)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ Gardrobe L - Schalten" Address="2/4/1" Unfiltered="true" Description="40 - Schlafen Garderobe (links)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ Gardrobe L - Schaltstatus" Address="2/4/4" Unfiltered="true" Description="40 - Schlafen Garderobe&#xD;&#xA; (links)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ Gardrobe L - Sperren" Address="2/4/5" Unfiltered="true" Description="40 - Schlafen Garderobe (links)" DPTs="DPST-1-3" />
+      <GroupAddress Name="L SZ Gardrobe R - Schalten (mit Timer)" Address="2/4/10" Unfiltered="true" Description="40 - Schlafen Garderobe (rechts)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ Gardrobe R - Schalten" Address="2/4/11" Unfiltered="true" Description="40 - Schlafen Garderobe (rechts)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ Gardrobe R - Schaltstatus" Address="2/4/14" Unfiltered="true" Description="40 - Schlafen Garderobe (rechts)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ Gardrobe R - Sperren" Address="2/4/15" Unfiltered="true" Description="40 - Schlafen Garderobe (rechts)" DPTs="DPST-1-3" />
+      <GroupAddress Name="L SZ - Schalten" Address="2/4/20" Unfiltered="true" Description="40 - Schlafen LED Kehlbalken&#xD;&#xA;" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ - Dimmen (relativ)" Address="2/4/21" Unfiltered="true" Description="40 - Schlafen LED Kehlbalken&#xD;&#xA;" DPTs="DPST-3-7" />
+      <GroupAddress Name="L SZ - Dimmen (absolut)" Address="2/4/22" Unfiltered="true" Description="40 - Schlafen LED Kehlbalken&#xD;&#xA;" DPTs="DPST-5-1" />
+      <GroupAddress Name="L SZ - Dimmwert" Address="2/4/23" Unfiltered="true" Description="40 - Schlafen LED Kehlbalken&#xD;&#xA;" DPTs="DPST-5-1" />
+      <GroupAddress Name="L SZ - Schaltstatus" Address="2/4/24" Unfiltered="true" Description="40 - Schlafen LED Kehlbalken&#xD;&#xA;" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ NT L - Schalten" Address="2/4/30" Unfiltered="true" Description="40 - Schlafen Nachttisch (links)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ NT L - Schaltstatus" Address="2/4/31" Unfiltered="true" Description="40 - Schlafen Nachttisch (links)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ NT R - Schalten R" Address="2/4/40" Unfiltered="true" Description="40 - Schlafen Nachttisch (rechts)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ NT R - Schaltstatus R" Address="2/4/41" Unfiltered="true" Description="40 - Schlafen Nachttisch (rechts)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ Ori L - Schalten" Address="2/4/100" Unfiltered="true" Description="40 - Schlafen Orientierungslicht (links)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ Ori R - Schalten" Address="2/4/110" Unfiltered="true" Description="40 - Schlafen Orientierungslicht (rechts)" DPTs="DPST-1-1" />
+      <GroupAddress Name="L SZ - Schalten (alle)" Address="2/4/255" Unfiltered="true" Description="40 - Schlafen alle Lichter schalten" DPTs="DPST-1-1" />
+    </GroupRange>
+  </GroupRange>
+  <GroupRange Name="Heizung" RangeStart="10240" RangeEnd="12287" Unfiltered="true">
+    <GroupRange Name="EG" RangeStart="10240" RangeEnd="10495" Unfiltered="true">
+      <GroupAddress Name="HZ HWR - Isttemperatur" Address="5/0/0" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ HWR - Sollwert" Address="5/0/1" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ HWR - Sollwertverschiebung 1bit" Address="5/0/2" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ HWR - Status Sollwert" Address="5/0/3" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ HWR - Betriebsart" Address="5/0/4" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ HWR - Status Betriebsart" Address="5/0/5" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ HWR - Status Stellwert" Address="5/0/6" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ HWR - Komfort" Address="5/0/7" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ HWR - Economy" Address="5/0/8" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ HWR - Standby" Address="5/0/9" Unfiltered="true" Description="21 - HWR Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ GZ - Isttemperatur" Address="5/0/10" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ GZ - Sollwert" Address="5/0/11" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ GZ - Sollwertverschiebung 1bit" Address="5/0/12" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ GZ - Status Sollwert" Address="5/0/13" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ GZ - Betriebsart" Address="5/0/14" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ GZ - Status Betriebsart" Address="5/0/15" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ GZ - Status Stellwert" Address="5/0/16" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ GZ - Komfort" Address="5/0/17" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ GZ - Economy" Address="5/0/18" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ GZ - Standby" Address="5/0/19" Unfiltered="true" Description="22 - Gäste Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ BadEG - Isttemperatur" Address="5/0/20" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ BadEG - Sollwert" Address="5/0/21" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ BadEG - Sollwertverschiebung 1bit" Address="5/0/22" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ BadEG - Status Sollwert" Address="5/0/23" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ BadEG - Betriebsart" Address="5/0/24" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ BadEG - Status Betriebsart" Address="5/0/25" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ BadEG - Status Stellwert" Address="5/0/26" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ BadEG - Komfort" Address="5/0/27" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ BadEG - Economy" Address="5/0/28" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ BadEG - Standby" Address="5/0/29" Unfiltered="true" Description="23 - Bad EG Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Wohnen - Isttemperatur" Address="5/0/30" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Wohnen - Sollwert" Address="5/0/31" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Wohnen - Sollwertverschiebung 1bit" Address="5/0/32" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ Wohnen - Status Sollwert" Address="5/0/33" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Wohnen - Betriebsart" Address="5/0/34" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Wohnen - Status Betriebsart" Address="5/0/35" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Wohnen - Status Stellwert" Address="5/0/36" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ Wohnen - Komfort" Address="5/0/37" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Wohnen - Economy" Address="5/0/38" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Wohnen - Standby" Address="5/0/39" Unfiltered="true" Description="24 - Wohnbereich Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Eingang - Isttemperatur" Address="5/0/40" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Eingang - Sollwert" Address="5/0/41" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Eingang - Sollwertverschiebung 1bit" Address="5/0/42" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ Eingang - Status Sollwert" Address="5/0/43" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Eingang - Betriebsart" Address="5/0/44" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Eingang - Status Betriebsart" Address="5/0/45" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Eingang - Status Stellwert" Address="5/0/46" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ Eingang - Komfort" Address="5/0/47" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Eingang - Economy" Address="5/0/48" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Eingang - Standby" Address="5/0/49" Unfiltered="true" Description="25 - Eingangsbereich Heizung" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="OG" RangeStart="10496" RangeEnd="10751" Unfiltered="true">
+      <GroupAddress Name="HZ BadOG - Isttemperatur" Address="5/1/0" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ BadOG - Sollwert" Address="5/1/1" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ BadOG - Sollwertverschiebung 1bit" Address="5/1/2" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ BadOG - Status Sollwert" Address="5/1/3" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ BadOG - Betriebsart" Address="5/1/4" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ BadOG - Status Betriebsart" Address="5/1/5" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ BadOG - Status Stellwert" Address="5/1/6" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ BadOG - Komfort" Address="5/1/7" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ BadOG - Economy" Address="5/1/8" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ BadOG - Standby" Address="5/1/9" Unfiltered="true" Description="30 - Bad OG Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Galerie - Isttemperatur" Address="5/1/10" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Galerie - Sollwert" Address="5/1/11" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Galerie - Sollwertverschiebung 1bit" Address="5/1/12" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ Galerie - Status Sollwert" Address="5/1/13" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Galerie - Betriebsart" Address="5/1/14" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Galerie - Status Betriebsart" Address="5/1/15" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Galerie - Status Stellwert" Address="5/1/16" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ Galerie - Komfort" Address="5/1/17" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Galerie - Economy" Address="5/1/18" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Galerie - Standby" Address="5/1/19" Unfiltered="true" Description="31 - Galerie Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Kind M - Isttemperatur" Address="5/1/20" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Kind M - Sollwert" Address="5/1/21" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Kind M - Sollwertverschiebung 1bit" Address="5/1/22" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ Kind M - Status Sollwert" Address="5/1/23" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Kind M - Betriebsart" Address="5/1/24" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Kind M - Status Betriebsart" Address="5/1/25" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Kind M - Status Stellwert" Address="5/1/26" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ Kind M - Komfort" Address="5/1/27" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Kind M - Economy" Address="5/1/28" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Kind M - Standby" Address="5/1/29" Unfiltered="true" Description="32 - Kind (Maximilian) Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Kind C - Isttemperatur" Address="5/1/30" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Kind C - Sollwert" Address="5/1/31" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Kind C - Sollwertverschiebung 1bit" Address="5/1/32" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ Kind C - Status Sollwert" Address="5/1/33" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ Kind C - Betriebsart" Address="5/1/34" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Kind C - Status Betriebsart" Address="5/1/35" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ Kind C - Status Stellwert" Address="5/1/36" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ Kind C - Komfort" Address="5/1/37" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Kind C - Economy" Address="5/1/38" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ Kind C - Standby" Address="5/1/39" Unfiltered="true" Description="33 - Kind (Clemens) Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ SZ - Isttemperatur" Address="5/1/40" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ SZ - Sollwert" Address="5/1/41" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ SZ - Sollwertverschiebung 1bit" Address="5/1/42" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-1-7" />
+      <GroupAddress Name="HZ SZ - Status Sollwert" Address="5/1/43" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-9-1" />
+      <GroupAddress Name="HZ SZ - Betriebsart" Address="5/1/44" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ SZ - Status Betriebsart" Address="5/1/45" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-20-102" />
+      <GroupAddress Name="HZ SZ - Status Stellwert" Address="5/1/46" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-5-1" />
+      <GroupAddress Name="HZ SZ - Komfort" Address="5/1/47" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ SZ - Economy" Address="5/1/48" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-1-1" />
+      <GroupAddress Name="HZ SZ - Standby" Address="5/1/49" Unfiltered="true" Description="40 - Schlafen Heizung" DPTs="DPST-1-1" />
+    </GroupRange>
+  </GroupRange>
+  <GroupRange Name="Präsenz und Bewegung" RangeStart="12288" RangeEnd="14335" Unfiltered="true">
+    <GroupRange Name="Außen" RangeStart="12288" RangeEnd="12543" Unfiltered="true">
+      <GroupAddress Name="P Parken - Schalten durch Präsenz" Address="6/0/0" Unfiltered="true" Description="52 - Weg / Parken Parkplatz" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Eingang - Präsenz" Address="6/0/1" Unfiltered="true" Description="51 - Eingangsbereich Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Eingang - Präsenz links" Address="6/0/2" Unfiltered="true" Description="51 - Eingangsbereich Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Eingang - Präsenz frontal" Address="6/0/3" Unfiltered="true" Description="51 - Eingangsbereich Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Eingang - Präsenz rechts" Address="6/0/4" Unfiltered="true" Description="51 - Eingangsbereich Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Parken - Vernetzung Bewegungsmelder Außen" Address="6/0/5" Unfiltered="true" Description="52 - Weg / Parken Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="A Eingang - Sabotage" Address="6/0/6" Unfiltered="true" Description="51 - Eingangsbereich Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Parken - Schalten durch Präsenz (deaktiviert)" Address="6/0/10" Unfiltered="true" Description="52 - Weg / Parken Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Parken - Präsenz" Address="6/0/11" Unfiltered="true" Description="52 - Weg / Parken Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Parken - Präsenz links" Address="6/0/12" Unfiltered="true" Description="52 - Weg / Parken Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Parken - Präsenz frontal" Address="6/0/13" Unfiltered="true" Description="52 - Weg / Parken Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Parken - Präsenz rechts" Address="6/0/14" Unfiltered="true" Description="52 - Weg / Parken Bewegungsmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="A Parken - Sabotage" Address="6/0/16" Unfiltered="true" Description="52 - Weg / Parken Bewegungsmelder" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="EG" RangeStart="12544" RangeEnd="12799" Unfiltered="true">
+      <GroupAddress Name="P Eingang - Schalten über Präsenz" Address="6/1/0" Unfiltered="true" Description="25 - Eingangsbereich Präsenzmelder (Decke)" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Eingang - Präsenz" Address="6/1/1" Unfiltered="true" Description="25 - Eingangsbereich Präsenzmelder (Decke)" DPTs="DPST-1-1" />
+      <GroupAddress Name="P Eingang - Präsenzmelder sperren" Address="6/1/2" Unfiltered="true" Description="25 - Eingangsbereich Präsenzmelder (Decke)" DPTs="DPST-1-3" />
+      <GroupAddress Name="P BadEG - Schalten über Präsenz" Address="6/1/10" Unfiltered="true" Description="23 - Bad EG Präsenzmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P BadEG - Präsenz" Address="6/1/11" Unfiltered="true" Description="23 - Bad EG Präsenzmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P BadEG - Präsenzmelder sperren" Address="6/1/12" Unfiltered="true" Description="23 - Bad EG Präsenzmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P HWR - Schalten über Präsenz" Address="6/1/20" Unfiltered="true" Description="21 - HWR Präsenzmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P HWR - Präsenz" Address="6/1/21" Unfiltered="true" Description="21 - HWR Präsenzmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P HWR - Präsenzmelder sperren" Address="6/1/22" Unfiltered="true" Description="21 - HWR Präsenzmelder" DPTs="DPST-1-3" />
+    </GroupRange>
+    <GroupRange Name="OG" RangeStart="12800" RangeEnd="13055" Unfiltered="true">
+      <GroupAddress Name="P BadOG - Schalten über Präsenz" Address="6/2/0" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="P BadOG - Präsenz" Address="6/2/1" Unfiltered="true" Description="30 - Bad OG Präsenzmelder" DPTs="DPST-1-1" />
+      <GroupAddress Name="P BadOG - Präsenzmelder sperren" Address="6/2/2" Unfiltered="true" Description="30 - Bad OG Präsenzmelder" DPTs="DPST-1-1" />
+    </GroupRange>
+    <GroupRange Name="Personen" RangeStart="13056" RangeEnd="13311" Unfiltered="true">
+      <GroupAddress Name="P - Fabian" Address="6/3/0" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="P - Christiane" Address="6/3/1" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="P - Maximilian" Address="6/3/2" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="P - Clemens" Address="6/3/3" Unfiltered="true" DPTs="DPST-1-11" />
+    </GroupRange>
+  </GroupRange>
+  <GroupRange Name="Fenster &amp; Türen" RangeStart="14336" RangeEnd="16383" Description="&#xD;&#xA;">
+    <GroupRange Name="EG" RangeStart="14336" RangeEnd="14591">
+      <GroupAddress Name="FK - Türkontakt HWR" Address="7/0/0" Description="21 - HWR Fensterkontakt" DPTs="DPST-1-19" />
+      <GroupAddress Name="FK - Türkontakt Bad EG" Address="7/0/1" Description="23 - Bad EG Fensterkontakt" DPTs="DPST-1-9" />
+    </GroupRange>
+    <GroupRange Name="OG" RangeStart="14592" RangeEnd="14847">
+      <GroupAddress Name="FK - Fensterkontakt Bad (links)" Address="7/1/0" Description="30 - Bad OG Fenster offen" DPTs="DPST-1-19" />
+      <GroupAddress Name="FK - Fensterkontakt Bad (mitte)" Address="7/1/1" Description="30 - Bad OG Fenster offen" DPTs="DPST-1-19" />
+      <GroupAddress Name="FK - Fensterkontakt Bad (rechts)" Address="7/1/2" Description="30 - Bad OG Fenster offen" DPTs="DPST-1-19" />
+      <GroupAddress Name="FK - Fensterkontakte Bad (logisch ODER)" Address="7/1/3" Description="30 - Bad OG Fenster offen" DPTs="DPST-1-19" />
+      <GroupAddress Name="FA - Fensteraktor Schlafen (oben) - auf/zu" Address="7/1/10" Description="40 - Schlafen Fenster (oben)" DPTs="DPST-1-1" />
+      <GroupAddress Name="FK - Fensterkontakt Schlafen (oben)" Address="7/1/11" Description="40 - Schlafen Fenster (oben)" DPTs="DPST-1-19" />
+      <GroupAddress Name="FA - Fensteraktor Schlafen (oben) - Öffnung (Prozent)" Address="7/1/12" Description="40 - Schlafen Fenster (oben)" DPTs="DPST-5-1" />
+      <GroupAddress Name="FA - Fensteraktor Schlafen (oben) - Status Öffnung (Prozent)" Address="7/1/13" Description="40 - Schlafen Fenster (oben)" DPTs="DPST-5-1" />
+      <GroupAddress Name="FA - Fensteraktor Schlafen (oben) - Akkustand" Address="7/1/14" Description="40 - Schlafen Fenster (oben)" DPTs="DPST-5-1" />
+    </GroupRange>
+  </GroupRange>
+  <GroupRange Name="Bewässerung" RangeStart="16384" RangeEnd="18431">
+    <GroupRange Name="Zentral" RangeStart="16384" RangeEnd="16639">
+      <GroupAddress Name="BW Z - Schalten (dauernd)" Address="8/0/0" Description="80 - Bewässerung 00 - Zentral" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Z - Schalten (mit Auto-Aus)" Address="8/0/1" Description="80 - Bewässerung 00 - Zentral" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Z - Schalten mit Zeit (in Minuten)" Address="8/0/2" Description="80 - Bewässerung 00 - Zentral" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Z - Sperren" Address="8/0/3" Description="80 - Bewässerung 00 - Zentral" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Z - Status" Address="8/0/4" Description="80 - Bewässerung 00 - Zentral" DPTs="DPST-1-11" />
+    </GroupRange>
+    <GroupRange Name="Haus (Beete) &amp; Westen" RangeStart="16640" RangeEnd="16895">
+      <GroupAddress Name="BW Beete Haus L - Schalten (dauernd)" Address="8/1/0" Description="80 - Bewässerung 10 - Haus - Beete - links" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Beete Haus L - Schalten (mit Auto-Aus)" Address="8/1/1" Description="80 - Bewässerung 10 - Haus - Beete - links" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Beete Haus L - Schalten mit Zeit (in Minuten)" Address="8/1/2" Description="80 - Bewässerung 10 - Haus - Beete - links" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Beete Haus L - Sperren" Address="8/1/3" Description="80 - Bewässerung 10 - Haus - Beete - links" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Beete Haus L - Status" Address="8/1/4" Description="80 - Bewässerung 10 - Haus - Beete - links" DPTs="DPST-1-11" />
+      <GroupAddress Name="BW Beete Haus R - Schalten (dauernd)" Address="8/1/10" Description="80 - Bewässerung 11 - Haus - Beete - rechts" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Beete Haus R - Schalten (mit Auto-Aus)" Address="8/1/11" Description="80 - Bewässerung 11 - Haus - Beete - rechts" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Beete Haus R - Schalten mit Zeit (in Minuten)" Address="8/1/12" Description="80 - Bewässerung 11 - Haus - Beete - rechts" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Beete Haus R - Sperren" Address="8/1/13" Description="80 - Bewässerung 11 - Haus - Beete - rechts" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Beete Haus R - Status" Address="8/1/14" Description="80 - Bewässerung 11 - Haus - Beete - rechts" DPTs="DPST-1-11" />
+      <GroupAddress Name="BW Beete Sprayer - Schalten (dauernd)" Address="8/1/20" Description="80 - Bewässerung 12 - Westen - Sprayer" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Beete Sprayer - Schalten (mit Auto-Aus)" Address="8/1/21" Description="80 - Bewässerung 12 - Westen - Sprayer" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Beete Sprayer - Schalten mit Zeit (in Minuten)" Address="8/1/22" Description="80 - Bewässerung 12 - Westen - Sprayer" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Beete Sprayer - Sperren" Address="8/1/23" Description="80 - Bewässerung 12 - Westen - Sprayer" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Beete Sprayer - Status" Address="8/1/24" Description="80 - Bewässerung 12 - Westen - Sprayer" DPTs="DPST-1-11" />
+      <GroupAddress Name="BW Beete Eiben - Schalten (dauernd)" Address="8/1/30" Description="80 - Bewässerung 13 - Westen - Eiben" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Beete Eiben - Schalten (mit Auto-Aus)" Address="8/1/31" Description="80 - Bewässerung 13 - Westen - Eiben" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Beete Eiben - Schalten mit Zeit (in Minuten)" Address="8/1/32" Description="80 - Bewässerung 13 - Westen - Eiben" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Beete Eiben - Sperren" Address="8/1/33" Description="80 - Bewässerung 13 - Westen - Eiben" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Beete Eiben - Status" Address="8/1/34" Description="80 - Bewässerung 13 - Westen - Eiben" DPTs="DPST-1-11" />
+    </GroupRange>
+    <GroupRange Name="Osten (Hochbeet)" RangeStart="16896" RangeEnd="17151">
+      <GroupAddress Name="BW Hochbeet Gemüse - Schalten (dauernd)" Address="8/2/0" Description="80 - Bewässerung 20 - Osten - Hochbeet Gemüse" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Hochbeet Gemüse - Schalten (mit Auto-Aus)" Address="8/2/1" Description="80 - Bewässerung 20 - Osten - Hochbeet Gemüse" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Hochbeet Gemüse - Schalten mit Zeit (in Minuten)" Address="8/2/2" Description="80 - Bewässerung 20 - Osten - Hochbeet Gemüse" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Hochbeet Gemüse - Sperren" Address="8/2/3" Description="80 - Bewässerung 20 - Osten - Hochbeet Gemüse" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Hochbeet Gemüse - Status" Address="8/2/4" Description="80 - Bewässerung 20 - Osten - Hochbeet Gemüse" DPTs="DPST-1-11" />
+      <GroupAddress Name="BW Hochbeet M - Schalten (dauernd)" Address="8/2/10" Description="80 - Bewässerung 21 - Osten - Hochbeet Mitte" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Hochbeet M - Schalten (mit Auto-Aus)" Address="8/2/11" Description="80 - Bewässerung 21 - Osten - Hochbeet Mitte" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Hochbeet M - Schalten mit Zeit (in Minuten)" Address="8/2/12" Description="80 - Bewässerung 21 - Osten - Hochbeet Mitte" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Hochbeet M - Sperren" Address="8/2/13" Description="80 - Bewässerung 21 - Osten - Hochbeet Mitte" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Hochbeet M - Status" Address="8/2/14" Description="80 - Bewässerung 21 - Osten - Hochbeet Mitte" DPTs="DPST-1-11" />
+      <GroupAddress Name="BW Hochbeet R - Schalten (dauernd)" Address="8/2/20" Description="80 - Bewässerung 22 - Osten - Hochbeet über Weg" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Hochbeet R - Schalten (mit Auto-Aus)" Address="8/2/21" Description="80 - Bewässerung 22 - Osten - Hochbeet über Weg" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Hochbeet R - Schalten mit Zeit (in Minuten)" Address="8/2/22" Description="80 - Bewässerung 22 - Osten - Hochbeet über Weg" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Hochbeet R - Sperren" Address="8/2/23" Description="80 - Bewässerung 22 - Osten - Hochbeet über Weg" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Hochbeet R - Status" Address="8/2/24" Description="80 - Bewässerung 22 - Osten - Hochbeet über Weg" DPTs="DPST-1-11" />
+      <GroupAddress Name="BW Hochbeet Weg - Schalten (dauernd)" Address="8/2/30" Description="80 - Bewässerung 23 - Osten - Beet am Weg" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Hochbeet Weg - Schalten (mit Auto-Aus)" Address="8/2/31" Description="80 - Bewässerung 23 - Osten - Beet am Weg" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Hochbeet Weg - Schalten mit Zeit (in Minuten)" Address="8/2/32" Description="80 - Bewässerung 23 - Osten - Beet am Weg" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Hochbeet Weg - Sperren" Address="8/2/33" Description="80 - Bewässerung 23 - Osten - Beet am Weg" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Hochbeet Weg - Status" Address="8/2/34" Description="80 - Bewässerung 23 - Osten - Beet am Weg" DPTs="DPST-1-11" />
+    </GroupRange>
+    <GroupRange Name="Süden (Parkplatz)" RangeStart="17152" RangeEnd="17407">
+      <GroupAddress Name="BW Süden - Eiche - Schalten (dauernd)" Address="8/3/0" Description="80 - Bewässerung 30 - Süden - Reserve - Links" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Süden - Eiche - Schalten (mit Auto-Aus)" Address="8/3/1" Description="80 - Bewässerung 30 - Süden - Reserve - Links" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Süden - Eiche - Schalten mit Zeit (in Minuten)" Address="8/3/2" Description="80 - Bewässerung 30 - Süden - Reserve - Links" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Süden - Eiche - Sperren" Address="8/3/3" Description="80 - Bewässerung 30 - Süden - Reserve - Links" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Süden - Eiche - Status" Address="8/3/4" Description="80 - Bewässerung 30 - Süden - Reserve - Links" DPTs="DPST-1-11" />
+      <GroupAddress Name="BW Süden - Töpfel Beet (vorne) - Schalten (dauernd)" Address="8/3/10" Description="80 - Bewässerung 31 - Süden - Reserve - Rechts" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Süden - Töpfel Beet (vorne) - Schalten (mit Auto-Aus)" Address="8/3/11" Description="80 - Bewässerung 31 - Süden - Reserve - Rechts" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Süden - Töpfel Beet (vorne) - Schalten mit Zeit (in Minuten)" Address="8/3/12" Description="80 - Bewässerung 31 - Süden - Reserve - Rechts" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Süden - Töpfel Beet (vorne) - Sperren" Address="8/3/13" Description="80 - Bewässerung 31 - Süden - Reserve - Rechts" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Süden - Töpfel Beet (vorne) - Status" Address="8/3/14" Description="80 - Bewässerung 31 - Süden - Reserve - Rechts" DPTs="DPST-1-11" />
+      <GroupAddress Name="BW Süden Tröpfel - Beet (hinten) - Schalten (dauernd)" Address="8/3/20" Description="80 - Bewässerung 32 - Süden - Tröpfel Beet" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Süden Tröpfel - Beet (hinten) - Schalten (mit Auto-Aus)" Address="8/3/21" Description="80 - Bewässerung 32 - Süden - Tröpfel Beet" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Süden Tröpfel - Beet (hinten) - Schalten mit Zeit (in Minuten)" Address="8/3/22" Description="80 - Bewässerung 32 - Süden - Tröpfel Beet" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Süden Tröpfel - Beet (hinten) - Sperren" Address="8/3/23" Description="80 - Bewässerung 32 - Süden - Tröpfel Beet" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Süden Tröpfel - Beet (hinten) - Status" Address="8/3/24" Description="80 - Bewässerung 32 - Süden - Tröpfel Beet" DPTs="DPST-1-11" />
+      <GroupAddress Name="BW Süden Hortensien - Schalten (dauernd)" Address="8/3/30" Description="80 - Bewässerung 33 - Süden - Tröpfel Beet Hortensien" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Süden Hortensien - Schalten (mit Auto-Aus)" Address="8/3/31" Description="80 - Bewässerung 33 - Süden - Tröpfel Beet Hortensien" DPTs="DPST-1-1" />
+      <GroupAddress Name="BW Süden Hortensien - Schalten mit Zeit (in Minuten)" Address="8/3/32" Description="80 - Bewässerung 33 - Süden - Tröpfel Beet Hortensien" DPTs="DPST-5-5" />
+      <GroupAddress Name="BW Süden Hortensien - Sperren" Address="8/3/33" Description="80 - Bewässerung 33 - Süden - Tröpfel Beet Hortensien" DPTs="DPST-1-3" />
+      <GroupAddress Name="BW Süden Hortensien - Status" Address="8/3/34" Description="80 - Bewässerung 33 - Süden - Tröpfel Beet Hortensien" DPTs="DPST-1-11" />
+    </GroupRange>
+    <GroupRange Name="Terrasse" RangeStart="17408" RangeEnd="17663" />
+  </GroupRange>
+  <GroupRange Name="Multimedia" RangeStart="18432" RangeEnd="20479" Unfiltered="true">
+    <GroupRange Name="EG" RangeStart="18432" RangeEnd="18687" Unfiltered="true">
+      <GroupAddress Name="MM Küche - Ein/Aus" Address="9/0/0" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Küche - Status Ein/Aus" Address="9/0/1" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Küche - Lautstärke (relativ)" Address="9/0/2" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-3-7" />
+      <GroupAddress Name="MM Küche - Lautstärke (absolut)" Address="9/0/3" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Küche - Wert Lautstärke" Address="9/0/4" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Küche - Station/Playlist" Address="9/0/5" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Küche - Wert Station/Playlist" Address="9/0/6" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Küche - Text Station/Playlist" Address="9/0/7" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Küche - Titel" Address="9/0/8" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Küche - Künstler" Address="9/0/9" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Küche - Album" Address="9/0/10" Unfiltered="true" Description="26 - Küche Audio (Küche)" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Küche - Station/Playlist vor/zurück" Address="9/0/11" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Küche - Track vor/zurück" Address="9/0/12" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Küche - Mute" Address="9/0/13" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Küche - Mute Status" Address="9/0/14" Unfiltered="true" Description="24 - Wohnbereich Audio (Küche)" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Küche - Shuffle" Address="9/0/15" Unfiltered="true" Description="26 - Küche Audio (Küche)" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Küche - Wert Shuffle" Address="9/0/16" Unfiltered="true" Description="26 - Küche Audio (Küche)" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Küche - Repeat" Address="9/0/17" Unfiltered="true" Description="26 - Küche Audio (Küche)" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Küche - Wert Repeat" Address="9/0/18" Unfiltered="true" Description="26 - Küche Audio (Küche)" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM BadEG - Ein/Aus" Address="9/0/20" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM BadEG - Status Ein/Aus" Address="9/0/21" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM BadEG - Lautstärke (relativ)" Address="9/0/22" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-3-7" />
+      <GroupAddress Name="MM BadEG - Lautstärke (absolut)" Address="9/0/23" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM BadEG - Wert Lautstärke" Address="9/0/24" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM BadEG - Station/Playlist" Address="9/0/25" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM BadEG - Wert Station/Playlist" Address="9/0/26" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM BadEG - Text Station/Playlist" Address="9/0/27" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM BadEG - Titel" Address="9/0/28" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM BadEG - Künstler" Address="9/0/29" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM BadEG - Album" Address="9/0/30" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM BadEG - Station/Playlist vor/zurück" Address="9/0/31" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM BadEG - Track vor/zurück" Address="9/0/32" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM BadEG - Mute" Address="9/0/33" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM BadEG - Mute Status" Address="9/0/34" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM BadEG - Shuffle" Address="9/0/35" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM BadEG - Wert Shuffle" Address="9/0/36" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM BadEG - Repeat" Address="9/0/37" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM BadEG - Wert Repeat" Address="9/0/38" Unfiltered="true" Description="23 - Bad EG Audio" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Gäste - Ein/Aus" Address="9/0/40" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Gäste - Status Ein/Aus" Address="9/0/41" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Gäste - Lautstärke (relativ)" Address="9/0/42" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-3-7" />
+      <GroupAddress Name="MM Gäste - Lautstärke (absolut)" Address="9/0/43" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Gäste - Wert Lautstärke" Address="9/0/44" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Gäste - Station/Playlist" Address="9/0/45" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Gäste - Wert Station/Playlist" Address="9/0/46" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Gäste - Text Station/Playlist" Address="9/0/47" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Gäste - Titel" Address="9/0/48" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Gäste - Künstler" Address="9/0/49" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Gäste - Album" Address="9/0/50" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Gäste - Station/Playlist vor/zurück" Address="9/0/51" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Gäste - Track vor/zurück" Address="9/0/52" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Gäste - Mute" Address="9/0/53" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Gäste - Mute Status" Address="9/0/54" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Gäste - Shuffle" Address="9/0/55" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Gäste - Wert Shuffle" Address="9/0/56" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Gäste - Repeat" Address="9/0/57" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Gäste - Wert Repeat" Address="9/0/58" Unfiltered="true" Description="22 - Gäste Audio" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM TV - Ein/Aus" Address="9/0/60" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM TV - Status Ein/Aus" Address="9/0/61" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM TV - Lautstärke (relativ)" Address="9/0/62" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-3-7" />
+      <GroupAddress Name="MM TV - Lautstärke (absolut)" Address="9/0/63" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM TV - Wert Lautstärke" Address="9/0/64" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM TV - Station/Playlist" Address="9/0/65" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM TV - Wert Station/Playlist" Address="9/0/66" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM TV - Text Station/Playlist" Address="9/0/67" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM TV - Titel" Address="9/0/68" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM TV - Künstler" Address="9/0/69" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM TV - Album" Address="9/0/70" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM TV - Station/Playlist vor/zurück" Address="9/0/71" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM TV - Track vor/zurück" Address="9/0/72" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM TV - Mute" Address="9/0/73" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM TV - Mute Status" Address="9/0/74" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM TV - Shuffle" Address="9/0/75" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM TV - Wert Shuffle" Address="9/0/76" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM TV - Repeat" Address="9/0/77" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM TV - Wert Repeat" Address="9/0/78" Unfiltered="true" Description="24 - Wohnbereich TV" DPTs="DPST-1-11" />
+    </GroupRange>
+    <GroupRange Name="OG" RangeStart="18688" RangeEnd="18943" Unfiltered="true">
+      <GroupAddress Name="MM BadOG - Ein/Aus" Address="9/1/0" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM BadOG - Status Ein/Aus" Address="9/1/1" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM BadOG - Lautstärke (relativ)" Address="9/1/2" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-3-7" />
+      <GroupAddress Name="MM BadOG - Lautstärke (absolut)" Address="9/1/3" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM BadOG - Wert Lautstärke" Address="9/1/4" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM BadOG - Station/Playlist" Address="9/1/5" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM BadOG - Wert Station/Playlist" Address="9/1/6" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM BadOG - Text Station/Playlist" Address="9/1/7" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM BadOG - Titel" Address="9/1/8" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM BadOG - Künstler" Address="9/1/9" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM BadOG - Album" Address="9/1/10" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM BadOG - Station/Playlist vor/zurück" Address="9/1/11" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM BadOG - Track vor/zurück" Address="9/1/12" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM BadOG - Mute" Address="9/1/13" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM BadOG - Mute Status" Address="9/1/14" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM BadOG - Shuffle" Address="9/1/15" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM BadOG - Wert Shuffle" Address="9/1/16" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM BadOG - Repeat" Address="9/1/17" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM BadOG - Wert Repeat" Address="9/1/18" Unfiltered="true" Description="30 - Bad OG Beschallung" DPTs="DPST-1-11" />
+    </GroupRange>
+    <GroupRange Name="Außen" RangeStart="18944" RangeEnd="19199" Unfiltered="true">
+      <GroupAddress Name="MM Süden - Ein/Aus" Address="9/2/0" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Süden - Status Ein/Aus" Address="9/2/1" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Süden - Lautstärke (relativ)" Address="9/2/2" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-3-7" />
+      <GroupAddress Name="MM Süden - Lautstärke (absolut)" Address="9/2/3" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Süden - Wert Lautstärke" Address="9/2/4" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Süden - Station/Playlist" Address="9/2/5" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Süden - Wert Station/Playlist" Address="9/2/6" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Süden - Text Station/Playlist" Address="9/2/7" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Süden - Text Inhalt" Address="9/2/8" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Süden - Künstler" Address="9/2/9" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Süden - Album" Address="9/2/10" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Süden)" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Süden - Station/Playlist vor/zurück" Address="9/2/11" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Süden - Track vor/zurück" Address="9/2/12" Unfiltered="true" Description="53 - Haus / Terasse Beschallung" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Süden - Mute" Address="9/2/13" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Süden)" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Süden - Mute Status" Address="9/2/14" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Süden)" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Süden - Shuffle" Address="9/2/15" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Süden)" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Süden - Wert Shuffle" Address="9/2/16" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Süden)" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Süden - Repeat" Address="9/2/17" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Süden)" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Süden - Wert Repeat" Address="9/2/18" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Süden)" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Westen - Ein/Aus" Address="9/2/20" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Westen - Status Ein/Aus" Address="9/2/21" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Westen - Lautstärke (relativ)" Address="9/2/22" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-3-7" />
+      <GroupAddress Name="MM Westen - Lautstärke (absolut)" Address="9/2/23" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Westen - Wert Lautstärke" Address="9/2/24" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Westen - Station/Playlist" Address="9/2/25" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Westen - Wert Station/Playlist" Address="9/2/26" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Westen - Text Station/Playlist" Address="9/2/27" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Westen - Text Inhalt" Address="9/2/28" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Westen - Künstler" Address="9/2/29" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Westen - Album" Address="9/2/30" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Westen - Station/Playlist vor/zurück" Address="9/2/31" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Westen - Track vor/zurück" Address="9/2/32" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Westen - Mute" Address="9/2/33" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Westen - Mute Status" Address="9/2/34" Unfiltered="true" Description="53 - Haus / Terasse Beschallung (Westen)" DPTs="DPST-1-11" />
+    </GroupRange>
+    <GroupRange Name="Test" RangeStart="20224" RangeEnd="20479" Unfiltered="true">
+      <GroupAddress Name="MM Küche - Ein/Aus" Address="9/7/0" Unfiltered="true" Description="Test" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Küche - Status Ein/Aus" Address="9/7/1" Unfiltered="true" Description="Test" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Küche - Lautstärke (relativ)" Address="9/7/2" Unfiltered="true" Description="Test" DPTs="DPST-3-7" />
+      <GroupAddress Name="MM Küche - Lautstärke (absolut)" Address="9/7/3" Unfiltered="true" Description="Test" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Küche - Wert Lautstärke" Address="9/7/4" Unfiltered="true" Description="Test" DPTs="DPST-5-1" />
+      <GroupAddress Name="MM Küche - Station/Playlist" Address="9/7/5" Unfiltered="true" Description="Test" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Küche - Wert Station/Playlist" Address="9/7/6" Unfiltered="true" Description="Test" DPTs="DPST-5-5" />
+      <GroupAddress Name="MM Küche - Text Station/Playlist" Address="9/7/7" Unfiltered="true" Description="Test" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Küche - Titel" Address="9/7/8" Unfiltered="true" Description="Test" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Küche - Künstler" Address="9/7/9" Unfiltered="true" Description="Test" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Küche - Album" Address="9/7/10" Unfiltered="true" Description="Test" DPTs="DPST-16-1" />
+      <GroupAddress Name="MM Küche - Station/Playlist vor/zurück" Address="9/7/11" Unfiltered="true" Description="Test" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Küche - Track vor/zurück" Address="9/7/12" Unfiltered="true" Description="Test" DPTs="DPST-1-7" />
+      <GroupAddress Name="MM Küche - Mute" Address="9/7/13" Unfiltered="true" Description="Test" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Küche - Mute Status" Address="9/7/14" Unfiltered="true" Description="Test" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Küche - Shuffle" Address="9/7/15" Unfiltered="true" Description="Test" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Küche - Wert Shuffle" Address="9/7/16" Unfiltered="true" Description="Test" DPTs="DPST-1-11" />
+      <GroupAddress Name="MM Küche - Repeat" Address="9/7/17" Unfiltered="true" Description="Test" DPTs="DPST-1-1" />
+      <GroupAddress Name="MM Küche - Wert Repeat" Address="9/7/18" Unfiltered="true" Description="Test" DPTs="DPST-1-11" />
+    </GroupRange>
+  </GroupRange>
+  <GroupRange Name="Szenen" RangeStart="20480" RangeEnd="22527" Unfiltered="true">
+    <GroupRange Name="Außen" RangeStart="20480" RangeEnd="20735" Unfiltered="true" />
+    <GroupRange Name="EG" RangeStart="20736" RangeEnd="20991" Unfiltered="true">
+      <GroupAddress Name="EG - Szene wählen (über Programmierung)" Address="10/1/0" Unfiltered="true" Description="24 - Wohnbereich Szene" DPTs="DPST-17-1" />
+      <GroupAddress Name="EG - Szene wählen" Address="10/1/1" Unfiltered="true" Description="24 - Wohnbereich Szene" DPTs="DPST-17-1" />
+    </GroupRange>
+    <GroupRange Name="OG" RangeStart="20992" RangeEnd="21247" Unfiltered="true">
+      <GroupAddress Name="Szene Bad" Address="10/2/0" Unfiltered="true" Description="30 - Bad OG Szene" DPTs="DPST-1-22" />
+      <GroupAddress Name="Szene Galerie" Address="10/2/1" Unfiltered="true" Description="31 - Galerie Szene" DPTs="DPST-1-22" />
+      <GroupAddress Name="Szene Maximilian" Address="10/2/2" Unfiltered="true" Description="32 - Kind (Maximilian) Szene" DPTs="DPST-17-1" />
+      <GroupAddress Name="Szene Clemens" Address="10/2/3" Unfiltered="true" Description="33 - Kind (Clemens) Szene" DPTs="DPST-17-1" />
+      <GroupAddress Name="Szene Schlafen" Address="10/2/4" Unfiltered="true" DPTs="DPST-1-22" />
+    </GroupRange>
+  </GroupRange>
+  <GroupRange Name="IoT" RangeStart="22528" RangeEnd="24575">
+    <GroupRange Name="Fahrzeug" RangeStart="22528" RangeEnd="22783">
+      <GroupAddress Name="Auto - Locked" Address="11/0/0" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Hood Open" Address="11/0/1" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Trunk Open" Address="11/0/2" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Door Front Right" Address="11/0/3" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Door Front Left" Address="11/0/4" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Door Rear Right" Address="11/0/5" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Door Rear Left" Address="11/0/6" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Klima Status" Address="11/0/7" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Heat Steering Wheel" Address="11/0/8" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Heat Side Mirror" Address="11/0/9" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Heat Rear Window" Address="11/0/10" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Defrost" Address="11/0/11" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Klima Temperatur" Address="11/0/12" Unfiltered="true" DPTs="DPST-9-1" />
+      <GroupAddress Name="Auto - Reichweite" Address="11/0/13" Unfiltered="true" DPTs="DPST-7-11" />
+      <GroupAddress Name="Auto - Charging" Address="11/0/14" Unfiltered="true" DPTs="DPST-1-11" />
+      <GroupAddress Name="Auto - Charge Duration" Address="11/0/15" Unfiltered="true" DPTs="DPST-7-6" />
+      <GroupAddress Name="Auto  - Battery Level" Address="11/0/16" Unfiltered="true" DPTs="DPST-5-1" />
+      <GroupAddress Name="Auto - Klima starten" Address="11/0/20" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="Auto - Klima Temperatur setzen" Address="11/0/21" Unfiltered="true" DPTs="DPST-9-1" />
+      <GroupAddress Name="Auto - Klima Defroster starten" Address="11/0/22" Unfiltered="true" DPTs="DPST-1-1" />
+      <GroupAddress Name="Auto - Schloss öffnen/schließen" Address="11/0/23" Unfiltered="true" DPTs="DPST-1-19" />
+    </GroupRange>
+  </GroupRange>
+</GroupAddress-Export>

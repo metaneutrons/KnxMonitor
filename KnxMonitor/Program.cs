@@ -88,10 +88,15 @@ public static partial class Program
                 Description = "Group address filter pattern",
             };
 
-            Option<string?> csvOption = new("--groupaddress-csv", "--csv")
+            Option<string?> csvOption = new("--csv")
             {
                 Description =
                     "Path to KNX group address CSV file (ETS export format 3/1, semicolon separated)",
+            };
+
+            Option<string?> xmlOption = new("--xml")
+            {
+                Description = "Path to KNX group address XML export (KNX GA Export 01)",
             };
 
             Option<bool> loggingModeOption = new("--logging-mode", "-l")
@@ -165,6 +170,7 @@ public static partial class Program
             rootCommand.Options.Add(verboseOption);
             rootCommand.Options.Add(filterOption);
             rootCommand.Options.Add(csvOption);
+            rootCommand.Options.Add(xmlOption);
             rootCommand.Options.Add(loggingModeOption);
             rootCommand.Options.Add(enableHealthCheckOption);
             rootCommand.Options.Add(versionOption);
@@ -197,6 +203,7 @@ public static partial class Program
             bool verbose = parseResult.GetValue(verboseOption);
             string? filter = parseResult.GetValue(filterOption);
             string? csvPath = parseResult.GetValue(csvOption);
+            string? xmlPath = parseResult.GetValue(xmlOption);
             bool loggingMode = parseResult.GetValue(loggingModeOption);
             bool enableHealthCheck = parseResult.GetValue(enableHealthCheckOption);
             int httpPort = parseResult.GetValue(httpPortOption);
@@ -231,6 +238,13 @@ public static partial class Program
                 multicastAddress = "224.0.23.12";
             }
 
+            // Enforce XOR between --csv and --xml
+            if (!string.IsNullOrEmpty(csvPath) && !string.IsNullOrEmpty(xmlPath))
+            {
+                Console.Error.WriteLine("Error: --csv and --xml cannot be used together. Please specify only one.");
+                return 1;
+            }
+
             // Validate required parameters based on connection type
             if (connectionType.ToLowerInvariant() == "tunnel" && string.IsNullOrEmpty(gateway))
             {
@@ -252,6 +266,7 @@ public static partial class Program
                 verbose,
                 filter,
                 csvPath,
+                xmlPath,
                 loggingMode,
                 enableHealthCheck,
                 httpPort,
@@ -308,6 +323,7 @@ public static partial class Program
     /// <param name="verbose">Enable verbose logging.</param>
     /// <param name="filter">Group address filter.</param>
     /// <param name="csvPath">Path to KNX group address CSV file exported from ETS.</param>
+    /// <param name="xmlPath">Path to KNX group address XML export (KNX GA Export 01).</param>
     /// <param name="loggingMode">Force simple logging mode instead of TUI.</param>
     /// <param name="enableHealthCheck">Enable HTTP health check service (auto-enabled in containers).</param>
     /// <param name="httpPort">HTTP port for the web UI (default 8671).</param>
@@ -326,6 +342,7 @@ public static partial class Program
         bool verbose,
         string? filter,
         string? csvPath,
+        string? xmlPath,
         bool loggingMode,
         bool enableHealthCheck,
         int httpPort,
@@ -355,6 +372,7 @@ public static partial class Program
                 Verbose = verbose,
                 Filter = filter,
                 GroupAddressCsvPath = csvPath,
+                GroupAddressXmlPath = xmlPath,
             };
 
             // Validate configuration

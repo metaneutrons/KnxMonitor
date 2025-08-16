@@ -68,8 +68,13 @@ public partial class KnxMonitorService : IKnxMonitorService, IAsyncDisposable
         {
             this.LogStartingMonitoring(this._config.ConnectionType.ToString());
 
-            // Load group address database if CSV path is provided
-            // Note: Application will exit with code 1 if CSV loading fails
+            // Load group address database from CSV or XML (mutually exclusive)
+            if (!string.IsNullOrEmpty(this._config.GroupAddressCsvPath) && !string.IsNullOrEmpty(this._config.GroupAddressXmlPath))
+            {
+                this.LogFailedToLoadGroupAddressCsv(new InvalidOperationException("Both --csv and --xml specified"), "Both --csv and --xml specified");
+                Environment.Exit(1);
+            }
+
             if (!string.IsNullOrEmpty(this._config.GroupAddressCsvPath))
             {
                 try
@@ -81,7 +86,20 @@ public partial class KnxMonitorService : IKnxMonitorService, IAsyncDisposable
                 catch (Exception ex)
                 {
                     this.LogFailedToLoadGroupAddressCsv(ex, ex.Message);
-                    // Exit with error code when CSV loading fails
+                    Environment.Exit(1);
+                }
+            }
+            else if (!string.IsNullOrEmpty(this._config.GroupAddressXmlPath))
+            {
+                try
+                {
+                    this.LogLoadingGroupAddressDatabase(this._config.GroupAddressXmlPath);
+                    await this._groupAddressDatabase.LoadFromXmlAsync(this._config.GroupAddressXmlPath);
+                    this.LogGroupAddressDatabaseLoaded(this._groupAddressDatabase.Count);
+                }
+                catch (Exception ex)
+                {
+                    this.LogFailedToLoadGroupAddressCsv(ex, ex.Message);
                     Environment.Exit(1);
                 }
             }
