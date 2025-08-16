@@ -1,293 +1,236 @@
+![KNX Monitor](https://img.shields.io/badge/KNX-Monitor-blue) ![.NET 9.0](https://img.shields.io/badge/.NET-9.0-purple) ![Docker](https://img.shields.io/badge/Docker-Ready-blue) ![Terminal.Gui V2](https://img.shields.io/badge/Terminal.Gui-V2-green)
+
 # KNX Monitor
 
-[![Build Status](https://github.com/metaneutrons/KnxMonitor/workflows/Build%20and%20Test/badge.svg)](https://github.com/metaneutrons/KnxMonitor/actions)
-[![Release](https://github.com/metaneutrons/KnxMonitor/workflows/Release/badge.svg)](https://github.com/metaneutrons/KnxMonitor/actions)
-[![Docker](https://img.shields.io/badge/Docker-ghcr.io-blue)](https://github.com/metaneutrons/KnxMonitor/pkgs/container/knxmonitor)
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/GPL-3.0)
-[![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/9.0)
+A visual, colorful command-line application for monitoring KNX/EIB bus activity with **Terminal.Gui V2 interface**.
 
-> **KNX/EIB bus monitoring and debugging tool built with modern .NET 9**
+## 🏆 Features
 
-KNX Monitor is a command-line application for monitoring, debugging, and analyzing KNX/EIB building automation networks. Built with best-practice architecture patterns, it provides real-time visualization of KNX bus traffic with comprehensive logging and analysis capabilities.
+- 🎨 **Terminal.Gui V2 Interface**: Beautiful, interactive TUI with real-time updates
+- 🔄 **Dual-Mode Architecture**: Automatic switching between TUI and logging modes
+- 🔌 **Multiple Connection Types**: Support for IP Tunneling, IP Routing, and USB
+- 🔍 **Real-time Monitoring**: Live display of all KNX bus activity with zero flickering
+- 🎯 **Advanced Filtering**: Interactive filter dialogs with pattern matching
+- 📊 **Rich Status Display**: Connection status, message count, and uptime tracking
+- 🧠 **Advanced DPT Decoding**: Falcon SDK-powered data point type decoding with auto-detection
+- 🎨 **Smart Value Formatting**: Context-aware display of decoded values (temperatures, percentages, etc.) with KNX group address database support
+- 🐳 **Docker Ready**: Development and production Docker containers
+- ⚡ **Hot Reload**: Development mode with automatic code reloading
+- 🎹 **Keyboard Shortcuts**: Full keyboard navigation and shortcuts
+- 📤 **Export Functionality**: Export messages to CSV format
+- 🎨 **Color Coding**: Age-based and type-based color coding for messages
 
-## ✨ Features
+## 🧠 Advanced DPT Decoding
 
-- **Real-time KNX bus monitoring** with millisecond precision
-- **Multiple connection types**: IP Tunneling, IP Routing, USB
-- **Group address resolution** via CSV database import
-- **Data Point Type (DPT) decoding** for human-readable values
-- **Advanced filtering** with regex pattern support
-- **Health check endpoints** for monitoring integration
-- **Docker containerization** with multi-architecture support
-- **Cross-platform compatibility** (Windows, macOS, Linux)
+KNX Monitor features sophisticated Data Point Type (DPT) decoding using the Falcon SDK:
 
-## 🚀 Quick Start
+### Supported DPT Types
 
-### Installation
+- **DPT 1.xxx**: Boolean values with context-aware formatting
+  - `1.001` Switch: `On/Off`
+  - `1.008` Up/Down: `Up/Down`
+  - `1.009` Open/Close: `Open/Close`
+- **DPT 5.xxx**: 8-bit unsigned values
+  - `5.001` Scaling: `75%`
+  - `5.003` Angle: `180°`
+- **DPT 9.xxx**: 2-byte float values with proper units
+  - `9.001` Temperature: `21.5°C`
+  - `9.004` Illuminance: `1500 lux`
+  - `9.005` Wind Speed: `5.2 m/s`
+  - `9.006` Pressure: `1013 Pa`
+  - `9.007` Humidity: `65.0%`
+- **DPT 14.xxx**: 4-byte IEEE 754 float values
+  - `14.019` Electric Current: `16.5 A`
+  - `14.027` Frequency: `50.0 Hz`
+  - `14.056` Power: `1500.0 W`
+  - `14.076` Voltage: `230.0 V`
 
-#### Homebrew (macOS/Linux)
+## 🖥️ Display Modes
+
+### Interactive Mode (Terminal.Gui V2)
+
+When running in an interactive terminal, KNX Monitor automatically launches the **Terminal.Gui V2 interface**:
+
+### Logging Mode (Console Output)
+
+### Web Interface (non-TUI mode)
+
+- Starts automatically when not in interactive TUI mode (e.g., when output is redirected or `-l/--logging-mode` is used)
+- Default URL: `http://localhost:8671` (configurable via `--http-port`)
+- Modern, readable UI with:
+  - Live message table (updates every second)
+  - Filter control supporting patterns like `1/2/*` and exact matches
+  - CSV export
+  - Status header with connection state and total message count
+
+When output is redirected or running in containers, automatically switches to logging mode:
+
+```plaintext
+[14:32:15.123] Write 1.1.5 -> 1/2/1 = 75 (Normal)
+[14:32:15.456] Read 1.1.10 -> 1/2/5 = Empty (Normal)
+[14:32:15.789] Response 1.1.5 -> 1/2/5 = false (Normal)
+```
+
+## Quick Start
+
+### Using .NET CLI
 
 ```bash
-brew install metaneutrons/tap/knxmonitor
+# Install dependencies
+dotnet restore
+
+# Run with default settings (connects to knxd via tunneling)
+dotnet run
+
+# Run with custom settings
+dotnet run -- --connection-type tunnel --gateway 192.168.2.8 --verbose
 ```
 
-#### Docker
+## ⌨️ Keyboard Shortcuts (Interactive Mode)
 
-```bash
-docker run --rm -it ghcr.io/metaneutrons/knxmonitor:latest --help
-```
+| Shortcut | Action | Description |
+|----------|--------|-------------|
+| **F1** | Help | Show keyboard shortcuts help |
+| **F2** | Filter | Open filter dialog |
+| **F3** | Clear | Clear all messages |
+| **F5** | Refresh | Refresh display |
+| **F9** | Export | Export messages to CSV |
+| **F10** | Quit | Exit application |
+| **Ctrl+C** | Quit | Exit application |
+| **Ctrl+R** | Refresh | Refresh display |
+| **Ctrl+F** | Filter | Open filter dialog |
+| **Ctrl+E** | Export | Export messages |
+| **Arrow Keys** | Navigate | Navigate table |
+| **Page Up/Down** | Scroll | Scroll through messages |
+| **Home/End** | Jump | Go to first/last message |
 
-#### Local Docker Build
+## 🎨 Color Coding (Interactive Mode)
 
-```bash
-# Git-based build (default Dockerfile)
-docker build -t knxmonitor:local .
+- 🟢 **Green**: Recent messages (< 1 second), Write operations, Connected status
+- 🟡 **Yellow**: Medium age messages (< 5 seconds), Response operations, Values
+- 🟠 **Orange**: Older messages (< 30 seconds), Urgent priority
+- 🔵 **Cyan**: Read operations, IP Tunneling connection
+- 🟣 **Magenta**: IP Routing connection
+- 🔴 **Red**: System priority, Disconnected status, Errors
+- ⚪ **White/Dim**: Normal priority, Very old messages
 
-# CI/CD build (requires pre-built binaries)
-docker build -f Dockerfile.ci -t knxmonitor:ci .
-```
+## Command Line Options
 
-#### Manual Installation
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--connection-type` | `-c` | Connection type: `tunnel`, `router`, or `usb` | `tunnel` |
+| `--gateway` | `-g` | KNX gateway address (required for tunnel/router) | `knxd` |
+| `--port` | `-p` | KNX gateway port | `3671` |
+| `--verbose` | `-v` | Enable verbose logging | `false` |
+| `--filter` | `-f` | Filter group addresses (e.g., `1/2/*` or `1/2/3`) | None |
+| `--csv` |  | Path to KNX group address CSV file (ETS export format) | None |
+| `--xml` |  | Path to KNX group address XML export (KNX GA Export 01) | None |
+| `--logging-mode` | `-l` | Force simple logging mode instead of TUI | `false` |
+| `--http-port` |  | HTTP port for the web UI (non-TUI mode) | `8671` |
+| `--test` | `-t` | Run DPT decoding tests and exit | `false` |
 
-Download the latest release from [GitHub Releases](https://github.com/metaneutrons/KnxMonitor/releases).
+## Group Address Database Support
 
-### Basic Usage
+KNX Monitor supports loading group address databases from ETS exports in two formats:
 
-```bash
-# Show version information
-knxmonitor --version
+### CSV Format (ETS Export)
 
-# Show help and all options
-knxmonitor --help
+- Use `--csv path/to/addresses.csv`
+- Requires ETS export format with semicolon separation
+- Expected columns: Main, Middle, Sub, Address, Central, Unfiltered, Description, DatapointType, Security
 
-# Monitor KNX bus via IP tunneling
-knxmonitor --connection-type tunneling --host 192.168.1.100
+### XML Format (KNX GA Export 01)
 
-# Monitor with group address database
-knxmonitor --connection-type routing --csv-path knx_addresses.csv
+- Use `--xml path/to/addresses.xml`
+- Supports KNX GA XML export format with namespace `http://knx.org/xml/ga-export/01`
+- Automatically extracts group addresses, names, descriptions, and DPT information
+- Handles hierarchical group names with automatic splitting
 
-# Monitor with filtering
-knxmonitor --connection-type tunneling --host 192.168.1.100 --filter "1/1/*"
+**Note**: `--csv` and `--xml` options are mutually exclusive - use only one at a time.
 
-# Run with health check endpoint
-knxmonitor --connection-type routing --health-check-port 8080
-```
-
-## 📋 Version Information
-
-Get concise version and GitVersion information:
-
-```bash
-knxmonitor --version
-```
-
-**Example output:**
-
-```
-Version:    1.0.1
-GitVersion: 1.0.1+Branch.main.Sha.8c6f5fd4d70c35e1d68e8fd5d0a7cb1e50bfbe21
-```
-
-- **Version**: Semantic version from GitVersion
-- **GitVersion**: Full GitVersion string with build metadata and commit SHA
-
-Perfect for scripts, automation, and build verification.
-
-## 📖 Documentation
-
-### Connection Types
-
-#### IP Tunneling
-
-```bash
-knxmonitor --connection-type tunneling --host <knx-gateway-ip> [--port 3671]
-```
-
-#### IP Routing (Multicast)
-
-```bash
-knxmonitor --connection-type routing [--multicast-address 224.0.23.12]
-```
-
-#### USB Interface
-
-```bash
-knxmonitor --connection-type usb [--device /dev/ttyUSB0]
-```
-
-### Group Address Database
-
-Import group addresses from ETS CSV export:
-
-```bash
-knxmonitor --csv-path group_addresses.csv --connection-type routing
-```
-
-**CSV Format:**
-
-```csv
-"Group address";"Name";"Central function";"Unfiltered";"Description";"DatapointType";"Security"
-"0/1/1";"Living Room Light";"Switching";"No";"Main living room lighting";"DPST-1-1";"Auto"
-"0/1/2";"Kitchen Light";"Switching";"No";"Kitchen ceiling light";"DPST-1-1";"Auto"
-```
-
-### Advanced Configuration
-
-#### Environment Variables
-
-```bash
-export KNX_CONNECTION_TYPE=tunneling
-export KNX_HOST=192.168.1.100
-export KNX_CSV_PATH=/path/to/addresses.csv
-export KNX_LOG_LEVEL=Information
-```
-
-#### Configuration File
-
-Create `knxmonitor.json`:
-
-```json
-{
-  "ConnectionType": "tunneling",
-  "Host": "192.168.1.100",
-  "Port": 3671,
-  "CsvPath": "group_addresses.csv",
-  "LogLevel": "Information",
-  "HealthCheckPort": 8080
-}
-```
-
-## 🐳 Docker Usage
+## Usage Examples
 
 ### Basic Monitoring
 
 ```bash
-docker run --rm -it --network host \
-  ghcr.io/metaneutrons/knxmonitor:latest \
-  --connection-type routing
+# Monitor KNX bus via IP tunneling to knxd
+dotnet run
+
+# Monitor with verbose logging
+dotnet run -- --verbose
+
+# Monitor with group address database (CSV)
+dotnet run -- --csv ~/Documents/knx-addresses.csv
+
+# Monitor with group address database (XML)
+dotnet run -- --xml ~/Documents/knx-groupaddress.xml
+
+# Monitor specific group addresses
+dotnet run -- --filter "1/2/*"
 ```
 
-### With Volume Mapping
+### Different Connection Types
 
 ```bash
-docker run --rm -it --network host \
-  -v $(pwd)/config:/app/config \
-  ghcr.io/metaneutrons/knxmonitor:latest \
-  --csv-path /app/config/addresses.csv \
-  --connection-type tunneling \
-  --host 192.168.1.100
+# IP Tunneling (most common)
+dotnet run -- --connection-type tunnel --gateway 192.168.1.100
+
+# IP Routing (multicast)
+dotnet run -- --connection-type router --gateway 224.0.23.12
+
+# USB Interface
+dotnet run -- --connection-type usb
 ```
 
-### Docker Compose
-
-```yaml
-version: '3.8'
-services:
-  knxmonitor:
-    image: ghcr.io/metaneutrons/knxmonitor:latest
-    network_mode: host
-    volumes:
-      - ./config:/app/config:ro
-    command: >
-      --connection-type routing
-      --csv-path /app/config/addresses.csv
-      --health-check-port 8080
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "./KnxMonitor", "--health-check"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-```
-
-## 🛠️ Development
-
-### Prerequisites
-
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
-- [Git](https://git-scm.com/)
-- [VS Code](https://code.visualstudio.com/) (recommended)
-
-### VS Code Setup (Recommended)
-
-This project includes comprehensive VS Code configuration for optimal development experience:
-
-#### Quick Start
-
-1. Open the project in VS Code
-2. Install recommended extensions (VS Code will prompt)
-3. **Press Shift+Cmd+B** to build and run the application
-4. Use **F5** to debug with breakpoints
-
-#### Key Shortcuts
-
-- **Shift+Cmd+B**: Build and run in router mode (primary development shortcut)
-- **Shift+Cmd+R**: Run in IP routing mode
-- **Shift+Cmd+T**: Run in IP tunneling mode
-- **Shift+Cmd+W**: Watch mode (hot reload)
-- **F5**: Debug with breakpoints
-- **Cmd+K Cmd+T**: Run tests
-
-See [.vscode/README.md](.vscode/README.md) for complete VS Code documentation.
-
-### Building from Source
+### Monitor Production KNX Installation
 
 ```bash
-git clone https://github.com/metaneutrons/KnxMonitor.git
-cd KnxMonitor
-dotnet tool restore
+# Connect to real KNX/IP gateway
+dotnet run -- --connection-type tunnel --gateway 192.168.1.100 --port 3671
+
+# Monitor only lighting controls
+dotnet run -- --gateway 192.168.1.100 --filter "1/1/*"
+
+# Monitor with IP routing (multicast)
+dotnet run -- --connection-type router --gateway 224.0.23.12
+```
+
+## Development
+
+### Dependencies
+
+- **Knx.Falcon.Sdk**: KNX/EIB communication
+- **Terminal.Gui V2**: Terminal User Interface
+- **System.CommandLine**: Command-line argument parsing
+- **Spectre.Console**: Beautiful console output for logging mode
+- **Microsoft.Extensions.Hosting**: Dependency injection and hosting
+- **Microsoft.Extensions.Logging**: Structured logging
+
+### Building
+
+```bash
+# Restore dependencies
 dotnet restore
-dotnet build --configuration Release
+
+# Build project
+dotnet build
+
+# Build Docker images
+docker build  .
 ```
 
-### Git Hooks Setup (Recommended)
+## License
 
-For consistent code quality and conventional commits:
+This project is part of SnapDog2 and is licensed under the GNU GPL v3.0.
 
-```bash
-./setup-hooks.sh
-```
+## Contributing
 
-This installs Git hooks that:
-- ✅ Validate conventional commit messages
-- ✅ Format code automatically with CSharpier
-- ✅ Build project before commits
-- ✅ Run tests before pushes
-- ✅ Provide commit message templates
-
-### Running Tests
-
-```bash
-dotnet test --configuration Release --verbosity normal
-```
-
-### Development Environment
-
-```bash
-# Run with hot reload
-dotnet run --project KnxMonitor -- --connection-type routing --csv-path test.csv
-
-# Debug build
-dotnet build --configuration Debug
-```
-
-## 📝 License
-
-This project is licensed under the GNU Lesser General Public License v3.0 or later - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **KNX Association** for the KNX/EIB standard
-- **Falcon SDK** for KNX protocol implementation
-- **.NET Community** for the excellent framework
-- **Contributors** who make this project possible
-
-## 📞 Support
-
-- **Documentation**: [Wiki](https://github.com/metaneutrons/KnxMonitor/wiki)
-- **Issues**: [GitHub Issues](https://github.com/metaneutrons/KnxMonitor/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/metaneutrons/KnxMonitor/discussions)
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with both development and production Docker builds
+5. Submit a pull request
 
 ---
 
-**Built with ❤️ using .NET 9 and architecture patterns**
+**Happy KNX Monitoring!** 🎉

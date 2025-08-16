@@ -10,7 +10,7 @@ using Terminal.Gui.Views;
 namespace KnxMonitor.Services;
 
 /// <summary>
-/// Award-worthy Terminal.Gui V2 implementation for KNX Monitor.
+/// Terminal.Gui V2 implementation for KNX Monitor.
 /// Provides windowed interface with proper V2 API compatibility and coordinated shutdown.
 /// </summary>
 public partial class TuiDisplayService : IDisplayService
@@ -154,17 +154,17 @@ public partial class TuiDisplayService : IDisplayService
         {
             this.Stop();
             Application.Shutdown();
-            
+
             // Explicitly restore cursor visibility for macOS terminal compatibility
             // This fixes the issue where cursor becomes invisible after TUI exit
             RestoreCursorVisibility();
-            
+
             this.LogTerminalGuiShutdownCompleted();
         }
         catch (Exception ex)
         {
             this.LogErrorDuringTerminalGuiShutdown(ex);
-            
+
             // Ensure cursor is restored even if shutdown fails
             RestoreCursorVisibility();
         }
@@ -180,7 +180,7 @@ public partial class TuiDisplayService : IDisplayService
         {
             // Send ANSI escape sequences to restore cursor
             Console.Write("\x1b[?25h"); // Show cursor
-            Console.Write("\x1b[0m");   // Reset all attributes
+            Console.Write("\x1b[0m"); // Reset all attributes
             Console.Out.Flush();
         }
         catch
