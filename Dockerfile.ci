@@ -1,5 +1,6 @@
 # Runtime Docker image with multi-architecture support
 # Application is built in GitHub Actions and copied as framework-dependent deployment
+# This approach is needed for code signing on MacOS.
 FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine
 
 # Build arguments

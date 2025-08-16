@@ -8,23 +8,19 @@ url="https://github.com/metaneutrons/KnxMonitor"
 license=('GPL3')
 depends=('glibc' 'gcc-libs' 'openssl')
 makedepends=('dotnet-sdk>=9.0')
-optdepends=(
-    'knxd: KNX daemon for local KNX/IP gateway'
-    'docker: For containerized deployment'
-)
 source=("$pkgname-$pkgver.tar.gz::https://github.com/metaneutrons/KnxMonitor/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('SKIP')  # Will be updated with actual SHA
 
 prepare() {
     cd "$srcdir/KnxMonitor-$pkgver"
-    
+
     # Restore NuGet packages
     dotnet restore KnxMonitor/KnxMonitor.csproj
 }
 
 build() {
     cd "$srcdir/KnxMonitor-$pkgver"
-    
+
     # Determine runtime based on architecture
     case "$CARCH" in
         x86_64)
@@ -38,7 +34,7 @@ build() {
             return 1
             ;;
     esac
-    
+
     # Build the application
     dotnet publish KnxMonitor/KnxMonitor.csproj \
         --configuration Release \
@@ -53,7 +49,7 @@ build() {
 
 check() {
     cd "$srcdir/KnxMonitor-$pkgver"
-    
+
     # Basic functionality test
     ./publish/KnxMonitor --version
     ./publish/KnxMonitor --help
@@ -61,19 +57,19 @@ check() {
 
 package() {
     cd "$srcdir/KnxMonitor-$pkgver"
-    
+
     # Install binary
     install -Dm755 publish/KnxMonitor "$pkgdir/usr/bin/knxmonitor"
-    
+
     # Install documentation
     install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
     install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-    
+
     # Install man page
     if [ -f "docs/knxmonitor.1" ]; then
         install -Dm644 docs/knxmonitor.1 "$pkgdir/usr/share/man/man1/knxmonitor.1"
     fi
-    
+
     # Install example CSV file
     if [ -f "knx-addresses.csv" ]; then
         install -Dm644 knx-addresses.csv "$pkgdir/usr/share/doc/$pkgname/examples/knx-addresses.csv"
