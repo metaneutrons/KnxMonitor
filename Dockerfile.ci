@@ -1,6 +1,6 @@
 # Enterprise-grade runtime Docker image for prebuilt KNX Monitor binaries
 # Designed to work with GitVersion-tagged and code-signed prebuilt deployments
-FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS runtime
 
 # Build arguments with defaults
 ARG VERSION=1.0.0
