@@ -174,7 +174,7 @@ jobs:
           else
             echo "DEBUG: Using enterprise-grade self-contained deployment for native platforms"
             
-            # Self-contained deployment with optimized single executable
+            # Self-contained deployment with conservative settings for compatibility
             dotnet publish ${{ env.PROJECT_NAME }} \
               --configuration Release \
               --runtime ${{ matrix.runtime }} \
@@ -182,9 +182,8 @@ jobs:
               --property:PublishSingleFile=true \
               --property:IncludeNativeLibrariesForSelfExtract=true \
               --property:EnableCompressionInSingleFile=true \
-              --property:PublishTrimmed=true \
-              --property:TrimMode=partial \
-              --property:PublishReadyToRun=true \
+              --property:PublishTrimmed=false \
+              --property:PublishReadyToRun=false \
               --output ./publish/${{ matrix.runtime }} \
               --verbosity normal \
               --nologo
