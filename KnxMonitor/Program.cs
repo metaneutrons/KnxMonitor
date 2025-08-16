@@ -140,24 +140,6 @@ public static partial class Program
             };
             httpUrlOption.AllowMultipleArgumentsPerToken = true;
 
-            Option<bool> httpHealthEnabledOption = new("--http-health-enabled")
-            {
-                Description = "Expose /health and /ready endpoints on the same HTTP server",
-                DefaultValueFactory = _ => true,
-            };
-
-            Option<string> httpHealthPathOption = new("--http-health-path")
-            {
-                Description = "Path for the health endpoint",
-                DefaultValueFactory = _ => "/health",
-            };
-
-            Option<string> httpReadyPathOption = new("--http-ready-path")
-            {
-                Description = "Path for the readiness endpoint",
-                DefaultValueFactory = _ => "/ready",
-            };
-
             // Create root command using modern pattern
             RootCommand rootCommand = new(
                 "KNX Monitor - Visual debugging tool for KNX/EIB bus activity"
@@ -176,9 +158,6 @@ public static partial class Program
             rootCommand.Options.Add(httpHostOption);
             rootCommand.Options.Add(httpPathBaseOption);
             rootCommand.Options.Add(httpUrlOption);
-            rootCommand.Options.Add(httpHealthEnabledOption);
-            rootCommand.Options.Add(httpHealthPathOption);
-            rootCommand.Options.Add(httpReadyPathOption);
 
             // Parse and handle commands
             var parseResult = rootCommand.Parse(args);
@@ -207,10 +186,6 @@ public static partial class Program
             string httpHost = parseResult.GetValue(httpHostOption) ?? "localhost";
             string httpPathBase = parseResult.GetValue(httpPathBaseOption) ?? "/";
             string[] httpUrls = parseResult.GetValue(httpUrlOption) ?? Array.Empty<string>();
-            bool httpHealthEnabled = parseResult.GetValue(httpHealthEnabledOption);
-            string httpHealthPath = parseResult.GetValue(httpHealthPathOption) ?? "/health";
-            string httpReadyPath = parseResult.GetValue(httpReadyPathOption) ?? "/ready";
-
             // If -m/--multicast-address was specified, automatically switch to router mode
             bool multicastOptionUsed = args.Contains("-m") || args.Contains("--multicast-address");
             if (multicastOptionUsed)
@@ -270,9 +245,9 @@ public static partial class Program
                 httpHost,
                 httpPathBase,
                 httpUrls,
-                httpHealthEnabled,
-                httpHealthPath,
-                httpReadyPath
+                true, // Health endpoints always enabled
+                "/health", // Fixed health path
+                "/ready" // Fixed ready path
             );
         }
         finally
@@ -327,9 +302,9 @@ public static partial class Program
     /// <param name="httpHost">HTTP host/interface (default localhost).</param>
     /// <param name="httpPathBase">Base path for UI and APIs (default "/").</param>
     /// <param name="httpUrls">Explicit HttpListener prefixes (overrides host/port/path-base).</param>
-    /// <param name="httpHealthEnabled">Whether to expose /health and /ready on the same server.</param>
-    /// <param name="httpHealthPath">Path for health (default /health).</param>
-    /// <param name="httpReadyPath">Path for ready (default /ready).</param>
+    /// <param name="httpHealthEnabled">Health endpoints always enabled.</param>
+    /// <param name="httpHealthPath">Health endpoint path (always /health).</param>
+    /// <param name="httpReadyPath">Ready endpoint path (always /ready).</param>
     /// <returns>Exit code (0 = success, >0 = error).</returns>
     private static async Task<int> RunMonitorAsync(
         string? gateway,
@@ -489,7 +464,7 @@ public static partial class Program
             if (webService != null)
             {
                 var prefixes = BuildHttpPrefixes(httpUrls, httpHost, httpPort, httpPathBase);
-                await webService.StartAsync(prefixes, httpPathBase, httpHealthEnabled, httpHealthPath, httpReadyPath, _applicationCancellationTokenSource.Token);
+                await webService.StartAsync(prefixes, httpPathBase, true, "/health", "/ready", _applicationCancellationTokenSource.Token);
                 Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI started on: {string.Join(", ", prefixes)}");
             }
 
