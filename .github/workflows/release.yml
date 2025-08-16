@@ -156,15 +156,11 @@ jobs:
               --runtime ${{ matrix.runtime }} \
               --self-contained true \
               --property:PublishSingleFile=true \
-              --output ./publish/${{ matrix.runtime }}/standalone \
+              --output ./publish-packaging/${{ matrix.runtime }} \
               --verbosity normal \
               --nologo
               
-            # Copy the standalone executable to the main directory for packaging
-            if [[ -f "./publish/${{ matrix.runtime }}/standalone/KnxMonitor" ]]; then
-              cp "./publish/${{ matrix.runtime }}/standalone/KnxMonitor" "./publish/${{ matrix.runtime }}/KnxMonitor"
-              chmod +x "./publish/${{ matrix.runtime }}/KnxMonitor"
-            fi
+            echo "DEBUG: Self-contained deployment for packaging completed"
               
             echo "DEBUG: Framework-dependent deployment completed"
             
@@ -300,8 +296,11 @@ jobs:
           # Create a staging directory with all files for the archive
           mkdir -p ./archive-staging
           
-          # Copy the binary (handle Windows .exe extension)
-          if [[ "${{ matrix.runtime }}" == win-* ]]; then
+          # Copy the binary (handle Windows .exe extension and Linux packaging)
+          if [[ "${{ matrix.runtime }}" == "linux-x64" || "${{ matrix.runtime }}" == "linux-arm64" ]]; then
+            # Use self-contained executable for Linux packaging
+            cp ./publish-packaging/${{ matrix.runtime }}/KnxMonitor ./archive-staging/
+          elif [[ "${{ matrix.runtime }}" == win-* ]]; then
             cp ./publish/${{ matrix.runtime }}/KnxMonitor.exe ./archive-staging/
           else
             cp ./publish/${{ matrix.runtime }}/KnxMonitor ./archive-staging/
@@ -337,6 +336,15 @@ jobs:
           path: |
             *.zip
             *.tar.gz
+          retention-days: 1
+          compression-level: 9
+
+      - name: Upload Docker artifacts (framework-dependent)
+        if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-docker-${{ matrix.runtime }}
+          path: ./publish/${{ matrix.runtime }}/
           retention-days: 1
           compression-level: 9
 
@@ -385,7 +393,7 @@ jobs:
       - name: Download Linux binaries for Docker
         uses: actions/download-artifact@v4
         with:
-          pattern: ${{ env.PROJECT_NAME }}-linux-*
+          pattern: ${{ env.PROJECT_NAME }}-docker-linux-*
           path: ./docker-artifacts
           merge-multiple: false
 
@@ -398,21 +406,9 @@ jobs:
           mkdir -p docker-context/publish-amd64 docker-context/publish-arm64
           
           echo "INFO: Processing AMD64 (x64) artifacts..."
-          cd docker-artifacts/${{ env.PROJECT_NAME }}-linux-x64
+          cd docker-artifacts/${{ env.PROJECT_NAME }}-docker-linux-x64
           
-          # Verify archive exists
-          ARCHIVE_AMD64="${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-linux-x64.tar.gz"
-          if [[ ! -f "$ARCHIVE_AMD64" ]]; then
-            echo "ERROR: AMD64 archive not found: $ARCHIVE_AMD64"
-            ls -la
-            exit 1
-          fi
-          
-          # Extract and validate AMD64 deployment
-          tar -xzf "$ARCHIVE_AMD64"
-          echo "INFO: AMD64 archive extracted successfully"
-          
-          # Validate required files for AMD64
+          # Validate required files for AMD64 (direct directory, no archive)
           if [[ ! -f "KnxMonitor.dll" ]]; then
             echo "ERROR: KnxMonitor.dll not found in AMD64 deployment"
             echo "Available files:"
@@ -425,21 +421,9 @@ jobs:
           echo "INFO: AMD64 deployment copied to Docker context"
           
           echo "INFO: Processing ARM64 artifacts..."
-          cd ../${{ env.PROJECT_NAME }}-linux-arm64
+          cd ../${{ env.PROJECT_NAME }}-docker-linux-arm64
           
-          # Verify archive exists
-          ARCHIVE_ARM64="${{ env.PROJECT_NAME }}-${{ needs.calculate-version.outputs.version }}-linux-arm64.tar.gz"
-          if [[ ! -f "$ARCHIVE_ARM64" ]]; then
-            echo "ERROR: ARM64 archive not found: $ARCHIVE_ARM64"
-            ls -la
-            exit 1
-          fi
-          
-          # Extract and validate ARM64 deployment
-          tar -xzf "$ARCHIVE_ARM64"
-          echo "INFO: ARM64 archive extracted successfully"
-          
-          # Validate required files for ARM64
+          # Validate required files for ARM64 (direct directory, no archive)
           if [[ ! -f "KnxMonitor.dll" ]]; then
             echo "ERROR: KnxMonitor.dll not found in ARM64 deployment"
             echo "Available files:"
@@ -541,16 +525,19 @@ jobs:
         run: |
           echo "INFO: Validating built Docker images..."
           
+          # Convert project name to lowercase for Docker image name
+          IMAGE_NAME=$(echo "${{ env.PROJECT_NAME }}" | tr '[:upper:]' '[:lower:]')
+          
           # Test AMD64 image
           echo "INFO: Testing AMD64 image..."
           docker run --rm --platform linux/amd64 \
-            ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{ needs.calculate-version.outputs.version }} \
+            ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME}:${{ needs.calculate-version.outputs.version }} \
             --version
           
           # Test ARM64 image (if running on compatible hardware)
           echo "INFO: Testing ARM64 image..."
           if docker run --rm --platform linux/arm64 \
-            ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{ needs.calculate-version.outputs.version }} \
+            ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME}:${{ needs.calculate-version.outputs.version }} \
             --version 2>/dev/null; then
             echo "  ✓ ARM64 image validation successful"
           else
@@ -560,7 +547,7 @@ jobs:
           # Test help command
           echo "INFO: Testing help command..."
           docker run --rm --platform linux/amd64 \
-            ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{ needs.calculate-version.outputs.version }} \
+            ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME}:${{ needs.calculate-version.outputs.version }} \
             --help | head -5
           
           echo "INFO: Docker image validation completed successfully"
@@ -677,6 +664,9 @@ jobs:
     needs: [calculate-version, build]
     runs-on: ubuntu-latest
     if: needs.calculate-version.outputs.is-prerelease == 'false'
+    permissions:
+      contents: write
+      packages: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
