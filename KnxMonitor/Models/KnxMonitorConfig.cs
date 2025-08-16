@@ -39,6 +39,11 @@ public class KnxMonitorConfig
     /// Gets or sets the path to the KNX group address CSV file exported from ETS.
     /// </summary>
     public string? GroupAddressCsvPath { get; set; }
+
+    /// <summary>
+    /// Gets or sets the path to the KNX group address XML export (KNX GA Export 01).
+    /// </summary>
+    public string? GroupAddressXmlPath { get; set; }
 }
 
 /// <summary>

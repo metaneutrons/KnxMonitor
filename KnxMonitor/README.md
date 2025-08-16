@@ -13,7 +13,7 @@ A visual, colorful command-line application for monitoring KNX/EIB bus activity 
 - 🎯 **Advanced Filtering**: Interactive filter dialogs with pattern matching
 - 📊 **Rich Status Display**: Connection status, message count, and uptime tracking
 - 🧠 **Advanced DPT Decoding**: Falcon SDK-powered data point type decoding with auto-detection
-- 🎨 **Smart Value Formatting**: Context-aware display of decoded values (temperatures, percentages, etc.) if KNX ETS CSV file provided
+- 🎨 **Smart Value Formatting**: Context-aware display of decoded values (temperatures, percentages, etc.) with KNX group address database support
 - 🐳 **Docker Ready**: Development and production Docker containers
 - ⚡ **Hot Reload**: Development mode with automatic code reloading
 - 🎹 **Keyboard Shortcuts**: Full keyboard navigation and shortcuts
@@ -52,6 +52,16 @@ KNX Monitor features sophisticated Data Point Type (DPT) decoding using the Falc
 When running in an interactive terminal, KNX Monitor automatically launches the **Terminal.Gui V2 interface**:
 
 ### Logging Mode (Console Output)
+
+### Web Interface (non-TUI mode)
+
+- Starts automatically when not in interactive TUI mode (e.g., when output is redirected or `-l/--logging-mode` is used)
+- Default URL: `http://localhost:8671` (configurable via `--http-port`)
+- Modern, readable UI with:
+  - Live message table (updates every second)
+  - Filter control supporting patterns like `1/2/*` and exact matches
+  - CSV export
+  - Status header with connection state and total message count
 
 When output is redirected or running in containers, automatically switches to logging mode:
 
@@ -113,7 +123,28 @@ dotnet run -- --connection-type tunnel --gateway 192.168.2.8 --verbose
 | `--port` | `-p` | KNX gateway port | `3671` |
 | `--verbose` | `-v` | Enable verbose logging | `false` |
 | `--filter` | `-f` | Filter group addresses (e.g., `1/2/*` or `1/2/3`) | None |
+| `--csv` |  | Path to KNX group address CSV file (ETS export format) | None |
+| `--xml` |  | Path to KNX group address XML export (KNX GA Export 01) | None |
+| `--logging-mode` | `-l` | Force simple logging mode instead of TUI | `false` |
+| `--http-port` |  | HTTP port for the web UI (non-TUI mode) | `8671` |
 | `--test` | `-t` | Run DPT decoding tests and exit | `false` |
+
+## Group Address Database Support
+
+KNX Monitor supports loading group address databases from ETS exports in two formats:
+
+### CSV Format (ETS Export)
+- Use `--csv path/to/addresses.csv`
+- Requires ETS export format with semicolon separation
+- Expected columns: Main, Middle, Sub, Address, Central, Unfiltered, Description, DatapointType, Security
+
+### XML Format (KNX GA Export 01)
+- Use `--xml path/to/addresses.xml`
+- Supports KNX GA XML export format with namespace `http://knx.org/xml/ga-export/01`
+- Automatically extracts group addresses, names, descriptions, and DPT information
+- Handles hierarchical group names with automatic splitting
+
+**Note**: `--csv` and `--xml` options are mutually exclusive - use only one at a time.
 
 ## Usage Examples
 
@@ -125,6 +156,12 @@ dotnet run
 
 # Monitor with verbose logging
 dotnet run -- --verbose
+
+# Monitor with group address database (CSV)
+dotnet run -- --csv ~/Documents/knx-addresses.csv
+
+# Monitor with group address database (XML)
+dotnet run -- --xml ~/Documents/knx-groupaddress.xml
 
 # Monitor specific group addresses
 dotnet run -- --filter "1/2/*"

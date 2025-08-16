@@ -211,8 +211,12 @@ jobs:
           # Create a staging directory with all files for the archive
           mkdir -p ./archive-staging
           
-          # Copy the binary
-          cp ./publish/${{ matrix.runtime }}/KnxMonitor ./archive-staging/
+          # Copy the binary (handle Windows .exe extension)
+          if [[ "${{ matrix.runtime }}" == win-* ]]; then
+            cp ./publish/${{ matrix.runtime }}/KnxMonitor.exe ./archive-staging/
+          else
+            cp ./publish/${{ matrix.runtime }}/KnxMonitor ./archive-staging/
+          fi
           
           # Copy documentation files
           cp README.md ./archive-staging/ 2>/dev/null || echo "README.md not found"
@@ -562,8 +566,8 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   update-homebrew:
-    needs: [calculate-version, release, docker]
-    if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success' && (needs.docker.result == 'success' || needs.docker.result == 'skipped')
+    needs: [calculate-version, release]
+    if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: false # Don't fail the entire release if Homebrew update fails
@@ -699,6 +703,7 @@ jobs:
           echo "### 📊 Job Status" >> $GITHUB_STEP_SUMMARY
           echo "- **Version Calculation**: ${{ needs.calculate-version.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Build**: ${{ needs.build.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Linux Packaging**: ${{ needs.package-linux.result == 'success' && '✅' || needs.package-linux.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Docker**: ${{ needs.docker.result == 'success' && '✅' || needs.docker.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Release**: ${{ needs.release.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Homebrew**: ${{ needs.update-homebrew.result == 'success' && '✅' || needs.update-homebrew.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
@@ -706,6 +711,11 @@ jobs:
           echo "### 📦 Assets" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.build.result }}" == "success" ]]; then
             echo "- ✅ Platform binaries created" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [[ "${{ needs.package-linux.result }}" == "success" ]]; then
+            echo "- ✅ Linux packages (.deb, AUR) created" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.package-linux.result }}" == "failure" ]]; then
+            echo "- ❌ Linux packaging failed" >> $GITHUB_STEP_SUMMARY
           fi
           if [[ "${{ needs.docker.result }}" == "success" ]]; then
             echo "- ✅ Docker image: \`ghcr.io/metaneutrons/knxmonitor:${{ needs.calculate-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY

@@ -88,10 +88,15 @@ public static partial class Program
                 Description = "Group address filter pattern",
             };
 
-            Option<string?> csvOption = new("--groupaddress-csv", "--csv")
+            Option<string?> csvOption = new("--csv")
             {
                 Description =
                     "Path to KNX group address CSV file (ETS export format 3/1, semicolon separated)",
+            };
+
+            Option<string?> xmlOption = new("--xml")
+            {
+                Description = "Path to KNX group address XML export (KNX GA Export 01)",
             };
 
             Option<bool> loggingModeOption = new("--logging-mode", "-l")
@@ -111,6 +116,49 @@ public static partial class Program
                 Description = "Show version information including GitVersion details",
             };
 
+            Option<int> httpPortOption = new("--http-port")
+            {
+                Description = "HTTP port for the web interface (only when not in TUI mode)",
+                DefaultValueFactory = _ => 8671,
+            };
+
+            Option<string> httpHostOption = new("--http-host")
+            {
+                Description = "HTTP host/interface to bind (e.g., localhost, 0.0.0.0, 192.168.1.10)",
+                DefaultValueFactory = _ => "localhost",
+            };
+
+            Option<string> httpPathBaseOption = new("--http-path-base")
+            {
+                Description = "Base path for the web interface and APIs (e.g., /knx)",
+                DefaultValueFactory = _ => "/",
+            };
+
+            Option<string[]> httpUrlOption = new("--http-url")
+            {
+                Description = "Full HttpListener prefix(es) to bind (overrides host/port/path-base). Can be repeated.",
+                Arity = ArgumentArity.ZeroOrMore,
+            };
+            httpUrlOption.AllowMultipleArgumentsPerToken = true;
+
+            Option<bool> httpHealthEnabledOption = new("--http-health-enabled")
+            {
+                Description = "Expose /health and /ready endpoints on the same HTTP server",
+                DefaultValueFactory = _ => true,
+            };
+
+            Option<string> httpHealthPathOption = new("--http-health-path")
+            {
+                Description = "Path for the health endpoint",
+                DefaultValueFactory = _ => "/health",
+            };
+
+            Option<string> httpReadyPathOption = new("--http-ready-path")
+            {
+                Description = "Path for the readiness endpoint",
+                DefaultValueFactory = _ => "/ready",
+            };
+
             // Create root command using modern pattern
             RootCommand rootCommand = new(
                 "KNX Monitor - Visual debugging tool for KNX/EIB bus activity"
@@ -122,64 +170,29 @@ public static partial class Program
             rootCommand.Options.Add(verboseOption);
             rootCommand.Options.Add(filterOption);
             rootCommand.Options.Add(csvOption);
+            rootCommand.Options.Add(xmlOption);
             rootCommand.Options.Add(loggingModeOption);
             rootCommand.Options.Add(enableHealthCheckOption);
             rootCommand.Options.Add(versionOption);
+            rootCommand.Options.Add(httpPortOption);
+            rootCommand.Options.Add(httpHostOption);
+            rootCommand.Options.Add(httpPathBaseOption);
+            rootCommand.Options.Add(httpUrlOption);
+            rootCommand.Options.Add(httpHealthEnabledOption);
+            rootCommand.Options.Add(httpHealthPathOption);
+            rootCommand.Options.Add(httpReadyPathOption);
 
-            // Parse the command line arguments
-            ParseResult parseResult = rootCommand.Parse(args);
+            // Parse and handle commands
+            var parseResult = rootCommand.Parse(args);
 
-            // Check if help was requested - if so, let the system handle it
-            if (args.Contains("--help") || args.Contains("-h") || args.Contains("-?"))
+            // Check if parsing failed or help was requested
+            if (parseResult.Errors.Count > 0 || args.Contains("--help") || args.Contains("-h") || args.Contains("--version"))
             {
-                Console.WriteLine(rootCommand.Description);
-                Console.WriteLine();
-                Console.WriteLine("Options:");
-
-                // Define help entries explicitly for better control
-                var helpEntries = new[]
+                var result = parseResult.Invoke();
+                if (result != 0 || args.Contains("--help") || args.Contains("-h") || args.Contains("--version"))
                 {
-                    ("-h, -?, --help", "Show help and usage information"),
-                    ("--version", "Show version information including GitVersion details"),
-                    ("-g, --gateway", "KNX gateway address (required for tunnel connections only)"),
-                    ("-c, --connection-type", "Connection type: tunnel (default), router, usb"),
-                    (
-                        "-m, --multicast-address",
-                        "Use router mode with multicast address (default: 224.0.23.12)"
-                    ),
-                    ("-p, --port", "Port number (default: 3671)"),
-                    ("-v, --verbose", "Enable verbose logging"),
-                    ("-f, --filter", "Group address filter pattern"),
-                    (
-                        "--csv, --groupaddress-csv",
-                        "Path to KNX group address CSV file (ETS export format)"
-                    ),
-                    ("-l, --logging-mode", "Force simple logging mode instead of TUI"),
-                    ("--enable-health-check", "Enable HTTP health check service on port 8080"),
-                };
-
-                foreach (var (aliases, description) in helpEntries)
-                {
-                    Console.WriteLine($"  {aliases,-27} {description}");
+                    return result;
                 }
-                return 0;
-            }
-
-            // Check if version was requested
-            if (args.Contains("--version"))
-            {
-                DisplayVersionInformation();
-                return 0;
-            }
-
-            // Check for parsing errors
-            if (parseResult.Errors.Count > 0)
-            {
-                foreach (ParseError parseError in parseResult.Errors)
-                {
-                    Console.Error.WriteLine(parseError.Message);
-                }
-                return 1;
             }
 
             // Extract parsed values with null checks
@@ -190,8 +203,16 @@ public static partial class Program
             bool verbose = parseResult.GetValue(verboseOption);
             string? filter = parseResult.GetValue(filterOption);
             string? csvPath = parseResult.GetValue(csvOption);
+            string? xmlPath = parseResult.GetValue(xmlOption);
             bool loggingMode = parseResult.GetValue(loggingModeOption);
             bool enableHealthCheck = parseResult.GetValue(enableHealthCheckOption);
+            int httpPort = parseResult.GetValue(httpPortOption);
+            string httpHost = parseResult.GetValue(httpHostOption) ?? "localhost";
+            string httpPathBase = parseResult.GetValue(httpPathBaseOption) ?? "/";
+            string[] httpUrls = parseResult.GetValue(httpUrlOption) ?? Array.Empty<string>();
+            bool httpHealthEnabled = parseResult.GetValue(httpHealthEnabledOption);
+            string httpHealthPath = parseResult.GetValue(httpHealthPathOption) ?? "/health";
+            string httpReadyPath = parseResult.GetValue(httpReadyPathOption) ?? "/ready";
 
             // If -m/--multicast-address was specified, automatically switch to router mode
             bool multicastOptionUsed = args.Contains("-m") || args.Contains("--multicast-address");
@@ -217,6 +238,13 @@ public static partial class Program
                 multicastAddress = "224.0.23.12";
             }
 
+            // Enforce XOR between --csv and --xml
+            if (!string.IsNullOrEmpty(csvPath) && !string.IsNullOrEmpty(xmlPath))
+            {
+                Console.Error.WriteLine("Error: --csv and --xml cannot be used together. Please specify only one.");
+                return 1;
+            }
+
             // Validate required parameters based on connection type
             if (connectionType.ToLowerInvariant() == "tunnel" && string.IsNullOrEmpty(gateway))
             {
@@ -238,8 +266,16 @@ public static partial class Program
                 verbose,
                 filter,
                 csvPath,
+                xmlPath,
                 loggingMode,
-                enableHealthCheck
+                enableHealthCheck,
+                httpPort,
+                httpHost,
+                httpPathBase,
+                httpUrls,
+                httpHealthEnabled,
+                httpHealthPath,
+                httpReadyPath
             );
         }
         finally
@@ -287,8 +323,16 @@ public static partial class Program
     /// <param name="verbose">Enable verbose logging.</param>
     /// <param name="filter">Group address filter.</param>
     /// <param name="csvPath">Path to KNX group address CSV file exported from ETS.</param>
+    /// <param name="xmlPath">Path to KNX group address XML export (KNX GA Export 01).</param>
     /// <param name="loggingMode">Force simple logging mode instead of TUI.</param>
     /// <param name="enableHealthCheck">Enable HTTP health check service (auto-enabled in containers).</param>
+    /// <param name="httpPort">HTTP port for the web UI (default 8671).</param>
+    /// <param name="httpHost">HTTP host/interface (default localhost).</param>
+    /// <param name="httpPathBase">Base path for UI and APIs (default "/").</param>
+    /// <param name="httpUrls">Explicit HttpListener prefixes (overrides host/port/path-base).</param>
+    /// <param name="httpHealthEnabled">Whether to expose /health and /ready on the same server.</param>
+    /// <param name="httpHealthPath">Path for health (default /health).</param>
+    /// <param name="httpReadyPath">Path for ready (default /ready).</param>
     /// <returns>Exit code (0 = success, >0 = error).</returns>
     private static async Task<int> RunMonitorAsync(
         string? gateway,
@@ -298,14 +342,23 @@ public static partial class Program
         bool verbose,
         string? filter,
         string? csvPath,
+        string? xmlPath,
         bool loggingMode,
-        bool enableHealthCheck
+        bool enableHealthCheck,
+        int httpPort,
+        string httpHost,
+        string httpPathBase,
+        string[] httpUrls,
+        bool httpHealthEnabled,
+        string httpHealthPath,
+        string httpReadyPath
     )
     {
         IHost? host = null;
         IKnxMonitorService? monitorService = null;
         IDisplayService? displayService = null;
         HealthCheckService? healthCheckService = null;
+        WebUiService? webUiService = null;
 
         try
         {
@@ -319,6 +372,7 @@ public static partial class Program
                 Verbose = verbose,
                 Filter = filter,
                 GroupAddressCsvPath = csvPath,
+                GroupAddressXmlPath = xmlPath,
             };
 
             // Validate configuration
@@ -372,18 +426,7 @@ public static partial class Program
                     // 🚀 Use simplified Falcon SDK-only KNX monitoring service
                     services.AddSingleton<IKnxMonitorService, KnxMonitorService>();
 
-                    // Health check service registration logic:
-                    // - Enabled by default in Docker containers (for container health monitoring)
-                    // - Disabled by default in standalone mode (unless --enable-health-check is used)
-                    bool shouldEnableHealthCheck =
-                        enableHealthCheck
-                        || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")
-                            == "true";
-
-                    if (shouldEnableHealthCheck)
-                    {
-                        services.AddSingleton<HealthCheckService>();
-                    }
+                    // Health endpoints are served from WebUiService now; no separate service by default.
 
                     // Register appropriate display service based on environment
                     if (ShouldUseTuiMode(loggingMode))
@@ -397,6 +440,7 @@ public static partial class Program
                     else
                     {
                         services.AddSingleton<IDisplayService, DisplayService>();
+                        services.AddSingleton<WebUiService>();
                     }
                 });
 
@@ -405,28 +449,12 @@ public static partial class Program
             // Get services
             monitorService = host.Services.GetRequiredService<IKnxMonitorService>();
             displayService = host.Services.GetRequiredService<IDisplayService>();
-
-            // Conditionally get health check service (same logic as registration)
-            bool shouldEnableHealthCheck =
-                enableHealthCheck
-                || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-
-            if (shouldEnableHealthCheck)
+            if (!ShouldUseTuiMode(loggingMode))
             {
-                healthCheckService = host.Services.GetRequiredService<HealthCheckService>();
+                webUiService = host.Services.GetRequiredService<WebUiService>();
             }
 
-            // Start health check service if enabled
-            if (healthCheckService != null)
-            {
-                await healthCheckService.StartAsync(
-                    8080,
-                    _applicationCancellationTokenSource.Token
-                );
-                Console.WriteLine(
-                    $"[{DateTime.Now:HH:mm:ss.fff}] Health check service started on port 8080"
-                );
-            }
+            // Health endpoints are integrated into the Web UI; no separate health listener is started.
 
             // Start monitoring service first
             try
@@ -440,6 +468,14 @@ public static partial class Program
             {
                 Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] {ex.Message} Exiting.");
                 return 2; // Exit code 2 for connection failure
+            }
+
+            // Start web UI when not in TUI mode
+            if (webUiService != null)
+            {
+                var prefixes = BuildHttpPrefixes(httpUrls, httpHost, httpPort, httpPathBase);
+                await webUiService.StartAsync(prefixes, httpPathBase, httpHealthEnabled, httpHealthPath, httpReadyPath, _applicationCancellationTokenSource.Token);
+                Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI started on: {string.Join(", ", prefixes)}");
             }
 
             // Start display service with proper lifecycle coordination
@@ -493,11 +529,13 @@ public static partial class Program
     /// <param name="monitorService">The KNX monitor service.</param>
     /// <param name="displayService">The display service.</param>
     /// <param name="healthCheckService">The health check service.</param>
+    /// <param name="webUiService">The web user interface service.</param>
     private static async Task CleanupServicesAsync(
         IHost? host,
         IKnxMonitorService? monitorService,
         IDisplayService? displayService,
-        HealthCheckService? healthCheckService = null
+        HealthCheckService? healthCheckService = null,
+        WebUiService? webUiService = null
     )
     {
         try
@@ -522,7 +560,21 @@ public static partial class Program
                 }
             }
 
-            // Stop display service first (this handles TUI shutdown)
+            // Stop web UI
+            if (webUiService != null)
+            {
+                try
+                {
+                    await webUiService.StopAsync();
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Web UI stopped");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Error stopping Web UI: {ex.Message}");
+                }
+            }
+
+            // Stop display service (this handles TUI shutdown)
             if (displayService != null)
             {
                 try
@@ -585,6 +637,33 @@ public static partial class Program
         {
             Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Error during cleanup: {ex.Message}");
         }
+    }
+
+    private static List<string> BuildHttpPrefixes(string[] urls, string host, int port, string pathBase)
+    {
+        static string EnsureTrailingSlash(string s) => s.EndsWith("/") ? s : s + "/";
+        static string NormalizePathBase(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return "/";
+            if (!s.StartsWith('/')) s = "/" + s;
+            return s.EndsWith('/') ? s : s + "/";
+        }
+
+        var list = new List<string>();
+        if (urls != null && urls.Length > 0)
+        {
+            foreach (var u in urls)
+            {
+                if (string.IsNullOrWhiteSpace(u)) continue;
+                list.Add(EnsureTrailingSlash(u));
+            }
+            return list;
+        }
+
+        var basePath = NormalizePathBase(pathBase);
+        var prefix = $"http://{host}:{port}{basePath}";
+        list.Add(prefix);
+        return list;
     }
 
     /// <summary>

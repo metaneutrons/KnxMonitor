@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KNX Monitor</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>KNX Monitor</h1>
+    <div id="status" class="status">Connecting…</div>
+    <div class="controls">
+      <input id="filter" type="text" placeholder="Filter (e.g. 1/2/* or 1/2/3)" />
+      <button id="applyFilter">Apply</button>
+      <button id="clearFilter" class="secondary">Clear</button>
+      <a id="export" href="#" download>Export CSV</a>
+    </div>
+  </header>
+  <main>
+    <table id="messages">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Type</th>
+          <th>Source</th>
+          <th>Group</th>
+          <th>Value</th>
+          <th>Priority</th>
+          <th>DPT</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+  <footer>
+    <small>Live KNX monitor. Refreshes every 1s.</small>
+  </footer>
+  <script src="/app.js"></script>
+</body>
+</html>
+

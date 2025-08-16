@@ -8,9 +8,9 @@ namespace KnxMonitor.Services;
 /// </summary>
 public partial class KnxGroupAddressDatabase
 {
-    // CSV Loading Operations (3000-3099)
-    [LoggerMessage(3001, LogLevel.Information, "Loaded {LoadedCount} group addresses from {CsvFilePath}")]
-    private partial void LogGroupAddressesLoaded(int loadedCount, string csvFilePath);
+    // CSV/XML Loading Operations (3000-3099)
+    [LoggerMessage(3001, LogLevel.Information, "Loaded {LoadedCount} group addresses from {FilePath}")]
+    private partial void LogGroupAddressesLoaded(int loadedCount, string filePath);
 
     [LoggerMessage(3002, LogLevel.Warning, "Error parsing CSV line {LineNumber}: {ErrorMessage}")]
     private partial void LogCsvParsingError(Exception ex, int lineNumber, string errorMessage);

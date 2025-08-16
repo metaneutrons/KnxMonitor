@@ -3,12 +3,12 @@ using Microsoft.Extensions.Logging;
 
 namespace KnxMonitor.Services;
 
-/// <summary>
-/// Database for KNX group addresses loaded from ETS CSV export.
-/// Supports ETS export format "3/1" with semicolon separation.
-/// </summary>
-public partial class KnxGroupAddressDatabase
-{
+    /// <summary>
+    /// Database for KNX group addresses loaded from ETS CSV or XML export.
+    /// Supports ETS CSV export format "3/1" with semicolon separation and KNX GA XML export (01).
+    /// </summary>
+    public partial class KnxGroupAddressDatabase
+    {
     private readonly Dictionary<string, GroupAddressInfo> _groupAddresses = new();
     private readonly ILogger<KnxGroupAddressDatabase> _logger;
 
@@ -97,6 +97,72 @@ public partial class KnxGroupAddressDatabase
     /// Gets a value indicating whether a CSV file has been successfully loaded.
     /// </summary>
     public bool IsCsvLoaded { get; private set; }
+
+    /// <summary>
+    /// Loads group addresses from KNX GA XML export (01).
+    /// </summary>
+    public async Task LoadFromXmlAsync(string xmlFilePath)
+    {
+        if (!File.Exists(xmlFilePath))
+        {
+            throw new FileNotFoundException($"XML file not found: {xmlFilePath}");
+        }
+
+        // The KNX GA XML uses a default namespace; read with streaming XmlReader
+        // KNX GA XML uses default namespace; not needed since we read attributes only.
+        using var stream = File.OpenRead(xmlFilePath);
+        using var reader = System.Xml.XmlReader.Create(stream, new System.Xml.XmlReaderSettings { Async = true });
+
+        int loaded = 0;
+        while (await reader.ReadAsync())
+        {
+            if (reader.NodeType == System.Xml.XmlNodeType.Element && reader.LocalName == "GroupAddress")
+            {
+                // Move to attributes and extract
+                var name = reader.GetAttribute("Name");
+                var address = reader.GetAttribute("Address") ?? string.Empty;
+                var description = reader.GetAttribute("Description") ?? string.Empty;
+                var dtps = reader.GetAttribute("DPTs") ?? string.Empty;
+
+                if (string.IsNullOrWhiteSpace(address) || !IsValidGroupAddress(address))
+                {
+                    continue;
+                }
+
+                // split DPTs list (comma separated) and pick first if present
+                string datapoint = dtps;
+                if (!string.IsNullOrWhiteSpace(dtps))
+                {
+                    var first = dtps.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).FirstOrDefault();
+                    datapoint = first ?? string.Empty;
+                }
+
+                // Name may be hierarchical with separators like "A / B / C"; try to split
+                string main = string.Empty, middle = string.Empty, sub = string.Empty;
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    var parts = name.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    if (parts.Length == 1) { sub = parts[0]; }
+                    else if (parts.Length == 2) { middle = parts[0]; sub = parts[1]; }
+                    else if (parts.Length >= 3) { main = parts[0]; middle = parts[1]; sub = string.Join(" / ", parts.Skip(2)); }
+                }
+
+                _groupAddresses[address] = new GroupAddressInfo
+                {
+                    Address = address,
+                    Main = main,
+                    Middle = middle,
+                    Sub = sub,
+                    Description = description,
+                    DatapointType = datapoint,
+                };
+                loaded++;
+            }
+        }
+
+        this.LogGroupAddressesLoaded(loaded, xmlFilePath);
+        IsCsvLoaded = true; // reuse flag for now
+    }
 
     /// <summary>
     /// Splits CSV content into logical lines, handling multi-line quoted fields.
