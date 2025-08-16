@@ -8,6 +8,7 @@ A visual, colorful command-line application for monitoring KNX/EIB bus activity 
 
 - 🎨 **Terminal.Gui V2 Interface**: Beautiful, interactive TUI with real-time updates
 - 🔄 **Dual-Mode Architecture**: Automatic switching between TUI and logging modes
+- 🌐 **Modern Web Interface**: Real-time browser-based monitoring with live updates and filtering
 - 🔌 **Multiple Connection Types**: Support for IP Tunneling, IP Routing, and USB
 - 🔍 **Real-time Monitoring**: Live display of all KNX bus activity with zero flickering
 - 🎯 **Advanced Filtering**: Interactive filter dialogs with pattern matching
@@ -51,17 +52,23 @@ KNX Monitor features sophisticated Data Point Type (DPT) decoding using the Falc
 
 When running in an interactive terminal, KNX Monitor automatically launches the **Terminal.Gui V2 interface**:
 
+### Web Interface
+
+KNX Monitor includes a **modern web interface** that provides real-time monitoring through your browser:
+
+- **Automatic activation**: Starts when running in containers, with redirected output, or using `-l/--logging-mode`
+- **Manual activation**: Use `-l/--logging-mode` to force web interface mode
+- **Default URL**: `http://localhost:8671` (configurable via `--http-port`)
+- **Features**:
+  - 📊 Live message table with real-time updates
+  - 🔍 Advanced filtering (supports patterns like `1/2/*` and exact matches)
+  - 📤 CSV export functionality
+  - 📈 Connection status and message count display
+  - 🎨 Clean, responsive design
+
+**Access the web interface**: Open `http://localhost:8671` in your browser when running in non-TUI mode.
+
 ### Logging Mode (Console Output)
-
-### Web Interface (non-TUI mode)
-
-- Starts automatically when not in interactive TUI mode (e.g., when output is redirected or `-l/--logging-mode` is used)
-- Default URL: `http://localhost:8671` (configurable via `--http-port`)
-- Modern, readable UI with:
-  - Live message table (updates every second)
-  - Filter control supporting patterns like `1/2/*` and exact matches
-  - CSV export
-  - Status header with connection state and total message count
 
 When output is redirected or running in containers, automatically switches to logging mode:
 
@@ -167,6 +174,14 @@ dotnet run -- --xml ~/Documents/knx-groupaddress.xml
 
 # Monitor specific group addresses
 dotnet run -- --filter "1/2/*"
+
+# Use web interface (force non-TUI mode)
+dotnet run -- --logging-mode
+# Then open http://localhost:8671 in your browser
+
+# Web interface on custom port
+dotnet run -- --logging-mode --http-port 9000
+# Then open http://localhost:9000 in your browser
 ```
 
 ### Different Connection Types
