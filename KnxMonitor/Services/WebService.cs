@@ -57,7 +57,10 @@ public class WebService
             // In normal mode, suppress ASP.NET Core noise
             builder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None)
                            .AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.None)
-                           .AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.None);
+                           .AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.None)
+                           .AddFilter("Microsoft.AspNetCore.Routing", LogLevel.None)
+                           .AddFilter("Microsoft.AspNetCore.Http.Result", LogLevel.None)
+                           .AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
         }
         // In verbose mode, show all Kestrel startup messages
 
@@ -278,7 +281,7 @@ public class WebService
         <div class="footer">
             <span id="messageCount">0 messages</span>
             <span>•</span>
-            <span>Powered by ASP.NET Core Kestrel</span>
+            <span>Made with ❤️ in Hannover • <a href="https://github.com/metaneutrons/KnxMonitor" target="_blank">⭐ GitHub</a></span>
         </div>
     </div>
 
@@ -428,6 +431,17 @@ tr:hover {
     margin-top: 20px;
     color: #7f8c8d;
     font-size: 14px;
+}
+
+.footer a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer a:hover {
+    color: #2980b9;
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {
