@@ -34,4 +34,7 @@
     <PackageReference Include="Terminal.Gui" />
     <PackageReference Include="Polly" />
   </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 </Project>

@@ -60,7 +60,18 @@ public class WebUiService
             var pp = p.EndsWith("/") ? p : p + "/";
             _listener.Prefixes.Add(pp);
         }
-        _listener.Start();
+        
+        try
+        {
+            _listener.Start();
+        }
+        catch (HttpListenerException ex)
+        {
+            _logger.LogWarning("HttpListener not supported in this environment: {Message}. Web UI disabled.", ex.Message);
+            _listener?.Close();
+            _listener = null;
+            return Task.CompletedTask;
+        }
 
         _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
         _loop = Task.Run(() => LoopAsync(_cts.Token), _cts.Token);
