@@ -20,6 +20,11 @@ namespace KnxMonitor;
 /// </summary>
 public static partial class Program
 {
+    /// <summary>
+    /// Global verbose flag for logging configuration
+    /// </summary>
+    public static bool IsVerbose { get; private set; }
+
     private static readonly TaskCompletionSource<bool> _shutdownCompletionSource = new();
     private static readonly CancellationTokenSource _applicationCancellationTokenSource = new();
     private static bool _shutdownRequested = false;
@@ -354,6 +359,9 @@ public static partial class Program
         string httpReadyPath
     )
     {
+        // Set global verbose flag for other components
+        IsVerbose = verbose;
+
         IHost? host = null;
         IKnxMonitorService? monitorService = null;
         IDisplayService? displayService = null;
@@ -416,6 +424,14 @@ public static partial class Program
                             options.VerboseExceptions = verbose;
                         });
                         logging.SetMinimumLevel(verbose ? LogLevel.Debug : LogLevel.Information);
+                        
+                        // Configure ASP.NET Core logging filters based on verbose flag
+                        if (!verbose)
+                        {
+                            logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None)
+                                   .AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.None)
+                                   .AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.None);
+                        }
                     }
                 })
                 .ConfigureServices(services =>

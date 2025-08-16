@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -48,13 +49,17 @@ public class WebService
             options.ListenAnyIP(port);
         });
 
-        // Minimal logging setup - suppress ASP.NET Core startup messages
-        builder.Logging.ClearProviders()
-            .AddConsole()
-            .AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None)
-            .AddFilter("Microsoft.AspNetCore", LogLevel.Warning)
-            .AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.None)
-            .AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.None);
+        // Configure logging based on global verbose flag
+        builder.Logging.ClearProviders().AddConsole();
+        
+        if (!Program.IsVerbose)
+        {
+            // In normal mode, suppress ASP.NET Core noise
+            builder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None)
+                           .AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.None)
+                           .AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.None);
+        }
+        // In verbose mode, show all Kestrel startup messages
 
         _app = builder.Build();
 
