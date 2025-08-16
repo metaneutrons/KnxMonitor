@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using KnxMonitor.Models;
 using Microsoft.Extensions.Logging;
 
@@ -95,13 +96,25 @@ public class WebUiService
             {
                 case "/":
                 case "/index.html":
+#if DEBUG
                     await ServeStaticAsync(res, "index.html", "text/html; charset=utf-8");
+#else
+                    await ServeEmbeddedAsync(res, "index.html", "text/html; charset=utf-8");
+#endif
                     break;
                 case "/styles.css":
+#if DEBUG
                     await ServeStaticAsync(res, "styles.css", "text/css; charset=utf-8");
+#else
+                    await ServeEmbeddedAsync(res, "styles.css", "text/css; charset=utf-8");
+#endif
                     break;
                 case "/app.js":
+#if DEBUG
                     await ServeStaticAsync(res, "app.js", "application/javascript; charset=utf-8");
+#else
+                    await ServeEmbeddedAsync(res, "app.js", "application/javascript; charset=utf-8");
+#endif
                     break;
                 case "/api/status":
                     await JsonAsync(res, new
@@ -277,6 +290,8 @@ public class WebUiService
 
     // Static assets served from disk (wwwroot within application base directory)
     private static readonly string WebRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
+    private static readonly Assembly ThisAssembly = typeof(WebUiService).Assembly;
+    private const string ResourcePrefix = "KnxMonitor.wwwroot.";
 
     private static async Task ServeStaticAsync(HttpListenerResponse res, string fileName, string contentType)
     {
@@ -288,12 +303,28 @@ public class WebUiService
             var bytes = await File.ReadAllBytesAsync(path);
             res.ContentLength64 = bytes.LongLength;
             await res.OutputStream.WriteAsync(bytes);
+            return;
         }
-        else
+
+        // Fallback to embedded if file not found on disk
+        await ServeEmbeddedAsync(res, fileName, contentType);
+    }
+
+    private static async Task ServeEmbeddedAsync(HttpListenerResponse res, string fileName, string contentType)
+    {
+        var resourceName = ResourcePrefix + fileName.Replace('/', '.');
+        await using var stream = ThisAssembly.GetManifestResourceStream(resourceName);
+        if (stream == null)
         {
             res.StatusCode = 404;
             await WriteAsync(res, "Not Found");
+            return;
         }
+        res.StatusCode = 200;
+        res.ContentType = contentType;
+        // ContentLength64 may not be available for all streams; copy without setting if needed
+        try { res.ContentLength64 = stream.Length; } catch { }
+        await stream.CopyToAsync(res.OutputStream);
     }
 }
 

@@ -21,6 +21,7 @@
     <Content Include="wwwroot/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="wwwroot/**" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Knx.Falcon.Sdk" />
