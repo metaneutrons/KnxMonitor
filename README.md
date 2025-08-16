@@ -93,6 +93,42 @@ dotnet run
 dotnet run -- --connection-type tunnel --gateway 192.168.2.8 --verbose
 ```
 
+## 🛠️ Command Line Options
+
+| Option | Short | Description | Default | Example |
+|--------|-------|-------------|---------|---------|
+| `--gateway` | `-g` | KNX gateway IP address | `localhost` | `--gateway 192.168.1.100` |
+| `--connection-type` | `-c` | Connection type | `tunnel` | `--connection-type router` |
+| `--port` | `-p` | Gateway port | `3671` | `--port 3672` |
+| `--multicast-address` | `-m` | Multicast address (router mode) | `224.0.23.12` | `--multicast-address 224.0.23.13` |
+| `--verbose` | `-v` | **Enable verbose logging** | `false` | `--verbose` |
+| `--filter` | `-f` | Group address filter | None | `--filter "1/2/*"` |
+| `--csv` | | Path to ETS CSV export | None | `--csv addresses.csv` |
+| `--xml` | | Path to ETS XML export | None | `--xml project.xml` |
+| `--logging-mode` | | Logging mode | `auto` | `--logging-mode console` |
+| `--http-port` | | Web UI port | `8080` | `--http-port 8671` |
+
+### 🔍 Verbose Mode
+
+The `--verbose` flag enables detailed logging for debugging and development:
+
+**Normal Mode (default):**
+```bash
+dotnet run -- --gateway 192.168.1.100
+# Clean output - only KNX monitoring messages
+[22:01:24.022] Write 1.1.40 -> 5/1/40 = 22.80°C (Raw: 0891)
+```
+
+**Verbose Mode:**
+```bash
+dotnet run -- --gateway 192.168.1.100 --verbose
+# Detailed logging including:
+# - Full exception stack traces
+# - ASP.NET Core Kestrel startup messages
+# - Connection debugging information
+# - Internal component logging
+```
+
 ## ⌨️ Keyboard Shortcuts (Interactive Mode)
 
 | Shortcut | Action | Description |
