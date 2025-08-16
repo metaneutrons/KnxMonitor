@@ -211,8 +211,12 @@ jobs:
           # Create a staging directory with all files for the archive
           mkdir -p ./archive-staging
           
-          # Copy the binary
-          cp ./publish/${{ matrix.runtime }}/KnxMonitor ./archive-staging/
+          # Copy the binary (handle Windows .exe extension)
+          if [[ "${{ matrix.runtime }}" == win-* ]]; then
+            cp ./publish/${{ matrix.runtime }}/KnxMonitor.exe ./archive-staging/
+          else
+            cp ./publish/${{ matrix.runtime }}/KnxMonitor ./archive-staging/
+          fi
           
           # Copy documentation files
           cp README.md ./archive-staging/ 2>/dev/null || echo "README.md not found"
