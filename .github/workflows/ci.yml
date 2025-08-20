@@ -162,7 +162,7 @@ jobs:
         run: dotnet publish KnxMonitor/KnxMonitor.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained true --output ./publish/${{ matrix.runtime }} -p:PublishSingleFile=true
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: knxmonitor-${{ matrix.artifact-name }}-${{ needs.validate.outputs.version }}
           path: ./publish/${{ matrix.runtime }}/
