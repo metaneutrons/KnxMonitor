@@ -33,7 +33,7 @@ jobs:
       should-build: ${{ steps.changes.outputs.src }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -51,7 +51,7 @@ jobs:
 
       - name: Setup .NET
         if: steps.changes.outputs.src == 'true'
-        uses: actions/setup-dotnet@v4.1.0
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -100,12 +100,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4.1.0
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -119,7 +119,7 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.0.0
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4.1.2
+        uses: actions/cache@v4.3
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props') }}
@@ -162,7 +162,7 @@ jobs:
         run: dotnet publish KnxMonitor/KnxMonitor.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained true --output ./publish/${{ matrix.runtime }} -p:PublishSingleFile=true
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4.4.3
+        uses: actions/upload-artifact@v5
         with:
           name: knxmonitor-${{ matrix.artifact-name }}-${{ needs.validate.outputs.version }}
           path: ./publish/${{ matrix.runtime }}/
@@ -179,12 +179,12 @@ jobs:
       security-events: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Full git history needed for GitVersion
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4.1.0
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -200,7 +200,7 @@ jobs:
           fi
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3.27.6
+        uses: github/codeql-action/init@v4.31
         with:
           languages: csharp
           queries: security-and-quality
@@ -209,4 +209,4 @@ jobs:
         run: dotnet build --configuration Release --verbosity minimal
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3.27.6
+        uses: github/codeql-action/analyze@v4.31
