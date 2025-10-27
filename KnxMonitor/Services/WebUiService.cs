@@ -13,7 +13,7 @@ namespace KnxMonitor.Services;
 /// Lightweight web UI service hosting a minimal REST API and static frontend.
 /// Built for readability and best-practice minimalism without ASP.NET dependencies.
 /// </summary>
-public class WebUiService
+public partial class WebUiService
 {
     private readonly ILogger<WebUiService> _logger;
     private readonly IKnxMonitorService _knx;
