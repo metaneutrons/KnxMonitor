@@ -838,63 +838,55 @@ jobs:
           echo "macOS x64 SHA256: ${MACOS_X64_SHA}"
           echo "macOS ARM64 SHA256: ${MACOS_ARM64_SHA}"
 
-      - name: Update Homebrew formula (if token available)
-        if: env.HOMEBREW_UPDATE_TOKEN != ''
-        uses: peter-evans/repository-dispatch@v3.0.0
-        with:
-          token: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
-          repository: metaneutrons/homebrew-tap
-          event-type: update-formula
-          client-payload: |
-            {
-              "version": "${{ needs.calculate-version.outputs.version }}",
-              "macos_x64_sha": "${{ steps.checksums.outputs.macos_x64_sha }}",
-              "macos_arm64_sha": "${{ steps.checksums.outputs.macos_arm64_sha }}"
-            }
+      - name: Update Homebrew tap
+        if: needs.calculate-version.outputs.is-prerelease == 'false'
         env:
-          HOMEBREW_UPDATE_TOKEN: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
-
-      - name: Create Homebrew update instructions (fallback)
-        if: env.HOMEBREW_UPDATE_TOKEN == ''
-        env:
-          HOMEBREW_UPDATE_TOKEN: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
+          TAP_TOKEN: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
         run: |
-          cat << EOF > homebrew-update.md
-          ## 🍺 Homebrew Formula Update Required
+          VERSION=${{ needs.calculate-version.outputs.version }}
+          X64_SHA=${{ steps.checksums.outputs.macos_x64_sha }}
+          ARM64_SHA=${{ steps.checksums.outputs.macos_arm64_sha }}
+          
+          git clone https://x-access-token:${TAP_TOKEN}@github.com/metaneutrons/homebrew-tap.git
+          cd homebrew-tap
+          mkdir -p Formula
+          
+          cat > Formula/knxmonitor.rb << EOF
+          class Knxmonitor < Formula
+            desc "KNX/EIB bus monitoring and debugging tool"
+            homepage "https://github.com/metaneutrons/KnxMonitor"
+            version "${VERSION}"
+            license "GPL-3.0"
 
-          **Version**: ${{ needs.calculate-version.outputs.version }}
-          **macOS x64 SHA256**: \`${{ steps.checksums.outputs.macos_x64_sha }}\`
-          **macOS ARM64 SHA256**: \`${{ steps.checksums.outputs.macos_arm64_sha }}\`
+            on_macos do
+              if Hardware::CPU.intel?
+                url "https://github.com/metaneutrons/KnxMonitor/releases/download/v${VERSION}/KnxMonitor-${VERSION}-osx-x64.tar.gz"
+                sha256 "${X64_SHA}"
+              else
+                url "https://github.com/metaneutrons/KnxMonitor/releases/download/v${VERSION}/KnxMonitor-${VERSION}-osx-arm64.tar.gz"
+                sha256 "${ARM64_SHA}"
+              end
+            end
 
-          ### Manual Update Steps:
+            def install
+              bin.install "KnxMonitor" => "knxmonitor"
+              man1.install "docs/knxmonitor.1" if File.exist?("docs/knxmonitor.1")
+            end
 
-          1. Go to [homebrew-tap repository](https://github.com/metaneutrons/homebrew-tap)
-          2. Edit \`knxmonitor.rb\`
-          3. Update version to: \`${{ needs.calculate-version.outputs.version }}\`
-          4. Update Intel Mac SHA256 to: \`${{ steps.checksums.outputs.macos_x64_sha }}\`
-          5. Update Apple Silicon SHA256 to: \`${{ steps.checksums.outputs.macos_arm64_sha }}\`
-
-          ### Or run the update workflow manually:
-
-          \`\`\`bash
-          gh workflow run update-formula.yml \\
-            --repo metaneutrons/homebrew-tap \\
-            --field version=${{ needs.calculate-version.outputs.version }} \\
-            --field macos_x64_sha=${{ steps.checksums.outputs.macos_x64_sha }} \\
-            --field macos_arm64_sha=${{ steps.checksums.outputs.macos_arm64_sha }}
-          \`\`\`
+            test do
+              assert_match version.to_s, shell_output("#{bin}/knxmonitor --version")
+            end
+          end
           EOF
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/knxmonitor.rb
+          git commit -m "Update knxmonitor to ${VERSION}"
+          git push
 
-      - name: Upload Homebrew update instructions
-        uses: actions/upload-artifact@v5
-        with:
-          name: homebrew-update-instructions
-          path: homebrew-update.md
-          retention-days: 30
-
-      - name: Display update information
-        env:
-          HOMEBREW_UPDATE_TOKEN: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
+      - name: Create Homebrew update summary
+        if: needs.calculate-version.outputs.is-prerelease == 'false'
         run: |
           echo "## 🍺 Homebrew Update Information" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -902,11 +894,7 @@ jobs:
           echo "**macOS x64 SHA256**: \`${{ steps.checksums.outputs.macos_x64_sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**macOS ARM64 SHA256**: \`${{ steps.checksums.outputs.macos_arm64_sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [[ -n "$HOMEBREW_UPDATE_TOKEN" ]]; then
-            echo "✅ Homebrew formula updated automatically via repository dispatch." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "ℹ️ Homebrew formula needs to be updated manually. Check the homebrew-update-instructions artifact." >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "✅ Homebrew formula updated automatically at Formula/knxmonitor.rb" >> $GITHUB_STEP_SUMMARY
 
       - name: Release Summary
         run: |
