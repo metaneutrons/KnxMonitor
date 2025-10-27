@@ -31,12 +31,12 @@ jobs:
       is-prerelease: ${{ steps.gitversion.outputs.preReleaseLabel != '' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v5.0.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -94,12 +94,12 @@ jobs:
             os: macos-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v5.0.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -330,7 +330,7 @@ jobs:
           fi
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: ${{ env.PROJECT_NAME }}-${{ matrix.runtime }}
           path: |
@@ -341,7 +341,7 @@ jobs:
 
       - name: Upload Docker artifacts (framework-dependent)
         if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: ${{ env.PROJECT_NAME }}-docker-${{ matrix.runtime }}
           path: ./publish/${{ matrix.runtime }}/
@@ -358,7 +358,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
 
@@ -391,7 +391,7 @@ jobs:
             org.opencontainers.image.licenses=GPL-3.0
 
       - name: Download Linux binaries for Docker
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v6.0.0
         with:
           pattern: ${{ env.PROJECT_NAME }}-docker-linux-*
           path: ./docker-artifacts
@@ -505,7 +505,7 @@ jobs:
           echo "INFO: Docker context preparation completed successfully"
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6.18
+        uses: docker/build-push-action@v6.18.0
         with:
           context: ./docker-context
           platforms: linux/amd64,linux/arm64
@@ -561,12 +561,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v6.0.0
         with:
           path: ./artifacts
 
@@ -669,12 +669,12 @@ jobs:
       packages: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
 
       - name: Download Linux artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v6.0.0
         with:
           pattern: KnxMonitor-linux-*
           path: ./artifacts
@@ -775,7 +775,7 @@ jobs:
           EOF
 
       - name: Upload AUR package files
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: aur-package-${{ needs.calculate-version.outputs.version }}
           path: |
@@ -819,7 +819,7 @@ jobs:
     continue-on-error: false # Don't fail the entire release if Homebrew update fails
     steps:
       - name: Download macOS artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v6.0.0
         with:
           pattern: ${{ env.PROJECT_NAME }}-osx-*
           path: ./macos-artifacts

@@ -33,7 +33,7 @@ jobs:
       should-build: ${{ steps.changes.outputs.src }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
 
@@ -51,7 +51,7 @@ jobs:
 
       - name: Setup .NET
         if: steps.changes.outputs.src == 'true'
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v5.0.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -100,12 +100,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v5.0.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -162,7 +162,7 @@ jobs:
         run: dotnet publish KnxMonitor/KnxMonitor.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained true --output ./publish/${{ matrix.runtime }} -p:PublishSingleFile=true
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: knxmonitor-${{ matrix.artifact-name }}-${{ needs.validate.outputs.version }}
           path: ./publish/${{ matrix.runtime }}/
@@ -179,12 +179,12 @@ jobs:
       security-events: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0 # Full git history needed for GitVersion
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v5.0.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
