@@ -565,10 +565,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download all artifacts
+      - name: Download release artifacts
         uses: actions/download-artifact@v6.0.0
         with:
+          pattern: KnxMonitor-*
           path: ./artifacts
+          merge-multiple: false
+
+      - name: Download AUR package
+        uses: actions/download-artifact@v6.0.0
+        with:
+          pattern: aur-package-*
+          path: ./artifacts
+          merge-multiple: false
 
       - name: Prepare release assets
         run: |
