@@ -49,7 +49,7 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v4.1.0
         with:
-          useConfigFile: true
+          configFilePath: GitVersion.yml
 
       - name: Determine Tag
         id: determine-tag
@@ -112,7 +112,7 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v4.1.0
         with:
-          useConfigFile: true
+          configFilePath: GitVersion.yml
 
       - name: Cache NuGet packages
         uses: actions/cache@v4.3.0
