@@ -844,11 +844,13 @@ jobs:
         run: |
           echo "INFO: Validating AUR package files..."
           
-          # Find the AUR package directory
-          AUR_DIR=$(find ./aur-artifacts -type d -name "aur-package-*" | head -1)
+          # Find the AUR package directory (handles nested structure from download-artifact)
+          AUR_DIR=$(find ./aur-artifacts -name "PKGBUILD" -exec dirname {} \; | head -1)
           
           if [ -z "$AUR_DIR" ]; then
             echo "ERROR: AUR package directory not found"
+            echo "DEBUG: Contents of aur-artifacts:"
+            find ./aur-artifacts -type f
             exit 1
           fi
           
@@ -901,7 +903,7 @@ jobs:
           echo "INFO: Preparing AUR package for publishing..."
           
           # Find and copy AUR files to workspace root
-          AUR_DIR=$(find ./aur-artifacts -type d -name "aur-package-*" | head -1)
+          AUR_DIR=$(find ./aur-artifacts -name "PKGBUILD" -exec dirname {} \; | head -1)
           cp "$AUR_DIR/PKGBUILD" ./PKGBUILD
           cp "$AUR_DIR/.SRCINFO" ./.SRCINFO
           
