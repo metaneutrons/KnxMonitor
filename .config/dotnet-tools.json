@@ -15,6 +15,13 @@
         "dotnet-gitversion"
       ],
       "rollForward": true
+    },
+    "husky": {
+      "version": "0.7.2",
+      "commands": [
+        "husky"
+      ],
+      "rollForward": false
     }
   }
 }

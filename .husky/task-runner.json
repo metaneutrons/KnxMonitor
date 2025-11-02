@@ -1,0 +1,20 @@
+{
+   "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+   "tasks": [
+      {
+         "name": "lint-github-workflows",
+         "command": "bash",
+         "args": [
+            "-c",
+            "git diff --cached --name-only --diff-filter=ACM | grep -E '^\\.github/workflows/.*\\.ya?ml$' | xargs -r actionlint || true"
+         ],
+         "windows": {
+            "command": "powershell",
+            "args": [
+               "-c",
+               "$files = git diff --cached --name-only --diff-filter=ACM | Select-String -Pattern '^\\.github/workflows/.*\\.ya?ml$'; if ($files) { $files | ForEach-Object { actionlint $_ } }"
+            ]
+         }
+      }
+   ]
+}
