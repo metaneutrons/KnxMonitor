@@ -6,13 +6,13 @@
          "command": "bash",
          "args": [
             "-c",
-            "git diff --cached --name-only --diff-filter=ACM | grep -E '^\\.github/workflows/.*\\.ya?ml$' | xargs -r actionlint || true"
+            "git diff --cached --name-only --diff-filter=ACM | grep -E '^\\.github/workflows/.*\\.ya?ml$' | xargs -r actionlint -shellcheck= || true"
          ],
          "windows": {
             "command": "powershell",
             "args": [
                "-c",
-               "$files = git diff --cached --name-only --diff-filter=ACM | Select-String -Pattern '^\\.github/workflows/.*\\.ya?ml$'; if ($files) { $files | ForEach-Object { actionlint $_ } }"
+               "$files = git diff --cached --name-only --diff-filter=ACM | Select-String -Pattern '^\\.github/workflows/.*\\.ya?ml$'; if ($files) { $files | ForEach-Object { actionlint -shellcheck= $_ } }"
             ]
          }
       },

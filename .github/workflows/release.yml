@@ -57,13 +57,13 @@ jobs:
           if [[ -n "${{ needs.calculate-version.outputs.tag }}" ]]; then
             # Use provided tag
             TAG="${{ needs.calculate-version.outputs.tag }}"
-            echo "Using provided tag: $TAG"
+            echo "Using provided tag: ${TAG}"
           else
             # Auto-calculate tag from GitVersion
             TAG="v${{ steps.gitversion.outputs.semVer }}"
-            echo "Auto-calculated tag: $TAG"
+            echo "Auto-calculated tag: ${TAG}"
           fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Display GitVersion outputs
         run: |
