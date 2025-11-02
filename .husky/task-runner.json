@@ -15,6 +15,11 @@
                "$files = git diff --cached --name-only --diff-filter=ACM | Select-String -Pattern '^\\.github/workflows/.*\\.ya?ml$'; if ($files) { $files | ForEach-Object { actionlint $_ } }"
             ]
          }
+      },
+      {
+         "name": "build-solution",
+         "command": "dotnet",
+         "args": [ "build", "--configuration", "Release", "--no-restore" ]
       }
    ]
 }
