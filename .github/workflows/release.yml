@@ -820,6 +820,158 @@ jobs:
           echo "cd knxmonitor && makepkg -si" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
+  publish-aur:
+    needs: [calculate-version, package-linux, release]
+    if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Download AUR package artifact
+        uses: actions/download-artifact@v6.0.0
+        with:
+          pattern: aur-package-*
+          path: ./aur-artifacts
+          merge-multiple: false
+
+      - name: Validate AUR package files
+        run: |
+          echo "INFO: Validating AUR package files..."
+          
+          # Find the AUR package directory
+          AUR_DIR=$(find ./aur-artifacts -type d -name "aur-package-*" | head -1)
+          
+          if [ -z "$AUR_DIR" ]; then
+            echo "ERROR: AUR package directory not found"
+            exit 1
+          fi
+          
+          echo "INFO: Found AUR package directory: $AUR_DIR"
+          
+          # Validate PKGBUILD exists
+          if [ ! -f "$AUR_DIR/PKGBUILD" ]; then
+            echo "ERROR: PKGBUILD not found in $AUR_DIR"
+            exit 1
+          fi
+          
+          # Validate .SRCINFO exists
+          if [ ! -f "$AUR_DIR/.SRCINFO" ]; then
+            echo "ERROR: .SRCINFO not found in $AUR_DIR"
+            exit 1
+          fi
+          
+          # Validate PKGBUILD syntax
+          echo "INFO: Validating PKGBUILD syntax..."
+          if ! bash -n "$AUR_DIR/PKGBUILD"; then
+            echo "ERROR: PKGBUILD has syntax errors"
+            exit 1
+          fi
+          
+          # Check required PKGBUILD variables
+          echo "INFO: Checking required PKGBUILD variables..."
+          for var in pkgname pkgver pkgrel pkgdesc arch url license source sha256sums; do
+            if ! grep -q "^${var}=" "$AUR_DIR/PKGBUILD"; then
+              echo "ERROR: Required variable '$var' not found in PKGBUILD"
+              exit 1
+            fi
+          done
+          
+          # Validate version matches
+          PKGBUILD_VERSION=$(grep "^pkgver=" "$AUR_DIR/PKGBUILD" | cut -d'=' -f2)
+          EXPECTED_VERSION="${{ needs.calculate-version.outputs.version }}"
+          
+          if [ "$PKGBUILD_VERSION" != "$EXPECTED_VERSION" ]; then
+            echo "ERROR: PKGBUILD version ($PKGBUILD_VERSION) does not match expected version ($EXPECTED_VERSION)"
+            exit 1
+          fi
+          
+          echo "✅ AUR package files validated successfully"
+          echo "   - PKGBUILD: $(wc -l < "$AUR_DIR/PKGBUILD") lines"
+          echo "   - .SRCINFO: $(wc -l < "$AUR_DIR/.SRCINFO") lines"
+          echo "   - Version: $PKGBUILD_VERSION"
+
+      - name: Prepare AUR package for publishing
+        run: |
+          echo "INFO: Preparing AUR package for publishing..."
+          
+          # Find and copy AUR files to workspace root
+          AUR_DIR=$(find ./aur-artifacts -type d -name "aur-package-*" | head -1)
+          cp "$AUR_DIR/PKGBUILD" ./PKGBUILD
+          cp "$AUR_DIR/.SRCINFO" ./.SRCINFO
+          
+          echo "INFO: AUR package files prepared"
+          echo "PKGBUILD content:"
+          cat ./PKGBUILD
+          echo ""
+          echo ".SRCINFO content:"
+          cat ./.SRCINFO
+
+      - name: Publish to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        with:
+          pkgname: knxmonitor
+          pkgbuild: ./PKGBUILD
+          assets: ./.SRCINFO
+          commit_username: metaneutrons
+          commit_email: wohlhabend_gasherd_2r@icloud.com
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update to version ${{ needs.calculate-version.outputs.version }}"
+          ssh_keyscan_types: rsa,ecdsa,ed25519
+          updpkgsums: false
+          test: false
+          force_push: false
+          allow_empty_commits: false
+
+      - name: Create AUR publish summary
+        if: always()
+        run: |
+          echo "## 📦 AUR Package Publishing" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ **Successfully published to AUR**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Package**: knxmonitor" >> $GITHUB_STEP_SUMMARY
+            echo "- **Version**: ${{ needs.calculate-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **AUR URL**: https://aur.archlinux.org/packages/knxmonitor" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Installation" >> $GITHUB_STEP_SUMMARY
+            echo '```bash' >> $GITHUB_STEP_SUMMARY
+            echo "# Using yay" >> $GITHUB_STEP_SUMMARY
+            echo "yay -S knxmonitor" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "# Using paru" >> $GITHUB_STEP_SUMMARY
+            echo "paru -S knxmonitor" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "# Manual installation" >> $GITHUB_STEP_SUMMARY
+            echo "git clone https://aur.archlinux.org/knxmonitor.git" >> $GITHUB_STEP_SUMMARY
+            echo "cd knxmonitor" >> $GITHUB_STEP_SUMMARY
+            echo "makepkg -si" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **AUR publishing failed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Manual Publishing" >> $GITHUB_STEP_SUMMARY
+            echo "If automatic publishing fails, you can manually update the AUR package:" >> $GITHUB_STEP_SUMMARY
+            echo '```bash' >> $GITHUB_STEP_SUMMARY
+            echo "git clone ssh://aur@aur.archlinux.org/knxmonitor.git" >> $GITHUB_STEP_SUMMARY
+            echo "cd knxmonitor" >> $GITHUB_STEP_SUMMARY
+            echo "# Download PKGBUILD and .SRCINFO from artifacts" >> $GITHUB_STEP_SUMMARY
+            echo "makepkg --printsrcinfo > .SRCINFO" >> $GITHUB_STEP_SUMMARY
+            echo "git add PKGBUILD .SRCINFO" >> $GITHUB_STEP_SUMMARY
+            echo "git commit -m 'Update to version ${{ needs.calculate-version.outputs.version }}'" >> $GITHUB_STEP_SUMMARY
+            echo "git push" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
   update-homebrew:
     needs: [calculate-version, release]
     if: always() && needs.calculate-version.outputs.is-prerelease == 'false' && needs.release.result == 'success'
@@ -930,7 +1082,7 @@ jobs:
 
   # Summary job to show overall status
   summary:
-    needs: [calculate-version, build, docker, release, package-linux, update-homebrew]
+    needs: [calculate-version, build, docker, release, package-linux, update-homebrew, publish-aur]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -950,6 +1102,7 @@ jobs:
           echo "- **Docker**: ${{ needs.docker.result == 'success' && '✅' || needs.docker.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Release**: ${{ needs.release.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Homebrew**: ${{ needs.update-homebrew.result == 'success' && '✅' || needs.update-homebrew.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **AUR**: ${{ needs.publish-aur.result == 'success' && '✅' || needs.publish-aur.result == 'skipped' && '⏭️' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📦 Assets" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.build.result }}" == "success" ]]; then
@@ -970,6 +1123,11 @@ jobs:
           elif [[ "${{ needs.update-homebrew.result }}" == "failure" ]]; then
             echo "- ❌ Homebrew formula update failed (check artifacts for manual instructions)" >> $GITHUB_STEP_SUMMARY
           fi
+          if [[ "${{ needs.publish-aur.result }}" == "success" ]]; then
+            echo "- ✅ AUR package published automatically" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.publish-aur.result }}" == "failure" ]]; then
+            echo "- ❌ AUR package publishing failed (check artifacts for manual instructions)" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.release.result }}" == "success" ]]; then
@@ -979,6 +1137,9 @@ jobs:
             echo "- [Docker Image](https://github.com/${{ github.repository }}/pkgs/container/knxmonitor)" >> $GITHUB_STEP_SUMMARY
           fi
           echo "- [Homebrew Tap](https://github.com/metaneutrons/homebrew-tap)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.publish-aur.result }}" == "success" ]]; then
+            echo "- [AUR Package](https://aur.archlinux.org/packages/knxmonitor)" >> $GITHUB_STEP_SUMMARY
+          fi
 
           # Set overall workflow status
           if [[ "${{ needs.build.result }}" != "success" || "${{ needs.release.result }}" != "success" ]]; then
