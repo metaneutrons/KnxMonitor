@@ -760,9 +760,8 @@ jobs:
           sed -i "s/pkgver=.*/pkgver=${VERSION}/" packaging/arch/PKGBUILD
           sed -i "s/sha256sums=('SKIP')/sha256sums=('${TARBALL_SHA}')/" packaging/arch/PKGBUILD
           
-          # Create .SRCINFO file (requires makepkg, so we'll create a basic one)
-          cd packaging/arch
-          cat > .SRCINFO << EOF
+          # Create .SRCINFO file
+          cat > packaging/arch/.SRCINFO << EOF
           pkgbase = knxmonitor
           	pkgdesc = KNX/EIB bus monitoring and debugging tool
           	pkgver = ${VERSION}
@@ -782,6 +781,10 @@ jobs:
 
           pkgname = knxmonitor
           EOF
+          
+          # Verify files were created
+          echo "INFO: Verifying AUR package files..."
+          ls -la packaging/arch/PKGBUILD packaging/arch/.SRCINFO
 
       - name: Upload AUR package files
         uses: actions/upload-artifact@v5.0.0
