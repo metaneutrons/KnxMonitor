@@ -790,9 +790,8 @@ jobs:
         uses: actions/upload-artifact@v5.0.0
         with:
           name: aur-package-${{ needs.calculate-version.outputs.version }}
-          path: |
-            packaging/arch/PKGBUILD
-            packaging/arch/.SRCINFO
+          path: packaging/arch/
+          include-hidden-files: true
           retention-days: 90
 
       - name: Create packaging summary
