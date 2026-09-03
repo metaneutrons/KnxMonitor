@@ -1010,7 +1010,7 @@ jobs:
       - name: Update Homebrew tap
         if: needs.calculate-version.outputs.is-prerelease == 'false'
         env:
-          TAP_TOKEN: ${{ secrets.HOMEBREW_UPDATE_TOKEN }}
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
           VERSION=${{ needs.calculate-version.outputs.version }}
           X64_SHA=${{ steps.checksums.outputs.macos_x64_sha }}
