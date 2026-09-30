@@ -2,6 +2,10 @@
 
 # KNX Monitor
 
+> **Deprecation notice:** For new KNX/IP installations, use [devknx](https://github.com/metaneutrons/devknx), the successor to KNX Monitor. Its [v0.1.0 release](https://github.com/metaneutrons/devknx/releases/tag/v0.1.0) supports IP tunneling and routing and provides GUI, TUI, REST API, and MCP interfaces, with ETS group address support.
+>
+> **KNX-USB:** Continue using KNX Monitor for USB interfaces. devknx v0.1.0 does not support KNX-USB; use this project for that connection type until devknx adds support.
+
 A visual, colorful command-line application for monitoring KNX/EIB bus activity with **Terminal.Gui V2 interface**.
 
 ## 🏆 Features
